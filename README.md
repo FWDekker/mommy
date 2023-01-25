@@ -13,7 +13,7 @@ sudo apt install ./mommy-0.0.2.deb
 Run any command you want, but prepend it with `mommy`~
 
 ```shell
-mommy npm test
+$> mommy npm test
 
 > little-girls-tests@1.4.13 test
 > mocha -r ts-node/register -r jsdom-global/register src/**/*.spec.ts
@@ -66,4 +66,8 @@ then mommy might say any of
 * `daddy loves their little pet~ ❤`
 * `daddy loves their little boy~ ❤`
 
-❤
+## Development
+All you need to build your own mommy is `build-essential`, `rpm`, and `squashfs-tools`, and then you just run `build.sh`~
+
+## Acknowledgements
+Mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
