@@ -1,0 +1,29 @@
+#!/bin/sh
+
+choose_random_option() {
+    count=$(expr $(echo "$1" | grep -o "/" | wc -l) + 1)
+    idx=$(shuf -i 1-"$count" -n 1)
+    echo "$1" | cut -d "/" -f "$idx"
+    return 0
+}
+
+# Defaults
+MOMMYS_LITTLE="girl"
+MOMMYS_PRONOUNS="her"
+MOMMYS_ROLES="mommy"
+
+# Load configuration
+FILE="$HOME/.config/mommy/config.sh" && test -f $FILE && . $FILE
+
+# Randomize
+little=$(choose_random_option "$MOMMYS_LITTLE")
+pronoun=$(choose_random_option "$MOMMYS_PRONOUNS")
+role=$(choose_random_option "$MOMMYS_ROLES")
+message="\n$role knows $pronoun little $little can do better~ ❤️"
+
+# Help the little one :3
+if [ $# -eq 0 ]; then
+    echo "$message"
+else
+    $@ || echo "$message"
+fi
