@@ -24,6 +24,17 @@ message="\n$role knows $pronoun little $little can do better~ ❤️"
 # Help the little one :3
 if [ $# -eq 0 ]; then
     echo "$message"
+elif [ $1 = "-h" ] || [ $1 = "--help" ]; then
+    global_man_path="/usr/share/man/man1/mommy.1"
+    local_man_path="$(dirname -- "$0")/mommy.1"
+
+    if [ -f $local_man_path ]; then
+        man -l "$local_man_path" | cat
+    elif [ -f $global_man_path ]; then
+        man mommy | cat
+    else
+        echo "$role could not find the manual for $pronoun little $little~"
+    fi
 else
     $@ || echo "$message"
 fi

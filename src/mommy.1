@@ -1,0 +1,91 @@
+.TH MOMMY "1" "2023-01-25" "mommy %%VERSION_NUMBER%%" "User Commands"
+
+
+.SH NAME
+mommy \- here to support you~
+
+
+.SH SYNOPSIS
+.B mommy
+.RI [\| "command" \|]
+.br
+.B mommy
+.BR \-h \||\| \-\-help
+.SH DESCRIPTION
+.B mommy
+displays encouraging messages when
+.I command
+fails~
+
+.PP
+.B mommy
+will carefully read
+.I ~/.config/mommy/config.sh
+to give you the bestest messages~ ❤
+
+.TS
+tab (@);
+l lx.
+*@T{
+.I MOMMYS_LITTLE
+is what
+.B mommy
+calls you~ (default: "girl")
+T}
+*@T{
+.I MOMMYS_PRONOUNS
+is what
+.B mommy
+uses for themselves~ (default: "her")
+T}
+*@T{
+.I MOMMYS_ROLES
+is what role
+.B mommy
+will have~ (default: "mommy")
+T}
+.TE
+
+.PP
+All these options can take a /-separated list, and
+.B mommy
+will select the one they feel like using whenever they talk to you~
+
+.PP
+For example, if the file
+.I ~/.config/mommy/config.sh
+looks like
+
+.RS
+.TS
+tab (@);
+l lx.
+MOMMY_LITTLE=@boy/pet/baby
+MOMMY_PRONOUNS=@his/their
+MOMMY_ROLES=@daddy
+.TE
+.RE
+
+then
+.B mommy
+might say any of
+.TS
+tab (@);
+l lx.
+*@T{
+daddy loves his little baby~ ❤
+T}
+*@T{
+daddy loves their little pet~ ❤
+T}
+*@T{
+daddy loves their little boy~ ❤
+T}
+.TE
+
+.PP
+❤
+
+
+.SH BUGS
+https://github.com/FWDekker/mommy/issues

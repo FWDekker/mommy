@@ -7,4 +7,4 @@
 --url "https://github.com/FWDekker/mommy"
 --maintainer "Florine W. Dekker"
 
-src/mommy=/usr/bin/mommy
+build/mommy=/usr/bin/mommy build/mommy.1=/usr/share/man/man1/mommy.1
