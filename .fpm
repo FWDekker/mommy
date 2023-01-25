@@ -1,0 +1,10 @@
+-s dir
+--name mommy
+--license unlicense
+--architecture all
+--depends coreutils --depends grep
+--description "Mommy's here to support you~"
+--url "https://github.com/FWDekker/mommy"
+--maintainer "Florine W. Dekker"
+
+src/mommy=/usr/bin/mommy
