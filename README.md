@@ -1,16 +1,18 @@
 # mommy
 mommy's here to support you~ ❤️
 
-## Installation
-Download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
+mommy was inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
 
-For example, on Debian-like systems (including Ubuntu), run
+## Installation
+download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
+
+for example, on Debian-like systems (including Ubuntu), run
 ```shell
 sudo apt install ./mommy-0.0.2.deb
 ```
 
 ## Usage
-Run any command you want, but prepend it with `mommy`~
+run any command you want, but prepend it with `mommy`~
 
 ```shell
 $> mommy npm test

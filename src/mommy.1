@@ -2,86 +2,120 @@
 
 
 .SH NAME
-mommy \- here to support you~
+mommy - here to support you~
 
 
 .SH SYNOPSIS
-.B mommy
-.RI [\| "command" \|]
+\fBmommy\fP [\fIcommand\fP]
 .br
-.B mommy
-.BR \-h \||\| \-\-help
+\fBmommy\fP \fB-0\fP
+.br
+\fBmommy\fP \fB-1\fP
+
+
 .SH DESCRIPTION
-.B mommy
-displays encouraging messages when
-.I command
-fails~
+\fBmommy\fP displays a compliment when \fIcommand\fP succeeds and an encouraging message when \fIcommand\fP fails~
 
 .PP
-.B mommy
-will carefully read
-.I ~/.config/mommy/config.sh
-to give you the bestest messages~ ❤
-
-.TS
-tab (@);
-l lx.
-*@T{
-.I MOMMYS_LITTLE
-is what
-.B mommy
-calls you~ (default: "girl")
-T}
-*@T{
-.I MOMMYS_PRONOUNS
-is what
-.B mommy
-uses for themselves~ (default: "her")
-T}
-*@T{
-.I MOMMYS_ROLES
-is what role
-.B mommy
-will have~ (default: "mommy")
-T}
-.TE
+alternatively, \fBmommy\fP will compliment you if you set \fI-0\fP, and will encourage you if you set \fI-1\fP~
 
 .PP
-All these options can take a /-separated list, and
-.B mommy
-will select the one they feel like using whenever they talk to you~
+\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP to give you the bestest
+messages~ ❤
+.br
+* \fIMOMMY_PET_NAME\fP is what \fBmommy\fP calls you~
+.br
+* \fIMOMMY_PRONOUN\fP is what \fBmommy\fP uses for themselves~
+.br
+* \fIMOMMY_ROLE\fP is how \fBmommy\fP calls themselves~
+.br
+* \fIMOMMY_SUFFIX\fP is how \fBmommy\fP will end all their messages~
+.br
+* \fIMOMMY_CAPITALIZE\fP is `0` if \fBmommy\fP should start her sentences in lowercase, and `1` for uppercase~
+.br
+* \fIMOMMY_COMPLIMENTS\fP is the compliment \fBmommy\fP should give you if you did a good job~
+.br
+* \fIMOMMY_COMPLIMENTS_EXTRA\fP is where you can add your own compliments without removing the default ones~
+.br
+* \fIMOMMY_ENCOURAGEMENTS\fP is the encouragement \fBmommy\fP should give you if you need help~
+.br
+* \fIMOMMY_ENCOURAGEMENTS_EXTRA\fP is where you can add your own encouragements without removing the default ones~
+.br
+all these options take a /-separated list, and \fBmommy\fP will select the one they feel like using whenever they talk
+to you~
 
 .PP
-For example, if the file
-.I ~/.config/mommy/config.sh
-looks like
+in custom compliments and encouragements, you can ask \fBmommy\fP to use variables \fI%%PET_NAME%%\fP,
+\fI%%PRONOUN%%\fP, and \fI%%ROLE%%\fP~
+be careful with trailing newlines because \fBmommy\fP doesn't remove those for you~
 
+.PP
+for example, if the file \fI~/.config/mommy/config.sh\fP looks like
 .RS
-.TS
-tab (@);
-l lx.
-MOMMY_LITTLE=@boy/pet/baby
-MOMMY_PRONOUNS=@his/their
-MOMMY_ROLES=@daddy
-.TE
+.br
+\fIMOMMY_PET_NAME\fP="boy/pet/baby"
+.br
+\fIMOMMY_PRONOUN\fP="his/their"
+.br
+\fIMOMMY_ROLE\fP="daddy"
+.br
+\fIMOMMY_SUFFIX\fP="~/ :3/"
+.br
+\fIMOMMY_COMPLIMENTS_EXTRA\fP="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
+.br
+\fIMOMMY_ENCOURAGEMENTS_EXTRA\fP="\\
+.br
+%%ROLE%% is here for you\\
+.br
+/%%ROLE%% will always love you\\
+.br
+/%%ROLE%% is here if you want a hug"
 .RE
+then \fBmommy\fP might compliment you with any of
+.br
+* daddy loves his little baby~
+.br
+* great job little baby :3
+.br
+* daddy is proud of you
+.br
+and so on~
 
-then
-.B mommy
-might say any of
-.TS
-tab (@);
-l lx.
-*@T{
-daddy loves his little baby~ ❤
-T}
-*@T{
-daddy loves their little pet~ ❤
-T}
-*@T{
-daddy loves their little boy~ ❤
-T}
-.TE
+
+.SH EXAMPLES
+.PP
+$ mommy true
+.br
+Good girl~
+
+.PP
+$ mommy false
+.br
+Mommy believes in you~
+
+.PP
+$ false || mommy
+.br
+Good girl~
+
+.PP
+$ true && mommy
+.br
+Mommy believes in you~
+
+.PP
+$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
+.br
+[if any command fails]
+.br
+Mommy believes in you~
+
+.PP
+$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
+.br
+[if all commands succeed]
+.br
+Good girl~
 
 
 .SH BUGS

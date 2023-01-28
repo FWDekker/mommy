@@ -1,104 +1,133 @@
 #!/bin/sh
 
 ## Defaults
-MOMMYS_CONFIG_FILE="$HOME/.config/mommy/config.sh"
-MOMMYS_LITTLE="girl"
-MOMMYS_PRONOUNS="her"
-MOMMYS_ROLES="mommy"
-MOMMYS_SUFFIX="~ ❤️"
-MOMMYS_COMPLIMENTS=\
-"Good %%LITTLE%%\
-/That's a good %%LITTLE%%\
+MOMMY_CONFIG_FILE="$HOME/.config/mommy/config.sh"
+
+MOMMY_PET_NAME="girl"
+MOMMY_PRONOUN="her"
+MOMMY_ROLE="mommy"
+MOMMY_SUFFIX="~ ❤️"
+
+MOMMY_CAPITALIZE="0"
+MOMMY_COMPLIMENTS="\
+good %%PET_NAME%%\
+/that's a good %%PET_NAME%%\
 /%%ROLE%% is so proud of you\
 /%%ROLE%% thinks you deserve a special treat for that\
-/Don't forget to take a break when you feel tired, little %%LITTLE%%\
+/don't forget to take a break when you feel tired, little %%PET_NAME%%\
 /%%ROLE%% loves you, you are doing amazing\
-/%%ROLE%% knew you could do it"
-MOMMYS_COMPLIMENTS_EXTRA=""
-MOMMYS_ENCOURAGEMENTS=\
-"%%ROLE%% knows %%PRONOUN%% little %%LITTLE%% can do better\
+/%%ROLE%% knew you could do it\
+"
+MOMMY_COMPLIMENTS_EXTRA=""
+MOMMY_ENCOURAGEMENTS="\
+%%ROLE%% knows %%PRONOUN%% little %%PET_NAME%% can do better\
 /%%ROLE%% is always here for you if you need %%PRONOUN%%\
-/Aww, did %%ROLE%%'s %%LITTLE%% make a big mess? I can help you clean up\
-/Just a little further, I know you can do it\
+/aww, did %%ROLE%%'s %%PET_NAME%% make a big mess? %%ROLE%% can help you clean up\
+/just a little further, %%ROLE%% knows you can do it\
 /%%ROLE%% believes in you\
-/Aww, come here, sit on my lap while you regain your courage\
-/I promise whatever happens %%ROLE%% will be here for you\
-/I believe in you because you're my good %%LITTLE%%"
-MOMMYS_ENCOURAGEMENTS_EXTRA=""
+/aww, come here, sit on my lap while you regain your courage\
+/%%ROLE%% promises whatever happens I will be here for you\
+/%%ROLE%% believes in you because you're my good %%PET_NAME%%\
+"
+MOMMY_ENCOURAGEMENTS_EXTRA=""
 
 
 ## Functions
-# Reads stdin, converts to sentence case, and writes to stdout.
-to_sentence_case() {
+# Reads stdin; if `$1` is `0`, the first character is changed to lowercase, otherwise the first character is changed to
+# uppercase; and writes to stdout.
+capitalize() {
     input=$(cat)
-    echo "$(echo "$input" | cut -c1 | tr "[:lower:]" "[:upper:]")$(echo "$input" | cut -c2-)"
-}
-
-# Splits `$1` by `/`, and writes a random part to stdout.
-choose_random() {
-    count=$(echo "$1/" | grep -o "/" | wc -l)
-    idx=$(shuf -i 1-"$count" -n 1)
-    echo "$1" | cut -d "/" -f "$idx"
-    return 0
-}
-
-# If `$2` is the empty string, writes `$1` to stdout; otherwise, writes `$1/$2` to stdout.
-append_with_delimiter_if_not_empty() {
-    if [ "$2" = "" ]; then
-        echo "$1"
+    if [ "$1" -eq "0" ]; then
+        from="[:upper:]"
+        to="[:lower:]"
     else
-        echo "$1/$2"
+        from="[:lower:]"
+        to="[:upper:]"
     fi
+
+    echo "$(echo "$input" | cut -c 1 | tr "$from" "$to")$(echo "$input" | cut -c 2-)"
     return 0
 }
 
-# Takes `$1`, replaces
-# * `%%LITTLE%%` with `$2`,
-# * `%%PRONOUN%%` with `$3`, and
-# * `%%ROLE%%` with `$4`;
-# appends `$5`; and converts the output to sentence case.
+# Splits stdin by `/`, and writes a random part to stdout.
+choose_random() {
+    list=$(cat)
+
+    count=$(echo "$list/" | grep -o "/" | wc -l)
+    idx=$(shuf -i 1-"$count" -n 1)
+
+    echo "$list" | cut -d "/" -f "$idx"
+    return 0
+}
+
+# Joins all input arguments using `/` as the delimiter and writes to stdout, removes consecutive `/`s, and removes
+# leading and trailing `/`es. Respects the word splitting of the inputs to determine where to place the delimiter.
+join_by_slash() {
+    printf "%s/" "$@" | tr -s "/" | sed -e "1h;2,\$H;\$!d;g" -e "s/^\/*//" -e "s/\/*$//"
+    return 0
+}
+
+# Reads stdin, and
+# 1. replaces
+#    * `%%PET_NAME%%` with `$1`,
+#    * `%%PRONOUN%%` with `$2`, and
+#    * `%%ROLE%%` with `$3`;
+# 2. appends `$4`;
+# 3. applies `capitalize` using `$5` as the choice parameter; and
+# 4. writes to stdout.
 fill_template() {
-    echo "$1$5" | sed -e "s/%%LITTLE%%/$2/g" -e "s/%%PRONOUN%%/$3/g" -e "s/%%ROLE%%/$4/g" | to_sentence_case
+    cat | sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" | sed "s/$/$4/" | capitalize "$5"
+    return 0
+}
+
+# Reads stdin and invokes `fill_template` using the expected global parameters.
+fill_template_with_globals() {
+    cat | fill_template "$pet_name" "$pronoun" "$role" "$suffix" "$MOMMY_CAPITALIZE"
     return 0
 }
 
 
 ## Load configuration
 # shellcheck source=/dev/null
-test -f "$MOMMYS_CONFIG_FILE" && . "$MOMMYS_CONFIG_FILE"
+test -f "$MOMMY_CONFIG_FILE" && . "$MOMMY_CONFIG_FILE"
 
-compliments=$(append_with_delimiter_if_not_empty "$MOMMYS_COMPLIMENTS" "$MOMMYS_COMPLIMENTS_EXTRA")
-encouragements=$(append_with_delimiter_if_not_empty "$MOMMYS_ENCOURAGEMENTS" "$MOMMYS_ENCOURAGEMENTS_EXTRA")
+compliments=$(join_by_slash "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA")
+encouragements=$(join_by_slash "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA")
 
 # Randomize
-little=$(choose_random "$MOMMYS_LITTLE")
-pronoun=$(choose_random "$MOMMYS_PRONOUNS")
-role=$(choose_random "$MOMMYS_ROLES")
-suffix=$(choose_random "$MOMMYS_SUFFIX")
+pet_name=$(echo "$MOMMY_PET_NAME" | choose_random)
+pronoun=$(echo "$MOMMY_PRONOUN" | choose_random)
+role=$(echo "$MOMMY_ROLE" | choose_random)
+suffix=$(echo "$MOMMY_SUFFIX" | choose_random)
 
-compliment=$(fill_template "$(choose_random "$compliments")" "$little" "$pronoun" "$role" "$suffix")
-encouragement=$(fill_template "$(choose_random "$encouragements")" "$little" "$pronoun" "$role" "$suffix")
+compliment=$(echo "$compliments" | choose_random | fill_template_with_globals)
+encouragement=$(echo "$encouragements" | choose_random | fill_template_with_globals)
 
 
 ## Output
 if [ "$1" = "-0" ]; then
     echo "$compliment"
+    return 0
 elif [ "$1" = "-1" ]; then
     echo "$encouragement" >&2
+    return 1
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     global_man_path="/usr/share/man/man1/mommy.1"
     local_man_path="$(dirname -- "$0")/mommy.1"
 
     if [ -f "$local_man_path" ]; then
+        echo ""
         man -l "$local_man_path" | cat
+        return 0
     elif [ -f "$global_man_path" ]; then
         man mommy | cat
+        return 0
     else
-        echo "$role could not find the manual for $pronoun little $little~" >&2
+        echo "%%ROLE%% could not find the manual for %%PRONOUN%% little %%PET_NAME%%" | fill_template_with_globals >&2
+        return 1
     fi
 else
-    # shellcheck disable=SC2068
-    $@
+    "$@"
     command_exit_code=$?
 
     if [ $command_exit_code -eq 0 ]; then
