@@ -1,40 +1,111 @@
 #!/bin/sh
 
-choose_random_option() {
-    count=$(expr $(echo "$1" | grep -o "/" | wc -l) + 1)
+## Defaults
+MOMMYS_CONFIG_FILE="$HOME/.config/mommy/config.sh"
+MOMMYS_LITTLE="girl"
+MOMMYS_PRONOUNS="her"
+MOMMYS_ROLES="mommy"
+MOMMYS_SUFFIX="~ ❤️"
+MOMMYS_COMPLIMENTS=\
+"Good %%LITTLE%%\
+/That's a good %%LITTLE%%\
+/%%ROLE%% is so proud of you\
+/%%ROLE%% thinks you deserve a special treat for that\
+/Don't forget to take a break when you feel tired, little %%LITTLE%%\
+/%%ROLE%% loves you, you are doing amazing\
+/%%ROLE%% knew you could do it"
+MOMMYS_COMPLIMENTS_EXTRA=""
+MOMMYS_ENCOURAGEMENTS=\
+"%%ROLE%% knows %%PRONOUN%% little %%LITTLE%% can do better\
+/%%ROLE%% is always here for you if you need %%PRONOUN%%\
+/Aww, did %%ROLE%%'s %%LITTLE%% make a big mess? I can help you clean up\
+/Just a little further, I know you can do it\
+/%%ROLE%% believes in you\
+/Aww, come here, sit on my lap while you regain your courage\
+/I promise whatever happens %%ROLE%% will be here for you\
+/I believe in you because you're my good %%LITTLE%%"
+MOMMYS_ENCOURAGEMENTS_EXTRA=""
+
+
+## Functions
+# Reads stdin, converts to sentence case, and writes to stdout.
+to_sentence_case() {
+    input=$(cat)
+    echo "$(echo "$input" | cut -c1 | tr "[:lower:]" "[:upper:]")$(echo "$input" | cut -c2-)"
+}
+
+# Splits `$1` by `/`, and writes a random part to stdout.
+choose_random() {
+    count=$(echo "$1/" | grep -o "/" | wc -l)
     idx=$(shuf -i 1-"$count" -n 1)
     echo "$1" | cut -d "/" -f "$idx"
     return 0
 }
 
-# Defaults
-MOMMYS_LITTLE="girl"
-MOMMYS_PRONOUNS="her"
-MOMMYS_ROLES="mommy"
+# If `$2` is the empty string, writes `$1` to stdout; otherwise, writes `$1/$2` to stdout.
+append_with_delimiter_if_not_empty() {
+    if [ "$2" = "" ]; then
+        echo "$1"
+    else
+        echo "$1/$2"
+    fi
+    return 0
+}
 
-# Load configuration
-FILE="$HOME/.config/mommy/config.sh" && test -f $FILE && . $FILE
+# Takes `$1`, replaces
+# * `%%LITTLE%%` with `$2`,
+# * `%%PRONOUN%%` with `$3`, and
+# * `%%ROLE%%` with `$4`;
+# appends `$5`; and converts the output to sentence case.
+fill_template() {
+    echo "$1$5" | sed -e "s/%%LITTLE%%/$2/g" -e "s/%%PRONOUN%%/$3/g" -e "s/%%ROLE%%/$4/g" | to_sentence_case
+    return 0
+}
+
+
+## Load configuration
+# shellcheck source=/dev/null
+test -f "$MOMMYS_CONFIG_FILE" && . "$MOMMYS_CONFIG_FILE"
+
+compliments=$(append_with_delimiter_if_not_empty "$MOMMYS_COMPLIMENTS" "$MOMMYS_COMPLIMENTS_EXTRA")
+encouragements=$(append_with_delimiter_if_not_empty "$MOMMYS_ENCOURAGEMENTS" "$MOMMYS_ENCOURAGEMENTS_EXTRA")
 
 # Randomize
-little=$(choose_random_option "$MOMMYS_LITTLE")
-pronoun=$(choose_random_option "$MOMMYS_PRONOUNS")
-role=$(choose_random_option "$MOMMYS_ROLES")
-message="\n$role knows $pronoun little $little can do better~ ❤️"
+little=$(choose_random "$MOMMYS_LITTLE")
+pronoun=$(choose_random "$MOMMYS_PRONOUNS")
+role=$(choose_random "$MOMMYS_ROLES")
+suffix=$(choose_random "$MOMMYS_SUFFIX")
 
-# Help the little one :3
-if [ $# -eq 0 ]; then
-    echo "$message"
-elif [ $1 = "-h" ] || [ $1 = "--help" ]; then
+compliment=$(fill_template "$(choose_random "$compliments")" "$little" "$pronoun" "$role" "$suffix")
+encouragement=$(fill_template "$(choose_random "$encouragements")" "$little" "$pronoun" "$role" "$suffix")
+
+
+## Output
+if [ "$1" = "-0" ]; then
+    echo "$compliment"
+elif [ "$1" = "-1" ]; then
+    echo "$encouragement" >&2
+elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     global_man_path="/usr/share/man/man1/mommy.1"
     local_man_path="$(dirname -- "$0")/mommy.1"
 
-    if [ -f $local_man_path ]; then
+    if [ -f "$local_man_path" ]; then
         man -l "$local_man_path" | cat
-    elif [ -f $global_man_path ]; then
+    elif [ -f "$global_man_path" ]; then
         man mommy | cat
     else
-        echo "$role could not find the manual for $pronoun little $little~"
+        echo "$role could not find the manual for $pronoun little $little~" >&2
     fi
 else
-    $@ || echo "$message"
+    # shellcheck disable=SC2068
+    $@
+    command_exit_code=$?
+
+    if [ $command_exit_code -eq 0 ]; then
+        echo "$compliment"
+        return 0
+    else
+        echo "$encouragement" >&2
+        return $command_exit_code
+    fi
 fi

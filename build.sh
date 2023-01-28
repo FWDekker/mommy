@@ -17,5 +17,5 @@ mkdir dist/
 
 for target in apk deb rpm sh tar; do
     echo "# Build $target"
-    fpm -t $target -p dist/mommy-$version.$target --version $version
+    fpm -t "$target" -p "dist/mommy-$version.$target" --version "$version"
 done
