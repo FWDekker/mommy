@@ -33,35 +33,36 @@ MOMMY_ENCOURAGEMENTS_EXTRA=""
 
 
 ## Functions
-# Reads stdin; if `$1` is `0`, the first character is changed to lowercase, otherwise the first character is changed to
-# uppercase; and writes to stdout.
+# Reads stdin; if `$1` is `0`, the first character is changed to lowercase, if `$1` is `1`, the first character is
+# changed to uppercase, otherwise nothing is changed; and writes to stdout.
 capitalize() {
     input=$(cat)
     if [ "$1" -eq "0" ]; then
         from="[:upper:]"
         to="[:lower:]"
-    else
+    elif [ "$1" -eq "1" ]; then
         from="[:lower:]"
         to="[:upper:]"
+    else
+        echo "$input"
+        return 0
     fi
 
     echo "$(echo "$input" | cut -c 1 | tr "$from" "$to")$(echo "$input" | cut -c 2-)"
     return 0
 }
 
-# Splits stdin by `/`, and writes a random part to stdout.
+# Splits `$1` by `/`, and writes a random part to stdout.
 choose_random() {
-    list=$(cat)
-
-    count=$(echo "$list/" | grep -o "/" | wc -l)
+    count=$(echo "$1/" | grep -o "/" | wc -l)
     idx=$(shuf -i 1-"$count" -n 1)
 
-    echo "$list" | cut -d "/" -f "$idx"
+    echo "$1" | cut -d "/" -f "$idx"
     return 0
 }
 
-# Joins all input arguments using `/` as the delimiter and writes to stdout, removes consecutive `/`s, and removes
-# leading and trailing `/`es. Respects the word splitting of the inputs to determine where to place the delimiter.
+# Joins all input arguments using `/` as the delimiter, removes consecutive `/`s, removes leading and trailing `/`es,
+# and writes to stdout. Respects the word splitting of the inputs to determine where to place the delimiter.
 join_by_slash() {
     printf "%s/" "$@" | tr -s "/" | sed -e "1h;2,\$H;\$!d;g" -e "s/^\/*//" -e "s/\/*$//"
     return 0
@@ -95,13 +96,13 @@ compliments=$(join_by_slash "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA")
 encouragements=$(join_by_slash "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA")
 
 # Randomize
-pet_name=$(echo "$MOMMY_PET_NAME" | choose_random)
-pronoun=$(echo "$MOMMY_PRONOUN" | choose_random)
-role=$(echo "$MOMMY_ROLE" | choose_random)
-suffix=$(echo "$MOMMY_SUFFIX" | choose_random)
+pet_name=$(choose_random "$MOMMY_PET_NAME")
+pronoun=$(choose_random "$MOMMY_PRONOUN")
+role=$(choose_random "$MOMMY_ROLE")
+suffix=$(choose_random "$MOMMY_SUFFIX")
 
-compliment=$(echo "$compliments" | choose_random | fill_template_with_globals)
-encouragement=$(echo "$encouragements" | choose_random | fill_template_with_globals)
+compliment=$(choose_random "$compliments" | fill_template_with_globals)
+encouragement=$(choose_random "$encouragements" | fill_template_with_globals)
 
 
 ## Output
@@ -116,7 +117,6 @@ elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     local_man_path="$(dirname -- "$0")/mommy.1"
 
     if [ -f "$local_man_path" ]; then
-        echo ""
         man -l "$local_man_path" | cat
         return 0
     elif [ -f "$global_man_path" ]; then

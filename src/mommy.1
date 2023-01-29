@@ -31,7 +31,8 @@ messages~ ❤
 .br
 * \fIMOMMY_SUFFIX\fP is how \fBmommy\fP will end all their messages~
 .br
-* \fIMOMMY_CAPITALIZE\fP is `0` if \fBmommy\fP should start her sentences in lowercase, and `1` for uppercase~
+* \fIMOMMY_CAPITALIZE\fP is `0` if \fBmommy\fP should start her sentences in lowercase, `1` for uppercase, and anything
+else to change nothing~
 .br
 * \fIMOMMY_COMPLIMENTS\fP is the compliment \fBmommy\fP should give you if you did a good job~
 .br
@@ -86,36 +87,36 @@ and so on~
 .PP
 $ mommy true
 .br
-Good girl~
+good girl~
 
 .PP
 $ mommy false
 .br
-Mommy believes in you~
+mommy knows her little girl can do better~
 
 .PP
 $ false || mommy
 .br
-Good girl~
+good girl~
 
 .PP
 $ true && mommy
 .br
-Mommy believes in you~
+mommy knows her little girl can do better~
 
 .PP
 $ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
 .br
 [if any command fails]
 .br
-Mommy believes in you~
+mommy knows her little girl can do better~
 
 .PP
 $ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
 .br
 [if all commands succeed]
 .br
-Good girl~
+good girl~
 
 
 .SH BUGS
