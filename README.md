@@ -15,7 +15,8 @@ if it fails~
 
 alternatively, mommy will compliment you if you run `mommy -0`, and will encourage you if you run `mommy -1`~
 
-mommy will carefully read the following variables from `~/.config/mommy/config.sh` to give you the bestest messages~ ❤
+mommy will carefully read the following variables from `~/.config/mommy/config.sh` (override using `mommy -c ./my_file`)
+to give you the bestest messages~ ❤
 * `MOMMY_PET_NAME` is what mommy calls you~
 * `MOMMY_PRONOUN` is what mommy uses for themselves~
 * `MOMMY_ROLE` is how mommy calls themselves~
@@ -34,7 +35,7 @@ in custom compliments and encouragements, you can ask mommy to use variables `%%
 `%%ROLE%%`~
 be careful with trailing newlines because mommy doesn't remove those for you~
 
-for example, if the file `~/.config/mommy/config.sh` looks like
+for example, if the config file looks like
 ```shell script
 MOMMY_PET_NAME="boy/pet/baby"
 MOMMY_PRONOUN="his/their"

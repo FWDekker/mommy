@@ -6,11 +6,11 @@ mommy - here to support you~
 
 
 .SH SYNOPSIS
-\fBmommy\fP [\fIcommand\fP]
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] [\fIcommand\fP]
 .br
-\fBmommy\fP \fB-0\fP
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-0\fP
 .br
-\fBmommy\fP \fB-1\fP
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-1\fP
 
 
 .SH DESCRIPTION
@@ -20,8 +20,8 @@ mommy - here to support you~
 alternatively, \fBmommy\fP will compliment you if you set \fI-0\fP, and will encourage you if you set \fI-1\fP~
 
 .PP
-\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP to give you the bestest
-messages~ ❤
+\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP (override with
+\fIconfig\fP) to give you the bestest messages~ ❤
 .br
 * \fIMOMMY_PET_NAME\fP is what \fBmommy\fP calls you~
 .br
@@ -51,7 +51,7 @@ in custom compliments and encouragements, you can ask \fBmommy\fP to use variabl
 be careful with trailing newlines because \fBmommy\fP doesn't remove those for you~
 
 .PP
-for example, if the file \fI~/.config/mommy/config.sh\fP looks like
+for example, if the \fIconfig\fP looks like
 .RS
 .br
 \fIMOMMY_PET_NAME\fP="boy/pet/baby"

@@ -1,8 +1,12 @@
 #!/bin/sh
 
 ## Defaults
+### Options
 MOMMY_CONFIG_FILE="$HOME/.config/mommy/config.sh"
+MOMMY_FORCE_COMPLIMENT="0"
+MOMMY_FORCE_ENCOURAGEMENT="0"
 
+### Configuration
 MOMMY_PET_NAME="girl"
 MOMMY_PRONOUN="her"
 MOMMY_ROLE="mommy"
@@ -88,6 +92,27 @@ fill_template_with_globals() {
 }
 
 
+## Read options
+while getopts ":01c:" OPTION; do
+    case "$OPTION" in
+    0)
+        MOMMY_FORCE_COMPLIMENT="1"
+        ;;
+
+    1)
+        MOMMY_FORCE_ENCOURAGEMENT="1"
+        ;;
+
+    c)
+        MOMMY_CONFIG_FILE="$OPTARG"
+        ;;
+
+    ?)
+        ;;
+    esac
+done
+
+
 ## Load configuration
 # shellcheck source=/dev/null
 test -f "$MOMMY_CONFIG_FILE" && . "$MOMMY_CONFIG_FILE"
@@ -106,13 +131,7 @@ encouragement=$(choose_random "$encouragements" | fill_template_with_globals)
 
 
 ## Output
-if [ "$1" = "-0" ]; then
-    echo "$compliment"
-    return 0
-elif [ "$1" = "-1" ]; then
-    echo "$encouragement" >&2
-    return 1
-elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     global_man_path="/usr/share/man/man1/mommy.1"
     local_man_path="$(dirname -- "$0")/mommy.1"
 
@@ -126,7 +145,14 @@ elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
         echo "%%ROLE%% could not find the manual for %%PRONOUN%% little %%PET_NAME%%" | fill_template_with_globals >&2
         return 1
     fi
+elif [ "$MOMMY_FORCE_COMPLIMENT" = "1" ]; then
+    echo "$compliment"
+    return 0
+elif [ "$MOMMY_FORCE_ENCOURAGEMENT" = "1" ]; then
+    echo "$encouragement" >&2
+    return 1
 else
+    shift "$((OPTIND -1))"
     "$@"
     command_exit_code=$?
 
