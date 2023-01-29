@@ -9,8 +9,8 @@ rm -rf build/
 rm -rf dist/
 
 # Prepare build
-cp -r src/main/sh/ build/
-cp -r src/main/resources/ build/
+mkdir build/
+cp src/main/sh/mommy src/main/resources/mommy.1 build/
 find build/ -type f -exec sed -i "s/%%VERSION_NUMBER%%/$version/g" {} \;
 
 # Build packages
