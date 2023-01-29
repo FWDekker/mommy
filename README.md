@@ -78,15 +78,30 @@ then mommy might compliment you with any of
 
 and so on~
 
+### renaming mommy
+if you don't want a mommy but for example a daddy, run the following:
+```shell
+sudo ln -s /usr/bin/mommy /usr/bin/daddy
+sudo ln -s /usr/share/man/man1/mommy.1 /usr/share/man/man1/daddy.1
+```
+
+if you update mommy, then your daddy will also be updated, but if you uninstall mommy, you should manually uninstall 
+your daddy by running
+```shell
+sudo rm /usr/bin/daddy
+sudo rm /usr/share/man/man1/daddy.1
+```
+
 ## installation
 download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
 
 for example, on Debian-like systems (including Ubuntu), run
 ```shell
-sudo apt install ./mommy-0.0.2.deb
+sudo apt install ./mommy-0.0.3.deb
 ```
-
 and then run `mommy [your command]`~
+
+to uninstall, just do `sudo apt remove mommy`~
 
 ## development
 to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
