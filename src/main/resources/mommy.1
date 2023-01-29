@@ -1,4 +1,4 @@
-.TH MOMMY "1" "2023-01-25" "mommy %%VERSION_NUMBER%%" "User Commands"
+.TH MOMMY "1" "2023-01-29" "mommy %%VERSION_NUMBER%%" "User Commands"
 
 
 .SH NAME
@@ -6,18 +6,15 @@ mommy - here to support you~
 
 
 .SH SYNOPSIS
-\fBmommy\fP [\fB\-c\fP \fIconfig\fP] [\fIcommand\fP]
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fIcommand\fP ...
 .br
-\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-0\fP
-.br
-\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-1\fP
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-e\fP \fIeval\fP
 
 
 .SH DESCRIPTION
 \fBmommy\fP displays a compliment when \fIcommand\fP succeeds and an encouraging message when \fIcommand\fP fails~
 
-.PP
-alternatively, \fBmommy\fP will compliment you if you set \fI-0\fP, and will encourage you if you set \fI-1\fP~
+alternatively, instead of running the vararg \fIcommand\fP, \fBmommy\fP evaluates the command in \fIeval\fP
 
 .PP
 \fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP (override with
@@ -95,24 +92,14 @@ $ mommy false
 mommy knows her little girl can do better~
 
 .PP
-$ false || mommy
-.br
-good girl~
-
-.PP
-$ true && mommy
-.br
-mommy knows her little girl can do better~
-
-.PP
-$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
+$ mommy "command1 | command2 | command 3 | command 4"
 .br
 [if any command fails]
 .br
 mommy knows her little girl can do better~
 
 .PP
-$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
+$ mommy "command1 | command2 | command 3 | command 4"
 .br
 [if all commands succeed]
 .br

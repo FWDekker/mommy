@@ -9,13 +9,37 @@ $ mommy npm test
 mommy knows her little girl can do better~
 ```
 
-## description
+## usage
 put `mommy` before any command you want to run and mommy displays a compliment if it succeeds and an encouraging message
 if it fails~
 
-alternatively, mommy will compliment you if you run `mommy -0`, and will encourage you if you run `mommy -1`~
+alternatively, use `mommy -e` to evaluate the string as a command, as in `mommy -e "npm test"`~
 
-mommy will carefully read the following variables from `~/.config/mommy/config.sh` (override using `mommy -c ./my_file`)
+```shell
+$ mommy true
+good girl~
+```
+
+```shell
+$ mommy false
+mommy knows her little girl can do better~
+```
+
+```shell
+$ mommy -e "command1 | command2 | command 3 | command 4"
+[if any command fails]
+mommy knows her little girl can do better~
+```
+
+```shell
+$ mommy -e "command1 | command2 | command 3 | command 4"
+[if all commands succeed]
+good girl~
+```
+
+## configuration
+mommy will carefully read the following variables from `~/.config/mommy/config.sh` (override using
+`mommy -c ./my_config`)
 to give you the bestest messages~ ❤
 * `MOMMY_PET_NAME` is what mommy calls you~
 * `MOMMY_PRONOUN` is what mommy uses for themselves~
@@ -43,7 +67,7 @@ MOMMY_ROLE="daddy"
 MOMMY_SUFFIX="~/ :3/"
 MOMMY_COMPLIMENTS_EXTRA="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
 MOMMY_ENCOURAGEMENTS_EXTRA="\
-%%ROLE%% is here for you\
+/%%ROLE%% is here for you\
 /%%ROLE%% will always love you\
 /%%ROLE%% is here if you want a hug"
 ```
@@ -53,39 +77,6 @@ then mommy might compliment you with any of
 * daddy is proud of you
 
 and so on~
-
-## examples
-```shell
-$ mommy true
-good girl~
-```
-
-```shell
-$ mommy false
-mommy knows her little girl can do better~
-```
-
-```shell
-$ false || mommy
-good girl~
-```
-
-```shell
-$ true && mommy
-mommy knows her little girl can do better~
-```
-
-```shell
-$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
-[if any command fails]
-mommy knows her little girl can do better~
-```
-
-```shell
-$ command1 | command2 | command 3 | command 4 || ./mommy -1 && ./mommy -0
-[if all commands succeed]
-good girl~
-```
 
 ## installation
 download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
@@ -98,9 +89,17 @@ sudo apt install ./mommy-0.0.2.deb
 and then run `mommy [your command]`~
 
 ## development
-all you need to build your own mommy is `build-essential`, `rpm`, and `squashfs-tools`, and then you just run
-`build.sh`~
-make sure to update the `version` file first though~
+to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
+
+to install the requirements on a Debian-like machine, run
+```shell
+sudo gem install fpm
+sudo apt install build-essential squashfs-tools rpm
+```
+
+for a new release, make sure to update `./version` and update the date in `src/main/resources/mommy.1`~
+
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `shellspec src/test/sh/mommy_spec.sh`~
 
 ## acknowledgements
 mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
