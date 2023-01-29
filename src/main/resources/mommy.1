@@ -1,0 +1,110 @@
+.TH MOMMY "1" "2023-01-29" "mommy %%VERSION_NUMBER%%" "User Commands"
+
+
+.SH NAME
+mommy - here to support you~
+
+
+.SH SYNOPSIS
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fIcommand\fP ...
+.br
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-e\fP \fIeval\fP
+
+
+.SH DESCRIPTION
+\fBmommy\fP displays a compliment when \fIcommand\fP succeeds and an encouraging message when \fIcommand\fP fails~
+
+alternatively, instead of running the vararg \fIcommand\fP, \fBmommy\fP evaluates the command in \fIeval\fP
+
+.PP
+\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP (override with
+\fIconfig\fP) to give you the bestest messages~ ❤
+.br
+* \fIMOMMY_PET_NAME\fP is what \fBmommy\fP calls you~
+.br
+* \fIMOMMY_PRONOUN\fP is what \fBmommy\fP uses for themselves~
+.br
+* \fIMOMMY_ROLE\fP is how \fBmommy\fP calls themselves~
+.br
+* \fIMOMMY_SUFFIX\fP is how \fBmommy\fP will end all their messages~
+.br
+* \fIMOMMY_CAPITALIZE\fP is `0` if \fBmommy\fP should start her sentences in lowercase, `1` for uppercase, and anything
+else to change nothing~
+.br
+* \fIMOMMY_COMPLIMENTS\fP is the compliment \fBmommy\fP should give you if you did a good job~
+.br
+* \fIMOMMY_COMPLIMENTS_EXTRA\fP is where you can add your own compliments without removing the default ones~
+.br
+* \fIMOMMY_ENCOURAGEMENTS\fP is the encouragement \fBmommy\fP should give you if you need help~
+.br
+* \fIMOMMY_ENCOURAGEMENTS_EXTRA\fP is where you can add your own encouragements without removing the default ones~
+.br
+all these options take a /-separated list, and \fBmommy\fP will select the one they feel like using whenever they talk
+to you~
+
+.PP
+in custom compliments and encouragements, you can ask \fBmommy\fP to use variables \fI%%PET_NAME%%\fP,
+\fI%%PRONOUN%%\fP, and \fI%%ROLE%%\fP~
+be careful with trailing newlines because \fBmommy\fP doesn't remove those for you~
+
+.PP
+for example, if the \fIconfig\fP looks like
+.RS
+.br
+\fIMOMMY_PET_NAME\fP="boy/pet/baby"
+.br
+\fIMOMMY_PRONOUN\fP="his/their"
+.br
+\fIMOMMY_ROLE\fP="daddy"
+.br
+\fIMOMMY_SUFFIX\fP="~/ :3/"
+.br
+\fIMOMMY_COMPLIMENTS_EXTRA\fP="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
+.br
+\fIMOMMY_ENCOURAGEMENTS_EXTRA\fP="\\
+.br
+%%ROLE%% is here for you\\
+.br
+/%%ROLE%% will always love you\\
+.br
+/%%ROLE%% is here if you want a hug"
+.RE
+then \fBmommy\fP might compliment you with any of
+.br
+* daddy loves his little baby~
+.br
+* great job little baby :3
+.br
+* daddy is proud of you
+.br
+and so on~
+
+
+.SH EXAMPLES
+.PP
+$ mommy true
+.br
+good girl~
+
+.PP
+$ mommy false
+.br
+mommy knows her little girl can do better~
+
+.PP
+$ mommy "command1 | command2 | command 3 | command 4"
+.br
+[if any command fails]
+.br
+mommy knows her little girl can do better~
+
+.PP
+$ mommy "command1 | command2 | command 3 | command 4"
+.br
+[if all commands succeed]
+.br
+good girl~
+
+
+.SH BUGS
+https://github.com/FWDekker/mommy/issues
