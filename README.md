@@ -14,7 +14,7 @@ download the [latest release](https://github.com/FWDekker/mommy/releases/latest)
 
 for example, on Debian-like systems (including Ubuntu), run
 ```shell
-sudo apt install ./mommy-0.0.3.deb
+sudo apt install ./mommy-0.0.4.deb
 ```
 and then run `mommy [your command]`~
 
