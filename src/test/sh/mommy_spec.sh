@@ -5,7 +5,7 @@ Describe "mommy"
     clean_config() { rm -f "$config"; }
     After "clean_config"
 
-    Describe "command line options"
+    Describe "command-line options"
         Describe "help information"
             It "outputs help information using -h"
                 When run "$mommy" -h
@@ -123,6 +123,30 @@ Describe "mommy"
                 The status should be failure
             End
         End
+
+        Describe "status"
+            It "writes a compliment to stdout if the status is 0"
+                echo "MOMMY_COMPLIMENTS='station top';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" -s 0
+                The output should equal "station top"
+                The status should be success
+            End
+
+            It "writes an encouragement to stderr if the status is non-0"
+                echo "MOMMY_ENCOURAGEMENTS='mend journey';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" -s 1
+                The error should equal "mend journey"
+                The status should be failure
+            End
+
+            It "returns the given non-0 status"
+                When run "$mommy" -s 167
+                The error should not equal ""
+                The status should equal 167
+            End
+        End
     End
 
     Describe "configuration"
@@ -159,8 +183,9 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "chooses a random variable value"
-                # Probability of 1/(26^4)=1/456976 to fail
+            It "chooses a random pronoun"
+                # Runs mommy several times and checks if output is different at least once.
+                # Probability of 1/(26^4)=1/456976 to fail even if code is correct.
 
                 pronouns="a/b/c/d/e/f/g/h/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z"
                 echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN='$pronouns'" > "$config"
@@ -177,6 +202,14 @@ Describe "mommy"
                 is_different="$?"
 
                 When call test "$is_different" -eq 0
+                The status should be success
+            End
+
+            It "chooses the empty string if no pronouns are set"
+                echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN=''" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal "><"
                 The status should be success
             End
         End
@@ -198,6 +231,14 @@ Describe "mommy"
                 The status should be success
             End
 
+            It "uses the template's original capitalization if configured to the empty string"
+                echo "MOMMY_COMPLIMENTS='Medicine frighten';MOMMY_SUFFIX='';MOMMY_CAPITALIZE=" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal "Medicine frighten"
+                The status should be success
+            End
+
             It "uses the template's original capitalization if configured to anything else"
                 echo "MOMMY_COMPLIMENTS='Belong shore';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='2'" > "$config"
 
@@ -205,63 +246,186 @@ Describe "mommy"
                 The output should equal "Belong shore"
                 The status should be success
             End
+
+            It "changes capitalization on all lines"
+                echo "MOMMY_COMPLIMENTS='luck
+fashion';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='1'" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal "Luck
+Fashion"
+                The status should be success
+            End
         End
 
         Describe "compliments/encouragements"
-            It "chooses from 'MOMMY_COMPLIMENTS'"
-                echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
+            Describe "selection"
+                It "chooses from 'MOMMY_COMPLIMENTS'"
+                    echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
 
-                When run "$mommy" -c "$config" true
-                The output should equal "spill drown"
-                The status should be success
+                    When run "$mommy" -c "$config" true
+                    The output should equal "spill drown"
+                    The status should be success
+                End
+
+                It "chooses from 'MOMMY_COMPLIMENTS_EXTRA'"
+                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='bill lump';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "bill lump"
+                    The status should be success
+                End
+
+                It "chooses a multiline compliment"
+                    echo "MOMMY_COMPLIMENTS='loud
+    bank/loud
+    bank';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "loud
+    bank"
+                    The status should be success
+                End
+
+                It "outputs nothing if no compliments are set"
+                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal ""
+                    The status should be success
+                End
             End
 
-            It "chooses from 'MOMMY_COMPLIMENTS_EXTRA'"
-                echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='bill lump';MOMMY_SUFFIX=''" > "$config"
+            Describe "slashes"
+                It "inserts a virtual / in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
+                    echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
 
-                When run "$mommy" -c "$config" true
-                The output should equal "bill lump"
-                The status should be success
+                    When run "$mommy" -c "$config" true
+                    The output should not equal "curse dear"
+                    The status should be success
+                End
+
+                It "ignores leading slashes"
+                    # Probability of ~1/30 to pass even if code is buggy
+
+                    echo "MOMMY_COMPLIMENTS='/////////////////////////////boy only';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "boy only"
+                    The status should be success
+                End
+
+                It "ignores trailing slashes"
+                    # Probability of ~1/30 to pass even if code is buggy
+
+                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='salt staff/////////////////////////////';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "salt staff"
+                    The status should be success
+                End
+
+                It "ignores slashes in the middle"
+                    # Probability of ~1/30 to pass even if code is buggy
+
+                    echo "MOMMY_COMPLIMENTS='end spring/////////////////////////////end spring';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "end spring"
+                    The status should be success
+                End
+
+                It "ignores slashes in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
+                    # Probability of ~1/30 to pass even if code is buggy
+
+                    echo "MOMMY_COMPLIMENTS='attempt cheap///////////////';MOMMY_COMPLIMENTS_EXTRA='//////////////attempt cheap';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "attempt cheap"
+                    The status should be success
+                End
             End
 
-            It "ignores leading slashes"
-                # Probability of ~1/30 to pass if code is buggy
+            Describe "newlines and whitespace"
+                It "removes leading newlines"
+                    echo "MOMMY_COMPLIMENTS='
+quick elastic';MOMMY_SUFFIX=''" > "$config"
 
-                echo "MOMMY_COMPLIMENTS='/////////////////////////////boy only';MOMMY_SUFFIX=''" > "$config"
+                    When run "$mommy" -c "$config" true
+                    The output should equal "quick elastic"
+                    The status should be success
+                End
 
-                When run "$mommy" -c "$config" true
-                The output should equal "boy only"
-                The status should be success
+                It "removes trailing newlines"
+                    echo "MOMMY_COMPLIMENTS='happy airplane
+';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "happy airplane"
+                    The status should be success
+                End
+
+                It "retains newlines inside a compliment"
+                    echo "MOMMY_COMPLIMENTS='mineral
+forward';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "mineral
+forward"
+                    The status should be success
+                End
+
+                It "retains leading whitespace"
+                    echo "MOMMY_COMPLIMENTS=' rake fix';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal " rake fix"
+                    The status should be success
+                End
+
+                It "retains trailing whitespace"
+                    echo "MOMMY_COMPLIMENTS='read wealth ';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "read wealth "
+                    The status should be success
+                End
             End
 
-            It "ignores trailing slashes"
-                # Probability of ~1/30 to pass if code is buggy
+            Describe "toggling"
+                It "outputs nothing if a command passes but compliments are disabled"
+                    echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
-                echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='salt staff/////////////////////////////';MOMMY_SUFFIX=''" > "$config"
+                    When run "$mommy" -c "$config" true
+                    The output should equal ""
+                    The status should be success
+                End
 
-                When run "$mommy" -c "$config" true
-                The output should equal "salt staff"
-                The status should be success
+                It "outputs nothing if a command fails but encouragements are disabled"
+                    echo "MOMMY_ENCOURAGEMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" false
+                    The output should equal ""
+                    The status should be failure
+                End
             End
 
-            It "ignores slashes in the middle"
-                # Probability of ~1/30 to pass if code is buggy
+            Describe "forbidden words"
+                It "outputs the compliment that does not contain the forbidden word"
+                    echo "MOMMY_COMPLIMENTS='mother search/fierce along';MOMMY_FORBIDDEN_WORDS='search';MOMMY_SUFFIX=''" > "$config"
 
-                echo "MOMMY_COMPLIMENTS='end spring///////////////end spring';MOMMY_SUFFIX=''" > "$config"
+                    When run "$mommy" -c "$config" true
+                    The output should equal "fierce along"
+                    The status should be success
+                End
 
-                When run "$mommy" -c "$config" true
-                The output should equal "end spring"
-                The status should be success
-            End
+                It "outputs the only compliment that does not contain a forbidden word"
+                    echo "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary';MOMMY_SUFFIX=''" > "$config"
 
-            It "ignores slashes in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
-                # Probability of ~1/30 to pass if code is buggy
-
-                echo "MOMMY_COMPLIMENTS='attempt cheap///////////////';MOMMY_COMPLIMENTS_EXTRA='///////////////attempt cheap';MOMMY_SUFFIX=''" > "$config"
-
-                When run "$mommy" -c "$config" true
-                The output should equal "attempt cheap"
-                The status should be success
+                    When run "$mommy" -c "$config" true
+                    The output should equal "failure school"
+                    The status should be success
+                End
             End
         End
     End

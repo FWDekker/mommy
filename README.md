@@ -9,11 +9,24 @@ $ mommy npm test
 mommy knows her little girl can do better~
 ```
 
+## installation
+download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
+
+for example, on Debian-like systems (including Ubuntu), run
+```shell
+sudo apt install ./mommy-0.0.4.deb
+```
+and then run `mommy [your command]`~
+
+to uninstall, just do `sudo apt remove mommy`~
+
 ## usage
 put `mommy` before any command you want to run and mommy displays a compliment if it succeeds and an encouraging message
 if it fails~
 
 alternatively, use `mommy -e` to evaluate the string as a command, as in `mommy -e "npm test"`~
+
+alternatively, use `mommy -s` to directly use an exit code, as in `mommy -s 0`~
 
 ```shell
 $ mommy true
@@ -37,6 +50,16 @@ $ mommy -e "command1 | command2 | command 3 | command 4"
 good girl~
 ```
 
+```shell
+$ mommy -s 0
+good girl~
+```
+
+```shell
+$ mommy -s 1
+mommy knows her little girl can do better~
+```
+
 ## configuration
 mommy will carefully read the following variables from `~/.config/mommy/config.sh` (override using
 `mommy -c ./my_config`)
@@ -49,15 +72,17 @@ to give you the bestest messages~ ❤
   change nothing~
 * `MOMMY_COMPLIMENTS` is the compliment mommy should give you if you did a good job~
 * `MOMMY_COMPLIMENTS_EXTRA` is where you can add your own compliments without removing the default ones~
+* `MOMMY_COMPLIMENTS_ENABLED` is `1` if and only if mommy should give you compliments~
 * `MOMMY_ENCOURAGEMENTS` is the encouragement mommy should give you if you need help~
 * `MOMMY_ENCOURAGEMENTS_EXTRA` is where you can add your own encouragements without removing the default ones~
+* `MOMMY_ENCOURAGEMENTS_ENABLED` is `1` if and only if mommy should give you encouragements~
+* `MOMMY_FORBIDDEN_WORDS` are words that mommy will never use in compliments and encouragements~
 
 all these options take a `/`-separated list, and mommy will select the one they feel like using whenever they talk
 to you~
 
 in custom compliments and encouragements, you can ask mommy to use variables `%%PET_NAME%%`, `%%PRONOUN%%`, and
 `%%ROLE%%`~
-be careful with trailing newlines because mommy doesn't remove those for you~
 
 for example, if the config file looks like
 ```shell script
@@ -66,10 +91,11 @@ MOMMY_PRONOUN="his/their"
 MOMMY_ROLE="daddy"
 MOMMY_SUFFIX="~/ :3/"
 MOMMY_COMPLIMENTS_EXTRA="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
-MOMMY_ENCOURAGEMENTS_EXTRA="\
-/%%ROLE%% is here for you\
-/%%ROLE%% will always love you\
-/%%ROLE%% is here if you want a hug"
+MOMMY_ENCOURAGEMENTS_EXTRA="
+/%%ROLE%% is here for you
+/%%ROLE%% will always love you
+/%%ROLE%% is here if you want a hug
+"
 ```
 then mommy might compliment you with any of
 * daddy loves his little baby~
@@ -92,17 +118,6 @@ sudo rm /usr/bin/daddy
 sudo rm /usr/share/man/man1/daddy.1
 ```
 
-## installation
-download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
-
-for example, on Debian-like systems (including Ubuntu), run
-```shell
-sudo apt install ./mommy-0.0.3.deb
-```
-and then run `mommy [your command]`~
-
-to uninstall, just do `sudo apt remove mommy`~
-
 ## development
 to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
 
@@ -112,9 +127,10 @@ sudo gem install fpm
 sudo apt install build-essential squashfs-tools rpm
 ```
 
-for a new release, make sure to update `./version` and update the date in `src/main/resources/mommy.1`~
+for a new release, make sure to update the version number in `./version` and `./README.md`, and update the date in
+`src/main/resources/mommy.1`~
 
-to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `shellspec src/test/sh/mommy_spec.sh`~
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`~
 
 ## acknowledgements
 mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
