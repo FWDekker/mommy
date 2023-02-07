@@ -13,6 +13,7 @@ MOMMY_ROLE="mommy"
 MOMMY_SUFFIX="~ ❤️"
 
 MOMMY_CAPITALIZE="0"
+
 MOMMY_COMPLIMENTS="
 good %%PET_NAME%%
 /that's a good %%PET_NAME%%
@@ -23,6 +24,8 @@ good %%PET_NAME%%
 /%%ROLE%% knew you could do it
 "
 MOMMY_COMPLIMENTS_EXTRA=""
+MOMMY_COMPLIMENTS_ENABLED="1"
+
 MOMMY_ENCOURAGEMENTS="
 /%%ROLE%% knows %%PRONOUN%% little %%PET_NAME%% can do better
 /%%ROLE%% is always here for you if you need %%PRONOUN%%
@@ -34,6 +37,7 @@ MOMMY_ENCOURAGEMENTS="
 /%%ROLE%% believes in you because you're my good %%PET_NAME%%
 "
 MOMMY_ENCOURAGEMENTS_EXTRA=""
+MOMMY_ENCOURAGEMENTS_ENABLED="1"
 
 
 ## Functions
@@ -177,7 +181,7 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         man mommy | cat
         return 0
     else
-        echo "%%ROLE%% could not find the manual for %%PRONOUN%% little %%PET_NAME%%" | fill_template_with_globals >&2
+        echo "could not find the manual page" | fill_template_with_globals >&2
         return 1
     fi
 else
@@ -192,10 +196,14 @@ else
     fi
 
     if [ $command_exit_code -eq 0 ]; then
-        echo "$compliment"
+        if [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
+            echo "$compliment"
+        fi
         return 0
     else
-        echo "$encouragement" >&2
+        if [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
+            echo "$encouragement" >&2
+        fi
         return $command_exit_code
     fi
 fi

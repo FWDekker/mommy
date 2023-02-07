@@ -72,8 +72,10 @@ to give you the bestest messages~ ❤
   change nothing~
 * `MOMMY_COMPLIMENTS` is the compliment mommy should give you if you did a good job~
 * `MOMMY_COMPLIMENTS_EXTRA` is where you can add your own compliments without removing the default ones~
+* `MOMMY_COMPLIMENTS_ENABLED` is `1` if and only if mommy should give you compliments~
 * `MOMMY_ENCOURAGEMENTS` is the encouragement mommy should give you if you need help~
 * `MOMMY_ENCOURAGEMENTS_EXTRA` is where you can add your own encouragements without removing the default ones~
+* `MOMMY_ENCOURAGEMENTS_ENABLED` is `1` if and only if mommy should give you encouragements~
 
 all these options take a `/`-separated list, and mommy will select the one they feel like using whenever they talk
 to you~

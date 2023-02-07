@@ -259,50 +259,70 @@ Fashion"
         End
 
         Describe "compliments/encouragements"
-            It "chooses from 'MOMMY_COMPLIMENTS'"
-                echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
+            Describe "selection"
+                It "chooses from 'MOMMY_COMPLIMENTS'"
+                    echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
 
-                When run "$mommy" -c "$config" true
-                The output should equal "spill drown"
-                The status should be success
+                    When run "$mommy" -c "$config" true
+                    The output should equal "spill drown"
+                    The status should be success
+                End
+
+                It "chooses from 'MOMMY_COMPLIMENTS_EXTRA'"
+                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='bill lump';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "bill lump"
+                    The status should be success
+                End
+
+                It "chooses a multiline compliment"
+                    echo "MOMMY_COMPLIMENTS='loud
+    bank/loud
+    bank';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "loud
+    bank"
+                    The status should be success
+                End
+
+                It "outputs nothing if no compliments are set"
+                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal ""
+                    The status should be success
+                End
             End
 
-            It "chooses from 'MOMMY_COMPLIMENTS_EXTRA'"
-                echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='bill lump';MOMMY_SUFFIX=''" > "$config"
+            Describe "toggling"
+                It "outputs nothing if a command passes but compliments are disabled"
+                    echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
-                When run "$mommy" -c "$config" true
-                The output should equal "bill lump"
-                The status should be success
-            End
+                    When run "$mommy" -c "$config" true
+                    The output should equal ""
+                    The status should be success
+                End
 
-            It "chooses a multiline compliment"
-                echo "MOMMY_COMPLIMENTS='loud
-bank/loud
-bank';MOMMY_SUFFIX=''" > "$config"
+                It "outputs nothing if a command fails but encouragements are disabled"
+                    echo "MOMMY_ENCOURAGEMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
-                When run "$mommy" -c "$config" true
-                The output should equal "loud
-bank"
-                The status should be success
-            End
-
-            It "outputs nothing if no compliments are set"
-                echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
-
-                When run "$mommy" -c "$config" true
-                The output should equal ""
-                The status should be success
-            End
-
-            It "inserts a virtual / in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
-                echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
-
-                When run "$mommy" -c "$config" true
-                The output should not equal "curse dear"
-                The status should be success
+                    When run "$mommy" -c "$config" false
+                    The output should equal ""
+                    The status should be failure
+                End
             End
 
             Describe "slashes"
+                It "inserts a virtual / in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
+                    echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should not equal "curse dear"
+                    The status should be success
+                End
+
                 It "ignores leading slashes"
                     # Probability of ~1/30 to pass even if code is buggy
 
