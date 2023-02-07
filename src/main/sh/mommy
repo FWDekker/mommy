@@ -2,9 +2,9 @@
 
 ## Defaults
 ### Options
-MOMMY_CONFIG_FILE="$HOME/.config/mommy/config.sh"
-MOMMY_HELP=""
-MOMMY_EVAL=""
+MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
+MOMMY_OPT_HELP=""
+MOMMY_OPT_EVAL=""
 
 ### Configuration
 MOMMY_PET_NAME="girl"
@@ -59,10 +59,10 @@ lists_join() {
     printf "%s/" "$@" | sed "s/\/\$//"
 }
 
-# Removes all whitespace-only entries from the list given on stdin. As a result, consecutive `/`s and leading and
+# Removes all whitespace-only entries from the list given in `$1`. As a result, consecutive `/`s and leading and
 # trailing `/`s are removed.
 list_sanitize() {
-    list="$(cat)/"
+    list="$1/"
 
     sanitized_list=""
     while [ -n "$list" ]; do
@@ -79,15 +79,29 @@ list_sanitize() {
     return 0
 }
 
-# Writes a random entry from the list given in `$1` to stdout.
+# Writes a random entry from the list given in `$1` to stdout, ignoring whitespace-only entries.
 list_choose_random() {
-    list=$1
+    list="$(list_sanitize "$1")/"
+    if [ "$list" = "" ]; then
+        echo ""
+        return 0
+    fi
 
-    count=$(echo "$list/" | grep -o "/" | wc -l)
+    count=$(echo "$list" | grep -o "/" | wc -l)
     idx=$(shuf -i 1-"$count" -n 1)
 
-    echo "$list" | cut -d "/" -f "$idx"
-    return 0
+    i=1
+    while [ -n "$list" ]; do
+        entry="${list%%/*}"
+
+        if [ "$i" -eq "$idx" ]; then
+            echo "$entry"
+            return 0
+        fi
+
+        list="${list#*/}"
+        i=$((i+1))
+    done
 }
 
 # Reads stdin, and
@@ -117,14 +131,15 @@ fill_template_with_globals() {
 
 ## Read options
 if [ "$1" = "--help" ]; then
-    MOMMY_HELP="1"
+    MOMMY_OPT_HELP="1"
 fi
 
-while getopts ":hc:e:" OPTION; do
+while getopts ":hc:e:s:" OPTION; do
     case "$OPTION" in
-    h) MOMMY_HELP="1" ;;
-    c) MOMMY_CONFIG_FILE="$OPTARG" ;;
-    e) MOMMY_EVAL="$OPTARG" ;;
+    h) MOMMY_OPT_HELP="1" ;;
+    c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
+    e) MOMMY_OPT_EVAL="$OPTARG" ;;
+    s) MOMMY_OPT_STATUS="$OPTARG" ;;
     ?) ;;
     esac
 done
@@ -134,29 +149,24 @@ shift "$((OPTIND -1))"
 
 ## Load configuration
 # shellcheck source=/dev/null
-test -f "$MOMMY_CONFIG_FILE" && . "$MOMMY_CONFIG_FILE"
+test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
 
 # Read lists
-pet_names=$(echo "$MOMMY_PET_NAME" | list_sanitize)
-pronouns=$(echo "$MOMMY_PRONOUN" | list_sanitize)
-roles=$(echo "$MOMMY_ROLE" | list_sanitize)
-suffixes=$(echo "$MOMMY_SUFFIX" | list_sanitize)
-
-compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA" | list_sanitize)
-encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA" | list_sanitize)
+compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA")
+encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA")
 
 # Randomize
-pet_name=$(list_choose_random "$pet_names")
-pronoun=$(list_choose_random "$pronouns")
-role=$(list_choose_random "$roles")
-suffix=$(list_choose_random "$suffixes")
+pet_name=$(list_choose_random "$MOMMY_PET_NAME")
+pronoun=$(list_choose_random "$MOMMY_PRONOUN")
+role=$(list_choose_random "$MOMMY_ROLE")
+suffix=$(list_choose_random "$MOMMY_SUFFIX")
 
 compliment=$(list_choose_random "$compliments" | fill_template_with_globals)
 encouragement=$(list_choose_random "$encouragements" | fill_template_with_globals)
 
 
 ## Output
-if [ -n "$MOMMY_HELP" ]; then
+if [ -n "$MOMMY_OPT_HELP" ]; then
     global_man_path="/usr/share/man/man1/mommy.1"
     local_man_path="$(dirname -- "$0")/../resources/mommy.1"
 
@@ -171,12 +181,15 @@ if [ -n "$MOMMY_HELP" ]; then
         return 1
     fi
 else
-    if [ -n "$MOMMY_EVAL" ]; then
-        (eval "$MOMMY_EVAL")
+    if [ -n "$MOMMY_OPT_EVAL" ]; then
+        (eval "$MOMMY_OPT_EVAL")
+        command_exit_code=$?
+    elif [ -n "$MOMMY_OPT_STATUS" ]; then
+        command_exit_code=$MOMMY_OPT_STATUS
     else
         ("$@")
+        command_exit_code=$?
     fi
-    command_exit_code=$?
 
     if [ $command_exit_code -eq 0 ]; then
         echo "$compliment"

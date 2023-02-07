@@ -26,6 +26,8 @@ if it fails~
 
 alternatively, use `mommy -e` to evaluate the string as a command, as in `mommy -e "npm test"`~
 
+alternatively, use `mommy -s` to directly use an exit code, as in `mommy -s 0`~
+
 ```shell
 $ mommy true
 good girl~
@@ -46,6 +48,16 @@ mommy knows her little girl can do better~
 $ mommy -e "command1 | command2 | command 3 | command 4"
 [if all commands succeed]
 good girl~
+```
+
+```shell
+$ mommy -s 0
+good girl~
+```
+
+```shell
+$ mommy -s 1
+mommy knows her little girl can do better~
 ```
 
 ## configuration

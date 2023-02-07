@@ -123,6 +123,30 @@ Describe "mommy"
                 The status should be failure
             End
         End
+
+        Describe "status"
+            It "writes a compliment to stdout if the status is 0"
+                echo "MOMMY_COMPLIMENTS='station top';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" -s 0
+                The output should equal "station top"
+                The status should be success
+            End
+
+            It "writes an encouragement to stderr if the status is non-0"
+                echo "MOMMY_ENCOURAGEMENTS='mend journey';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" -s 1
+                The error should equal "mend journey"
+                The status should be failure
+            End
+
+            It "returns the given non-0 status"
+                When run "$mommy" -s 167
+                The error should not equal ""
+                The status should equal 167
+            End
+        End
     End
 
     Describe "configuration"
@@ -248,6 +272,17 @@ Fashion"
 
                 When run "$mommy" -c "$config" true
                 The output should equal "bill lump"
+                The status should be success
+            End
+
+            It "chooses a multiline compliment"
+                echo "MOMMY_COMPLIMENTS='loud
+bank/loud
+bank';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal "loud
+bank"
                 The status should be success
             End
 

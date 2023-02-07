@@ -9,14 +9,19 @@ mommy - here to support you~
 \fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fIcommand\fP ...
 .br
 \fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-e\fP \fIeval\fP
+.br
+\fBmommy\fP [\fB\-c\fP \fIconfig\fP] \fB-s\fP \fIstatus\fP
 
 
 .SH DESCRIPTION
 \fBmommy\fP displays a compliment when \fIcommand\fP succeeds and an encouraging message when \fIcommand\fP fails~
 
-alternatively, instead of running the vararg \fIcommand\fP, \fBmommy\fP evaluates the command in \fIeval\fP
+alternatively, \fBmommy\fP evaluates the command in the string \fIeval\fP~
 
-.PP
+alternatively, \fBmommy\fP shows a message depending on the exit code given in \fIstatus\fP~
+
+
+.SH CONFIGURATION
 \fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP (override with
 \fIconfig\fP) to give you the bestest messages~ ❤
 .br
@@ -105,6 +110,16 @@ $ mommy "command1 | command2 | command 3 | command 4"
 [if all commands succeed]
 .br
 good girl~
+
+.PP
+$ mommy -s 0
+.br
+good girl~
+
+.PP
+$ mommy -s 1
+.br
+mommy knows her little girl can do better~
 
 
 .SH BUGS
