@@ -114,7 +114,7 @@ sudo apt install build-essential squashfs-tools rpm
 for a new release, make sure to update the version number in `./version` and `./README.md`, and update the date in
 `src/main/resources/mommy.1`~
 
-to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `shellspec src/test/sh/mommy_spec.sh`~
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`~
 
 ## acknowledgements
 mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
