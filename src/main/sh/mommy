@@ -49,7 +49,7 @@ MOMMY_FORBIDDEN_WORDS=""
 
 # Joins all lists from the input arguments into a single list.
 lists_join() {
-    printf "%s/" "$@" | sed "s/\/\$//"  # TODO: Replace by `head -c -1`
+    printf "%s/" "$@" | head -c -1
 }
 
 # Removes all whitespace-only entries from the list in stdin. As a result, consecutive `/`s and leading and trailing
@@ -61,14 +61,14 @@ list_sanitize() {
     while [ -n "$list" ]; do
         entry="${list%%/*}"
 
-        if [ -n "$(echo "$entry" | tr -d "[:space:]")" ]; then
+        if [ -n "$(printf "%s" "$entry" | tr -d "[:space:]")" ]; then
             sanitized_list="$sanitized_list$entry/"
         fi
 
         list="${list#*/}"
     done
 
-    echo "$sanitized_list" | sed "s/\/\$//"
+    printf "%s" "$sanitized_list" | head -c -1
     return 0
 }
 
@@ -78,14 +78,14 @@ list_contains_any() {
 
     while [ -n "$list" ]; do
         if [ -z "${1##*"${list%%/*}"*}" ]; then
-            echo "0"
+            printf "0"
             return 0
         fi
 
         list="${list#*/}"
     done
 
-    echo "1"
+    printf "1"
     return 0
 }
 
@@ -108,20 +108,20 @@ list_exclude_if_contains() {
         list="${list#*/}"
     done
 
-    echo "$filtered_list" | sed "s/\/\$//"
+    printf "%s" "$filtered_list" | head -c -1
     return 0
 }
 
 # Writes a random entry from the list in stdin to stdout.
 list_choose_random() {
     list="$(cat)/"
-    count="$(echo "$list" | grep -o "/" | wc -l)"
+    count="$(printf "%s" "$list" | grep -o "/" | wc -l)"
     idx="$(shuf -i 1-"$count" -n 1)"
 
     i="1"
     while [ -n "$list" ]; do
         if [ "$i" -eq "$idx" ]; then
-            echo "${list%%/*}"
+            printf "%s" "${list%%/*}"
             return 0
         fi
 
@@ -141,11 +141,11 @@ capitalize_lines() {
     elif [ "$1" = "1" ]; then
         mapping="toupper"
     else
-        echo "$entry"
+        printf "%s" "$entry"
         return 0
     fi
 
-    echo "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    printf "%s" "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
@@ -159,11 +159,11 @@ capitalize_lines() {
 # 4. appends `$4`; and
 # 5. writes to stdout.
 fill_template() {
-    cat |
-        sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" |
-        capitalize_lines "$5" |
-        sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//" |
-        sed "s/$/$4/"
+    output=$(cat |
+                 sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" |
+                 capitalize_lines "$5" |
+                 sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//")
+    printf "%s" "$output" "$4"
     return 0
 }
 
@@ -197,7 +197,7 @@ shift "$((OPTIND - 1))"
 test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
 
 # Read lists
-forbidden_words=$(echo "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
+forbidden_words=$(printf "%s" "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
 
 compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA" |
                   list_sanitize |
@@ -206,19 +206,19 @@ encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA
                      list_sanitize |
                      list_exclude_if_contains "$forbidden_words")
 
-pet_names=$(echo "$MOMMY_PET_NAME" | list_sanitize)
-pronouns=$(echo "$MOMMY_PRONOUN" | list_sanitize)
-roles=$(echo "$MOMMY_ROLE" | list_sanitize)
-suffixes=$(echo "$MOMMY_SUFFIX" | list_sanitize)
+pet_names=$(printf "%s" "$MOMMY_PET_NAME" | list_sanitize)
+pronouns=$(printf "%s" "$MOMMY_PRONOUN" | list_sanitize)
+roles=$(printf "%s" "$MOMMY_ROLE" | list_sanitize)
+suffixes=$(printf "%s" "$MOMMY_SUFFIX" | list_sanitize)
 
 # Randomize
-pet_name=$(echo "$pet_names" | list_choose_random)
-pronoun=$(echo "$pronouns" | list_choose_random)
-role=$(echo "$roles" | list_choose_random)
-suffix=$(echo "$suffixes" | list_choose_random)
+pet_name=$(printf "%s" "$pet_names" | list_choose_random)
+pronoun=$(printf "%s" "$pronouns" | list_choose_random)
+role=$(printf "%s" "$roles" | list_choose_random)
+suffix=$(printf "%s" "$suffixes" | list_choose_random)
 
-compliment=$(echo "$compliments" | list_choose_random | fill_template_with_globals)
-encouragement=$(echo "$encouragements" | list_choose_random | fill_template_with_globals)
+compliment=$(printf "%s" "$compliments" | list_choose_random | fill_template_with_globals)
+encouragement=$(printf "%s" "$encouragements" | list_choose_random | fill_template_with_globals)
 
 
 ## Output
