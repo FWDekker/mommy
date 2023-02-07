@@ -296,24 +296,6 @@ Fashion"
                 End
             End
 
-            Describe "toggling"
-                It "outputs nothing if a command passes but compliments are disabled"
-                    echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The output should equal ""
-                    The status should be success
-                End
-
-                It "outputs nothing if a command fails but encouragements are disabled"
-                    echo "MOMMY_ENCOURAGEMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" false
-                    The output should equal ""
-                    The status should be failure
-                End
-            End
-
             Describe "slashes"
                 It "inserts a virtual / in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
                     echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
@@ -406,6 +388,42 @@ forward"
 
                     When run "$mommy" -c "$config" true
                     The output should equal "read wealth "
+                    The status should be success
+                End
+            End
+
+            Describe "toggling"
+                It "outputs nothing if a command passes but compliments are disabled"
+                    echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal ""
+                    The status should be success
+                End
+
+                It "outputs nothing if a command fails but encouragements are disabled"
+                    echo "MOMMY_ENCOURAGEMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" false
+                    The output should equal ""
+                    The status should be failure
+                End
+            End
+
+            Describe "forbidden words"
+                It "outputs the compliment that does not contain the forbidden word"
+                    echo "MOMMY_COMPLIMENTS='mother search/fierce along';MOMMY_FORBIDDEN_WORDS='search';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "fierce along"
+                    The status should be success
+                End
+
+                It "outputs the only compliment that does not contain a forbidden word"
+                    echo "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "failure school"
                     The status should be success
                 End
             End

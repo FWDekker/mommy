@@ -39,34 +39,23 @@ MOMMY_ENCOURAGEMENTS="
 MOMMY_ENCOURAGEMENTS_EXTRA=""
 MOMMY_ENCOURAGEMENTS_ENABLED="1"
 
+MOMMY_FORBIDDEN_WORDS=""
 
-## Functions
-# Reads stdin; if `$1` is `0`, the first character is changed to lowercase, if `$1` is `1`, the first character is
-# changed to uppercase, otherwise nothing is changed; and writes to stdout.
-capitalize_lines() {
-    entry=$(cat)
-    if [ "$1" = "0" ]; then
-        mapping="tolower"
-    elif [ "$1" = "1" ]; then
-        mapping="toupper"
-    else
-        echo "$entry"
-        return 0
-    fi
 
-    echo "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
-    return 0
-}
+## Lists
+# A list is a collection of entries. An entry is a string, possibly multiline. An entry does not start or end with a
+# whitespace character. A list is represented by a string, consisting of the entries separated by `/`s. A list does not
+# have leading or trailing `/`s.
 
-# Joins all lists using `/` as the delimiter. May add empty elements to the list.
+# Joins all lists from the input arguments into a single list.
 lists_join() {
-    printf "%s/" "$@" | sed "s/\/\$//"
+    printf "%s/" "$@" | sed "s/\/\$//"  # TODO: Replace by `head -c -1`
 }
 
-# Removes all whitespace-only entries from the list given in `$1`. As a result, consecutive `/`s and leading and
-# trailing `/`s are removed.
+# Removes all whitespace-only entries from the list in stdin. As a result, consecutive `/`s and leading and trailing
+# `/`s are removed.
 list_sanitize() {
-    list="$1/"
+    list="$(cat)/"
 
     sanitized_list=""
     while [ -n "$list" ]; do
@@ -83,29 +72,81 @@ list_sanitize() {
     return 0
 }
 
-# Writes a random entry from the list given in `$1` to stdout, ignoring whitespace-only entries.
-list_choose_random() {
-    list="$(list_sanitize "$1")/"
-    if [ "$list" = "" ]; then
-        echo ""
-        return 0
-    fi
+# Outputs 0 if the string `$1` contains any of the substrings in the list `$2`, and outputs 1 otherwise.
+list_contains_any() {
+    list="$2/"
 
-    count=$(echo "$list" | grep -o "/" | wc -l)
-    idx=$(shuf -i 1-"$count" -n 1)
-
-    i=1
     while [ -n "$list" ]; do
-        entry="${list%%/*}"
-
-        if [ "$i" -eq "$idx" ]; then
-            echo "$entry"
+        if [ -z "${1##*"${list%%/*}"*}" ]; then
+            echo "0"
             return 0
         fi
 
         list="${list#*/}"
-        i=$((i+1))
     done
+
+    echo "1"
+    return 0
+}
+
+# Removes all entries from the list in stdin that contain any of the entries in `$1` as a substring.
+list_exclude_if_contains() {
+    if [ -z "$1" ]; then
+        cat
+        return 0
+    fi
+
+    list="$(cat)/"
+    filtered_list=""
+    while [ -n "$list" ]; do
+        entry="${list%%/*}"
+
+        if [ "$(list_contains_any "$entry" "$1")" -ne 0 ]; then
+            filtered_list="$filtered_list$entry/"
+        fi
+
+        list="${list#*/}"
+    done
+
+    echo "$filtered_list" | sed "s/\/\$//"
+    return 0
+}
+
+# Writes a random entry from the list in stdin to stdout.
+list_choose_random() {
+    list="$(cat)/"
+    count="$(echo "$list" | grep -o "/" | wc -l)"
+    idx="$(shuf -i 1-"$count" -n 1)"
+
+    i="1"
+    while [ -n "$list" ]; do
+        if [ "$i" -eq "$idx" ]; then
+            echo "${list%%/*}"
+            return 0
+        fi
+
+        list="${list#*/}"
+        i="$((i+1))"
+    done
+}
+
+
+## Functions
+# Reads stdin; if `$1` is `0`, the first character on each line is changed to lowercase, if `$1` is `1`, the first
+# character on each line is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
+capitalize_lines() {
+    entry="$(cat)"
+    if [ "$1" = "0" ]; then
+        mapping="tolower"
+    elif [ "$1" = "1" ]; then
+        mapping="toupper"
+    else
+        echo "$entry"
+        return 0
+    fi
+
+    echo "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    return 0
 }
 
 # Reads stdin, and
@@ -148,7 +189,7 @@ while getopts ":hc:e:s:" OPTION; do
     esac
 done
 
-shift "$((OPTIND -1))"
+shift "$((OPTIND - 1))"
 
 
 ## Load configuration
@@ -156,17 +197,28 @@ shift "$((OPTIND -1))"
 test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
 
 # Read lists
-compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA")
-encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA")
+forbidden_words=$(echo "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
+
+compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA" |
+                  list_sanitize |
+                  list_exclude_if_contains "$forbidden_words")
+encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA" |
+                     list_sanitize |
+                     list_exclude_if_contains "$forbidden_words")
+
+pet_names=$(echo "$MOMMY_PET_NAME" | list_sanitize)
+pronouns=$(echo "$MOMMY_PRONOUN" | list_sanitize)
+roles=$(echo "$MOMMY_ROLE" | list_sanitize)
+suffixes=$(echo "$MOMMY_SUFFIX" | list_sanitize)
 
 # Randomize
-pet_name=$(list_choose_random "$MOMMY_PET_NAME")
-pronoun=$(list_choose_random "$MOMMY_PRONOUN")
-role=$(list_choose_random "$MOMMY_ROLE")
-suffix=$(list_choose_random "$MOMMY_SUFFIX")
+pet_name=$(echo "$pet_names" | list_choose_random)
+pronoun=$(echo "$pronouns" | list_choose_random)
+role=$(echo "$roles" | list_choose_random)
+suffix=$(echo "$suffixes" | list_choose_random)
 
-compliment=$(list_choose_random "$compliments" | fill_template_with_globals)
-encouragement=$(list_choose_random "$encouragements" | fill_template_with_globals)
+compliment=$(echo "$compliments" | list_choose_random | fill_template_with_globals)
+encouragement=$(echo "$encouragements" | list_choose_random | fill_template_with_globals)
 
 
 ## Output

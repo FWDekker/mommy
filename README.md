@@ -76,6 +76,7 @@ to give you the bestest messages~ ❤
 * `MOMMY_ENCOURAGEMENTS` is the encouragement mommy should give you if you need help~
 * `MOMMY_ENCOURAGEMENTS_EXTRA` is where you can add your own encouragements without removing the default ones~
 * `MOMMY_ENCOURAGEMENTS_ENABLED` is `1` if and only if mommy should give you encouragements~
+* `MOMMY_FORBIDDEN_WORDS` are words that mommy will never use in compliments and encouragements~
 
 all these options take a `/`-separated list, and mommy will select the one they feel like using whenever they talk
 to you~
