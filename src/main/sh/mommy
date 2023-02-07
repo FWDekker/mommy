@@ -13,25 +13,25 @@ MOMMY_ROLE="mommy"
 MOMMY_SUFFIX="~ ❤️"
 
 MOMMY_CAPITALIZE="0"
-MOMMY_COMPLIMENTS="\
-/good %%PET_NAME%%\
-/that's a good %%PET_NAME%%\
-/%%ROLE%% is so proud of you\
-/%%ROLE%% thinks you deserve a special treat for that\
-/don't forget to take a break when you feel tired, little %%PET_NAME%%\
-/%%ROLE%% loves you, you are doing amazing\
-/%%ROLE%% knew you could do it\
+MOMMY_COMPLIMENTS="
+good %%PET_NAME%%
+/that's a good %%PET_NAME%%
+/%%ROLE%% is so proud of you
+/%%ROLE%% thinks you deserve a special treat for that
+/don't forget to take a break when you feel tired, little %%PET_NAME%%
+/%%ROLE%% loves you, you are doing amazing
+/%%ROLE%% knew you could do it
 "
 MOMMY_COMPLIMENTS_EXTRA=""
-MOMMY_ENCOURAGEMENTS="\
-/%%ROLE%% knows %%PRONOUN%% little %%PET_NAME%% can do better\
-/%%ROLE%% is always here for you if you need %%PRONOUN%%\
-/aww, did %%ROLE%%'s %%PET_NAME%% make a big mess? %%ROLE%% can help you clean up\
-/just a little further, %%ROLE%% knows you can do it\
-/%%ROLE%% believes in you\
-/aww, come here, sit on my lap while you regain your courage\
-/%%ROLE%% promises whatever happens %%ROLE%% will be here for you\
-/%%ROLE%% believes in you because you're my good %%PET_NAME%%\
+MOMMY_ENCOURAGEMENTS="
+/%%ROLE%% knows %%PRONOUN%% little %%PET_NAME%% can do better
+/%%ROLE%% is always here for you if you need %%PRONOUN%%
+/aww, did %%ROLE%%'s %%PET_NAME%% make a big mess? %%ROLE%% can help you clean up
+/just a little further, %%ROLE%% knows you can do it
+/%%ROLE%% believes in you
+/aww, come here, sit on my lap while you regain your courage
+/%%ROLE%% promises whatever happens %%ROLE%% will be here for you
+/%%ROLE%% believes in you because you're my good %%PET_NAME%%
 "
 MOMMY_ENCOURAGEMENTS_EXTRA=""
 
@@ -41,18 +41,16 @@ MOMMY_ENCOURAGEMENTS_EXTRA=""
 # changed to uppercase, otherwise nothing is changed; and writes to stdout.
 capitalize() {
     input=$(cat)
-    if [ "$1" -eq "0" ]; then
-        from="[:upper:]"
-        to="[:lower:]"
-    elif [ "$1" -eq "1" ]; then
-        from="[:lower:]"
-        to="[:upper:]"
+    if [ "$1" = "0" ]; then
+        mapping="tolower"
+    elif [ "$1" = "1" ]; then
+        mapping="toupper"
     else
         echo "$input"
         return 0
     fi
 
-    echo "$(echo "$input" | cut -c 1 | tr "$from" "$to")$(echo "$input" | cut -c 2-)"
+    echo "$input" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
@@ -65,10 +63,23 @@ choose_random() {
     return 0
 }
 
-# Joins all input arguments using `/` as the delimiter, removes consecutive `/`s, removes leading and trailing `/`es,
-# and writes to stdout. Respects the word splitting of the inputs to determine where to place the delimiter.
+# Joins all input arguments using `/` as the delimiter, finds all non-whitespace-only strings delimited by `/`s, and
+# joins those using `/`s. Multiline strings are supported.
 join_by_slash() {
-    printf "%s/" "$@" | tr -s "/" | sed -e "1h;2,\$H;\$!d;g" -e "s/^\/*//" -e "s/\/*$//"
+    sanitized=""
+
+    inputs="$(printf "%s/" "$@")"  # Has trailing `/`
+    while [ -n "$inputs" ]; do
+        input="${inputs%%/*}"
+
+        if [ -n "$(echo "$input" | tr -d "[:space:]")" ]; then
+            sanitized="$sanitized$input/"
+        fi
+
+        inputs="${inputs#*/}"
+    done
+
+    echo "$sanitized" | sed "s/\/\$//"  # Removes trailing `/`
     return 0
 }
 
@@ -77,11 +88,13 @@ join_by_slash() {
 #    * `%%PET_NAME%%` with `$1`,
 #    * `%%PRONOUN%%` with `$2`, and
 #    * `%%ROLE%%` with `$3`;
-# 2. appends `$4`;
-# 3. applies `capitalize` using `$5` as the choice parameter; and
-# 4. writes to stdout.
+# 2. applies `capitalize` using `$5` as the choice parameter;
+# 3. removes leading and trailing newlines; and
+# 4. appends `$4`;
+# 5. writes to stdout.
 fill_template() {
-    cat | sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" | sed "s/$/$4/" | capitalize "$5"
+    cat | sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" | capitalize "$5" |
+        sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//" | sed "s/$/$4/"
     return 0
 }
 

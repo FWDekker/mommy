@@ -57,7 +57,6 @@ to you~
 
 in custom compliments and encouragements, you can ask mommy to use variables `%%PET_NAME%%`, `%%PRONOUN%%`, and
 `%%ROLE%%`~
-be careful with trailing newlines because mommy doesn't remove those for you~
 
 for example, if the config file looks like
 ```shell script
@@ -112,7 +111,8 @@ sudo gem install fpm
 sudo apt install build-essential squashfs-tools rpm
 ```
 
-for a new release, make sure to update `./version` and update the date in `src/main/resources/mommy.1`~
+for a new release, make sure to update the version number in `./version` and `./README.md`, and update the date in
+`src/main/resources/mommy.1`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `shellspec src/test/sh/mommy_spec.sh`~
 
