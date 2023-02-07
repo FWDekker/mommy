@@ -180,6 +180,14 @@ Describe "mommy"
                 When call test "$is_different" -eq 0
                 The status should be success
             End
+
+            It "chooses the empty string if no pronouns are set"
+                echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN=''" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal "><"
+                The status should be success
+            End
         End
 
         Describe "capitalization"
@@ -240,6 +248,14 @@ Fashion"
 
                 When run "$mommy" -c "$config" true
                 The output should equal "bill lump"
+                The status should be success
+            End
+
+            It "outputs nothing if no compliments are set"
+                echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
+
+                When run "$mommy" -c "$config" true
+                The output should equal ""
                 The status should be success
             End
 

@@ -39,47 +39,54 @@ MOMMY_ENCOURAGEMENTS_EXTRA=""
 ## Functions
 # Reads stdin; if `$1` is `0`, the first character is changed to lowercase, if `$1` is `1`, the first character is
 # changed to uppercase, otherwise nothing is changed; and writes to stdout.
-capitalize() {
-    input=$(cat)
+capitalize_lines() {
+    entry=$(cat)
     if [ "$1" = "0" ]; then
         mapping="tolower"
     elif [ "$1" = "1" ]; then
         mapping="toupper"
     else
-        echo "$input"
+        echo "$entry"
         return 0
     fi
 
-    echo "$input" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    echo "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
-# Splits `$1` by `/`, and writes a random part to stdout.
-choose_random() {
-    count=$(echo "$1/" | grep -o "/" | wc -l)
-    idx=$(shuf -i 1-"$count" -n 1)
-
-    echo "$1" | cut -d "/" -f "$idx"
-    return 0
+# Joins all lists using `/` as the delimiter. May add empty elements to the list.
+lists_join() {
+    printf "%s/" "$@" | sed "s/\/\$//"
 }
 
-# Joins all input arguments using `/` as the delimiter, finds all non-whitespace-only strings delimited by `/`s, and
-# joins those using `/`s. Multiline strings are supported.
-join_by_slash() {
-    sanitized=""
+# Removes all whitespace-only entries from the list given on stdin. As a result, consecutive `/`s and leading and
+# trailing `/`s are removed.
+list_sanitize() {
+    list="$(cat)/"
 
-    inputs="$(printf "%s/" "$@")"  # Has trailing `/`
-    while [ -n "$inputs" ]; do
-        input="${inputs%%/*}"
+    sanitized_list=""
+    while [ -n "$list" ]; do
+        entry="${list%%/*}"
 
-        if [ -n "$(echo "$input" | tr -d "[:space:]")" ]; then
-            sanitized="$sanitized$input/"
+        if [ -n "$(echo "$entry" | tr -d "[:space:]")" ]; then
+            sanitized_list="$sanitized_list$entry/"
         fi
 
-        inputs="${inputs#*/}"
+        list="${list#*/}"
     done
 
-    echo "$sanitized" | sed "s/\/\$//"  # Removes trailing `/`
+    echo "$sanitized_list" | sed "s/\/\$//"
+    return 0
+}
+
+# Writes a random entry from the list given in `$1` to stdout.
+list_choose_random() {
+    list=$1
+
+    count=$(echo "$list/" | grep -o "/" | wc -l)
+    idx=$(shuf -i 1-"$count" -n 1)
+
+    echo "$list" | cut -d "/" -f "$idx"
     return 0
 }
 
@@ -88,13 +95,16 @@ join_by_slash() {
 #    * `%%PET_NAME%%` with `$1`,
 #    * `%%PRONOUN%%` with `$2`, and
 #    * `%%ROLE%%` with `$3`;
-# 2. applies `capitalize` using `$5` as the choice parameter;
-# 3. removes leading and trailing newlines; and
-# 4. appends `$4`;
+# 2. applies `capitalize_lines` using `$5` as the choice parameter;
+# 3. removes leading and trailing newlines;
+# 4. appends `$4`; and
 # 5. writes to stdout.
 fill_template() {
-    cat | sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" | capitalize "$5" |
-        sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//" | sed "s/$/$4/"
+    cat |
+        sed -e "s/%%PET_NAME%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%ROLE%%/$3/g" |
+        capitalize_lines "$5" |
+        sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//" |
+        sed "s/$/$4/"
     return 0
 }
 
@@ -126,17 +136,23 @@ shift "$((OPTIND -1))"
 # shellcheck source=/dev/null
 test -f "$MOMMY_CONFIG_FILE" && . "$MOMMY_CONFIG_FILE"
 
-compliments=$(join_by_slash "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA")
-encouragements=$(join_by_slash "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA")
+# Read lists
+pet_names=$(echo "$MOMMY_PET_NAME" | list_sanitize)
+pronouns=$(echo "$MOMMY_PRONOUN" | list_sanitize)
+roles=$(echo "$MOMMY_ROLE" | list_sanitize)
+suffixes=$(echo "$MOMMY_SUFFIX" | list_sanitize)
+
+compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA" | list_sanitize)
+encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA" | list_sanitize)
 
 # Randomize
-pet_name=$(choose_random "$MOMMY_PET_NAME")
-pronoun=$(choose_random "$MOMMY_PRONOUN")
-role=$(choose_random "$MOMMY_ROLE")
-suffix=$(choose_random "$MOMMY_SUFFIX")
+pet_name=$(list_choose_random "$pet_names")
+pronoun=$(list_choose_random "$pronouns")
+role=$(list_choose_random "$roles")
+suffix=$(list_choose_random "$suffixes")
 
-compliment=$(choose_random "$compliments" | fill_template_with_globals)
-encouragement=$(choose_random "$encouragements" | fill_template_with_globals)
+compliment=$(list_choose_random "$compliments" | fill_template_with_globals)
+encouragement=$(list_choose_random "$encouragements" | fill_template_with_globals)
 
 
 ## Output

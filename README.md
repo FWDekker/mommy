@@ -9,6 +9,17 @@ $ mommy npm test
 mommy knows her little girl can do better~
 ```
 
+## installation
+download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
+
+for example, on Debian-like systems (including Ubuntu), run
+```shell
+sudo apt install ./mommy-0.0.3.deb
+```
+and then run `mommy [your command]`~
+
+to uninstall, just do `sudo apt remove mommy`~
+
 ## usage
 put `mommy` before any command you want to run and mommy displays a compliment if it succeeds and an encouraging message
 if it fails~
@@ -65,10 +76,11 @@ MOMMY_PRONOUN="his/their"
 MOMMY_ROLE="daddy"
 MOMMY_SUFFIX="~/ :3/"
 MOMMY_COMPLIMENTS_EXTRA="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
-MOMMY_ENCOURAGEMENTS_EXTRA="\
-/%%ROLE%% is here for you\
-/%%ROLE%% will always love you\
-/%%ROLE%% is here if you want a hug"
+MOMMY_ENCOURAGEMENTS_EXTRA="
+/%%ROLE%% is here for you
+/%%ROLE%% will always love you
+/%%ROLE%% is here if you want a hug
+"
 ```
 then mommy might compliment you with any of
 * daddy loves his little baby~
@@ -90,17 +102,6 @@ your daddy by running
 sudo rm /usr/bin/daddy
 sudo rm /usr/share/man/man1/daddy.1
 ```
-
-## installation
-download the [latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
-
-for example, on Debian-like systems (including Ubuntu), run
-```shell
-sudo apt install ./mommy-0.0.3.deb
-```
-and then run `mommy [your command]`~
-
-to uninstall, just do `sudo apt remove mommy`~
 
 ## development
 to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
