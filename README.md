@@ -119,13 +119,16 @@ sudo rm /usr/share/man/man1/daddy.1
 ```
 
 ## development
+to build your own mommy, first install the requirements~
+on Debian-like machines you can run
+```shell
+sudo gem install fpm
+sudo apt install build-essential squashfs-tools rpm gzip
+```
+
 to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
 
 to install the requirements on a Debian-like machine, run
-```shell
-sudo gem install fpm
-sudo apt install build-essential squashfs-tools rpm
-```
 
 for a new release, make sure to update the version number in `./version` and `./README.md`, and update the date in
 `src/main/resources/mommy.1`~

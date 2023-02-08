@@ -12,12 +12,10 @@ rm -rf dist/
 mkdir build/
 cp src/main/sh/mommy src/main/resources/mommy.1 build/
 find build/ -type f -exec sed -i "s/%%VERSION_NUMBER%%/$version/g" {} \;
+gzip build/mommy.1
 
 # Build packages
 mkdir dist/
-
-echo "# Build sh"
-fpm -t sh -p "dist/mommy-$version.installer.sh" --version "$version"
 
 for target in apk deb rpm tar; do
     echo "# Build $target"

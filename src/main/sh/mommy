@@ -223,7 +223,7 @@ encouragement=$(printf "%s" "$encouragements" | list_choose_random | fill_templa
 
 ## Output
 if [ -n "$MOMMY_OPT_HELP" ]; then
-    global_man_path="/usr/share/man/man1/mommy.1"
+    global_man_path="/usr/share/man/man1/mommy.1.gz"
     local_man_path="$(dirname -- "$0")/../resources/mommy.1"
 
     if [ -f "$local_man_path" ]; then
@@ -233,7 +233,7 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         man mommy | cat
         return 0
     else
-        echo "could not find the manual page" | fill_template_with_globals >&2
+        echo "could not find the manual page~" | fill_template_with_globals >&2
         return 1
     fi
 else
