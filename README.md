@@ -61,12 +61,12 @@ mommy knows her little girl can do better~
 ```
 
 ## configuration
-mommy will carefully read the following variables from `~/.config/mommy/config.sh` (override using
+mommy will carefully read the following variables from `~/.config/mommy/mommy.conf` (override using
 `mommy -c ./my_config`)
 to give you the bestest messages~ ❤
-* `MOMMY_PET_NAME` is what mommy calls you~
-* `MOMMY_PRONOUN` is what mommy uses for themselves~
-* `MOMMY_ROLE` is how mommy calls themselves~
+* `MOMMY_CAREGIVER` is how mommy calls themselves~
+* `MOMMY_THEIR` is what mommy uses for themselves~
+* `MOMMY_SWEETIE` is what mommy calls you~
 * `MOMMY_SUFFIX` is how mommy will end all their messages~
 * `MOMMY_CAPITALIZE` is `0` if mommy should start her sentences in lowercase, `1` for uppercase, and anything else to
   change nothing~
@@ -80,26 +80,28 @@ to give you the bestest messages~ ❤
 
 all these options take a `/`-separated list, and mommy will select the one they feel like using whenever they talk
 to you~
+also, inside variables, lines starting with \fI#\fP are ignored so you can comment and categorize your config~
 
 in custom compliments and encouragements, you can ask mommy to use variables `%%PET_NAME%%`, `%%PRONOUN%%`, and
 `%%ROLE%%`~
 
 for example, if the config file looks like
 ```shell script
-MOMMY_PET_NAME="boy/pet/baby"
-MOMMY_PRONOUN="his/their"
-MOMMY_ROLE="daddy"
+MOMMY_CAREGIVER="daddy"
+MOMMY_THEIR="his/their"
+MOMMY_SWEETIE="boy/pet/baby"
 MOMMY_SUFFIX="~/ :3/"
-MOMMY_COMPLIMENTS_EXTRA="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
+MOMMY_COMPLIMENTS_EXTRA="great job, little %%SWEETIE%%/%%CAREGIVER%% is proud of you"
 MOMMY_ENCOURAGEMENTS_EXTRA="
-/%%ROLE%% is here for you
-/%%ROLE%% will always love you
-/%%ROLE%% is here if you want a hug
+# encouragements~
+/%%CAREGIVER%% is here for you
+/%%CAREGIVER%% will always love you
+/%%CAREGIVER%% is here if you want a hug
 "
 ```
 then mommy might compliment you with any of
 * daddy loves his little baby~
-* great job little baby :3
+* great job, little baby :3
 * daddy is proud of you
 
 and so on~
@@ -125,13 +127,9 @@ on Debian-like machines you can run
 sudo gem install fpm
 sudo apt install build-essential squashfs-tools rpm gzip
 ```
+after that, just run `./build.sh`, and outputs appear in `dist/`~
 
-to build your own mommy, just run `./build.sh`, and outputs appear in `dist/`~
-
-to install the requirements on a Debian-like machine, run
-
-for a new release, make sure to update the version number in `./version` and `./README.md`, and update the date in
-`src/main/resources/mommy.1`~
+for a new release, make sure to update the version number in `./version` and `./README.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`~
 

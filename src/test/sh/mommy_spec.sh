@@ -392,6 +392,54 @@ forward"
                 End
             End
 
+            Describe "comments"
+                It "ignores lines starting with '#'"
+                    echo "MOMMY_COMPLIMENTS='weaken
+#egg
+can';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "weaken
+can"
+                    The status should be success
+                End
+
+                It "does not ignore lines starting with ' #'"
+                    echo "MOMMY_COMPLIMENTS='dish
+ #seat
+absence';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "dish
+ #seat
+absence"
+                    The status should be success
+                End
+
+                It "does not ignore lines with a '#' not at the start"
+                    echo "MOMMY_COMPLIMENTS='speed
+ lo#ud
+home';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "speed
+ lo#ud
+home"
+                    The status should be success
+                End
+
+                It "ignores the '/' in a comment line"
+                    echo "MOMMY_COMPLIMENTS='figure
+#penny/some
+wear';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The output should equal "figure
+wear"
+                    The status should be success
+                End
+            End
+
             Describe "toggling"
                 It "outputs nothing if a command passes but compliments are disabled"
                     echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"

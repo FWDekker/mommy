@@ -1,4 +1,4 @@
-.TH MOMMY "1" "2023-02-07" "mommy %%VERSION_NUMBER%%" "User Commands"
+.TH MOMMY "1" "%%MANUAL_DATE%%" "mommy %%VERSION_NUMBER%%" "User Commands"
 
 
 .SH NAME
@@ -22,14 +22,14 @@ alternatively, \fBmommy\fP shows a message depending on the exit code given in \
 
 
 .SH CONFIGURATION
-\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/config.sh\fP (override with
+\fBmommy\fP will carefully read the following variables from \fI~/.config/mommy/mommy.conf\fP (override with
 \fIconfig\fP) to give you the bestest messages~ ❤
 .br
-* \fIMOMMY_PET_NAME\fP is what \fBmommy\fP calls you~
+* \fIMOMMY_SWEETIE\fP is what \fBmommy\fP calls you~
 .br
-* \fIMOMMY_PRONOUN\fP is what \fBmommy\fP uses for themselves~
+* \fIMOMMY_THEIR\fP is the pronoun \fBmommy\fP uses for themselves~
 .br
-* \fIMOMMY_ROLE\fP is how \fBmommy\fP calls themselves~
+* \fIMOMMY_CAREGIVER\fP is how \fBmommy\fP calls themselves~
 .br
 * \fIMOMMY_SUFFIX\fP is how \fBmommy\fP will end all their messages~
 .br
@@ -52,32 +52,35 @@ else to change nothing~
 .br
 all these options take a /-separated list, and \fBmommy\fP will select the one they feel like using whenever they talk
 to you~
+also, inside variables, lines starting with \fI#\fP are ignored so you can comment and categorize your config~
 
 .PP
-in custom compliments and encouragements, you can ask \fBmommy\fP to use variables \fI%%PET_NAME%%\fP,
-\fI%%PRONOUN%%\fP, and \fI%%ROLE%%\fP~
+in custom compliments and encouragements, you can ask \fBmommy\fP to use variables \fI%%CAREGIVER%%\fP, \fI%%THEIR%%\fP,
+and \fI%%SWEETIE%%\fP~
 
 .PP
 for example, if the \fIconfig\fP looks like
 .RS
 .br
-\fIMOMMY_PET_NAME\fP="boy/pet/baby"
+\fIMOMMY_CAREGIVER\fP="daddy"
 .br
-\fIMOMMY_PRONOUN\fP="his/their"
+\fIMOMMY_THEIR\fP="his/their"
 .br
-\fIMOMMY_ROLE\fP="daddy"
+\fIMOMMY_SWEETIE\fP="boy/pet/baby"
 .br
 \fIMOMMY_SUFFIX\fP="~/ :3/"
 .br
-\fIMOMMY_COMPLIMENTS_EXTRA\fP="great job little %%PET_NAME%%/%%ROLE%% is proud of you"
+\fIMOMMY_COMPLIMENTS_EXTRA\fP="great job, little %%SWEETIE%%/%%CAREGIVER%% is proud of you"
 .br
 \fIMOMMY_ENCOURAGEMENTS_EXTRA\fP="
 .br
-/%%ROLE%% is here for you
+# encouragements~
 .br
-/%%ROLE%% will always love you
+/%%CAREGIVER%% is here for you
 .br
-/%%ROLE%% is here if you want a hug
+/%%CAREGIVER%% will always love you
+.br
+/%%CAREGIVER%% is here if you want a hug
 .br
 "
 .RE
@@ -85,7 +88,7 @@ then \fBmommy\fP might compliment you with any of
 .br
 * daddy loves his little baby~
 .br
-* great job little baby :3
+* great job, little baby :3
 .br
 * daddy is proud of you
 .br
