@@ -151,24 +151,24 @@ Describe "mommy"
 
     Describe "configuration"
         Describe "template variables"
-            It "inserts the pet name"
-                echo "MOMMY_COMPLIMENTS='>%%PET_NAME%%<';MOMMY_SUFFIX='';MOMMY_PET_NAME='attempt'" > "$config"
+            It "replaces %%SWEETIE%%"
+                echo "MOMMY_COMPLIMENTS='>%%SWEETIE%%<';MOMMY_SUFFIX='';MOMMY_SWEETIE='attempt'" > "$config"
 
                 When run "$mommy" -c "$config" true
                 The output should equal ">attempt<"
                 The status should be success
             End
 
-            It "inserts the pronoun"
-                echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN='respect'" > "$config"
+            It "replaces %%THEIR%%"
+                echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR='respect'" > "$config"
 
                 When run "$mommy" -c "$config" true
                 The output should equal ">respect<"
                 The status should be success
             End
 
-            It "inserts the role"
-                echo "MOMMY_COMPLIMENTS='>%%ROLE%%<';MOMMY_SUFFIX='';MOMMY_ROLE='help'" > "$config"
+            It "replaces %%CAREGIVER%%"
+                echo "MOMMY_COMPLIMENTS='>%%CAREGIVER%%<';MOMMY_SUFFIX='';MOMMY_CAREGIVER='help'" > "$config"
 
                 When run "$mommy" -c "$config" true
                 The output should equal ">help<"
@@ -188,7 +188,7 @@ Describe "mommy"
                 # Probability of 1/(26^4)=1/456976 to fail even if code is correct.
 
                 pronouns="a/b/c/d/e/f/g/h/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z"
-                echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN='$pronouns'" > "$config"
+                echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR='$pronouns'" > "$config"
 
                 output1=$("$mommy" -c "$config" true)
                 output2=$("$mommy" -c "$config" true)
@@ -206,7 +206,7 @@ Describe "mommy"
             End
 
             It "chooses the empty string if no pronouns are set"
-                echo "MOMMY_COMPLIMENTS='>%%PRONOUN%%<';MOMMY_SUFFIX='';MOMMY_PRONOUN=''" > "$config"
+                echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR=''" > "$config"
 
                 When run "$mommy" -c "$config" true
                 The output should equal "><"

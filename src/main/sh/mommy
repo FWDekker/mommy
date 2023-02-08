@@ -16,6 +16,7 @@ MOMMY_CAPITALIZE="0"
 
 MOMMY_COMPLIMENTS="
 # generic~
+/*pets your head*
 /amazing work as always
 
 # good X~
@@ -27,12 +28,15 @@ MOMMY_COMPLIMENTS="
 # proud~
 /%%CAREGIVER%% is very proud of you
 /%%CAREGIVER%% is so proud of you
-/%%CAREGIVER%% is so very proud of  you
 /%%CAREGIVER%% knew you could do it
 /%%CAREGIVER%% loves you, you are doing amazing
 
+# compliment~
+/%%CAREGIVER%%'s %%SWEETIE%% is so smart
+
 # reward~
 /%%CAREGIVER%% thinks you deserve a special treat for that
+/my little %%SWEETIE%% deserves a big fat kiss for that
 "
 MOMMY_COMPLIMENTS_EXTRA=""
 MOMMY_COMPLIMENTS_ENABLED="1"
@@ -40,25 +44,26 @@ MOMMY_COMPLIMENTS_ENABLED="1"
 MOMMY_ENCOURAGEMENTS="
 # trust~
 /%%CAREGIVER%% believes in you
-/%%CAREGIVER%% knows you can do it
+/%%CAREGIVER%% knows you'll get there
 /%%CAREGIVER%% knows %%THEIR%% little %%SWEETIE%% can do better
+/just know that %%CAREGIVER%% still loves you
 
 # consolation~
-/%%CAREGIVER%% knows it's hard, but it will be okay~
+/%%CAREGIVER%% knows it's hard, but it will be okay
 
 # fallback~
 /%%CAREGIVER%% is always here for you
 /%%CAREGIVER%% is always here for you if you need %%THEIR%%
-/come here, sit on my lap while you regain your courage
+/come here, sit on my lap while we figure this out together
 /%%CAREGIVER%% promises that, whatever happens, %%CAREGIVER%% will be here for you
 
 # encouragement~
 /never give up, my love
-/%%CAREGIVER%% knows you'll get there, don't worry
 /just a little further, %%CAREGIVER%% knows you can do it
+/%%CAREGIVER%% knows you'll get there, don't worry about it
 
 # clean up~
-/did %%CAREGIVER%%'s %%SWEETIE%% make a big mess? %%CAREGIVER%% can help you clean up
+/did %%CAREGIVER%%'s %%SWEETIE%% make a big mess?
 "
 MOMMY_ENCOURAGEMENTS_EXTRA=""
 MOMMY_ENCOURAGEMENTS_ENABLED="1"
@@ -176,7 +181,7 @@ capitalize_lines() {
 # Reads stdin, and
 # 1. replaces
 #    * `%%SWEETIE%%` with `$1`,
-#    * `%%PRONOUN%%` with `$2`, and
+#    * `%%THEIR%%` with `$2`, and
 #    * `%%CAREGIVER%%` with `$3`;
 # 2. applies `capitalize_lines` using `$5` as the choice parameter;
 # 3. removes leading and trailing newlines;
@@ -184,7 +189,7 @@ capitalize_lines() {
 # 5. writes to stdout.
 fill_template() {
     output=$(cat |
-                 sed -e "s/%%SWEETIE%%/$1/g" -e "s/%%PRONOUN%%/$2/g" -e "s/%%CAREGIVER%%/$3/g" |
+                 sed -e "s/%%SWEETIE%%/$1/g" -e "s/%%THEIR%%/$2/g" -e "s/%%CAREGIVER%%/$3/g" |
                  capitalize_lines "$5" |
                  sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//")
     printf "%s" "$output" "$4"

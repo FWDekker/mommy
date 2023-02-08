@@ -82,7 +82,7 @@ all these options take a `/`-separated list, and mommy will select the one they 
 to you~
 also, inside variables, lines starting with \fI#\fP are ignored so you can comment and categorize your config~
 
-in custom compliments and encouragements, you can ask mommy to use variables `%%PET_NAME%%`, `%%PRONOUN%%`, and
+in custom compliments and encouragements, you can ask mommy to use variables `%%PET_NAME%%`, `%%THEIR%%`, and
 `%%ROLE%%`~
 
 for example, if the config file looks like
@@ -127,11 +127,12 @@ on Debian-like machines you can run
 sudo gem install fpm
 sudo apt install build-essential squashfs-tools rpm gzip
 ```
-after that, just run `./build.sh`, and outputs appear in `dist/`~
+after that, just run `./build.sh` (though obviously you should run `mommy ./build.sh`), and outputs appear in `dist/`~
 
 for a new release, make sure to update the version number in `./version` and `./README.md`~
 
-to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`~
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`
+(make that `mommy ./test.sh`)~
 
 ## acknowledgements
 mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
