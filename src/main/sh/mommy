@@ -2,7 +2,7 @@
 
 ## Defaults
 ### Options
-MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/mommy.conf"
+MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
 MOMMY_OPT_HELP=""
 MOMMY_OPT_EVAL=""
 
