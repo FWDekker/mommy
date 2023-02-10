@@ -162,6 +162,19 @@ list_choose_random() {
 
 
 ## Functions
+# Prints stdin, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
+# or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
+color_cat() {
+    if [ "$1" = "lolcat" ]; then
+        cat | lolcat
+    elif [ -z "$1" ] || [ ! -t 1 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
+        cat
+    else
+        echo "$(tput setaf "$1")$(cat)"
+    fi
+    return 0
+}
+
 # Reads stdin; if `$1` is `0`, the first character on each line is changed to lowercase, if `$1` is `1`, the first
 # character on each line is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
 capitalize_lines() {
@@ -198,7 +211,7 @@ fill_template() {
 }
 
 # Reads stdin and invokes `fill_template` using the expected global parameters.
-fill_template_with_globals() {
+g_fill_template() {
     cat | fill_template "$pet_name" "$pronoun" "$role" "$suffix" "$MOMMY_CAPITALIZE"
     return 0
 }
@@ -247,8 +260,8 @@ pronoun=$(printf "%s" "$pronoun_list" | list_choose_random)
 role=$(printf "%s" "$role_list" | list_choose_random)
 suffix=$(printf "%s" "$suffix_list" | list_choose_random)
 
-compliment=$(printf "%s" "$compliments" | list_choose_random | fill_template_with_globals)
-encouragement=$(printf "%s" "$encouragements" | list_choose_random | fill_template_with_globals)
+compliment=$(printf "%s" "$compliments" | list_choose_random | g_fill_template)
+encouragement=$(printf "%s" "$encouragements" | list_choose_random | g_fill_template)
 
 
 ## Output
@@ -263,11 +276,10 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         man mommy | cat
         return 0
     else
-        echo "could not find the manual page~" | fill_template_with_globals >&2
+        echo "could not find the manual page~" | g_fill_template >&2
         return 1
     fi
 else
-    # Execute
     if [ -n "$MOMMY_OPT_EVAL" ]; then
         (eval "$MOMMY_OPT_EVAL")
         command_exit_code=$?
@@ -278,23 +290,14 @@ else
         command_exit_code=$?
     fi
 
-    # Check color support
-    if [ -n "$MOMMY_COLOR" ] && [ -t 1 ]; then
-        n_colors="$(tput colors)"
-        if [ -n "$n_colors" ] && [ "$n_colors" -ge 8 ]; then
-            color="$(tput setaf "$MOMMY_COLOR")"
-        fi
-    fi
-
-    # Print
     if [ $command_exit_code -eq 0 ]; then
         if [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
-            echo "$color$compliment"
+            echo "$compliment" | color_cat "$MOMMY_COLOR"
         fi
         return 0
     else
         if [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
-            echo "$color$encouragement" >&2
+            echo "$encouragement" | color_cat "$MOMMY_COLOR" >&2
         fi
         return $command_exit_code
     fi
