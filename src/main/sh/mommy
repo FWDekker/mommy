@@ -11,8 +11,8 @@ MOMMY_CAREGIVER="mommy"
 MOMMY_THEIR="her"
 MOMMY_SWEETIE="girl"
 MOMMY_SUFFIX="~"
-
 MOMMY_COLOR="005"
+
 MOMMY_CAPITALIZE="0"
 
 MOMMY_COMPLIMENTS="
@@ -253,12 +253,14 @@ sweetie_list=$(printf "%s" "$MOMMY_SWEETIE" | list_sanitize)
 pronoun_list=$(printf "%s" "$MOMMY_THEIR" | list_sanitize)
 role_list=$(printf "%s" "$MOMMY_CAREGIVER" | list_sanitize)
 suffix_list=$(printf "%s" "$MOMMY_SUFFIX" | list_sanitize)
+color_list=$(printf "%s" "$MOMMY_COLOR" | list_sanitize)
 
 # Randomize
 pet_name=$(printf "%s" "$sweetie_list" | list_choose_random)
 pronoun=$(printf "%s" "$pronoun_list" | list_choose_random)
 role=$(printf "%s" "$role_list" | list_choose_random)
 suffix=$(printf "%s" "$suffix_list" | list_choose_random)
+color=$(printf "%s" "$color_list" | list_choose_random)
 
 compliment=$(printf "%s" "$compliments" | list_choose_random | g_fill_template)
 encouragement=$(printf "%s" "$encouragements" | list_choose_random | g_fill_template)
@@ -292,12 +294,12 @@ else
 
     if [ $command_exit_code -eq 0 ]; then
         if [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
-            echo "$compliment" | color_cat "$MOMMY_COLOR" >&2
+            echo "$compliment" | color_cat "$color" >&2
         fi
         return 0
     else
         if [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
-            echo "$encouragement" | color_cat "$MOMMY_COLOR" >&2
+            echo "$encouragement" | color_cat "$color" >&2
         fi
         return $command_exit_code
     fi
