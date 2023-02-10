@@ -9,19 +9,19 @@ Describe "mommy"
         Describe "help information"
             It "outputs help information using -h"
                 When run "$mommy" -h
-                The word 1 of output should equal "MOMMY(1)"
+                The word 1 of output should equal "mommy(1)"
                 The status should be success
             End
 
             It "outputs help information using --help"
                 When run "$mommy" --help
-                The word 1 of output should equal "MOMMY(1)"
+                The word 1 of output should equal "mommy(1)"
                 The status should be success
             End
 
             It "outputs help information even when -h is not the first option"
                 When run "$mommy" -c "./a_file" -h
-                The word 1 of output should equal "MOMMY(1)"
+                The word 1 of output should equal "mommy(1)"
                 The status should be success
             End
         End

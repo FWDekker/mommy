@@ -106,14 +106,15 @@ a few notes on compliments and encouragements:
 ### toggling features
 there are a few features that you can disable, enable, or otherwise customise~
 
-| variable                       | description                                                                             | default |
-|--------------------------------|-----------------------------------------------------------------------------------------|---------|
-| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                     | `1`     |
-| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                  | `1`     |
-| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing | `0`     |
+| variable                       | description                                                                                                                                                         | default |
+|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                                                                                                 | `1`     |
+| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                                                                                              | `1`     |
+| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                             | `0`     |
+| `MOMMY_COLOR`                  | color for mommy's text, if your terminal supports it. [see this chart for all colors](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg) | `005`   |
 
 ### forbidden words / trigger words
-if mommy uses a word that you really don't like, but you don't want to remove all of mommy's default 
+if mommy uses a word that you really don't like, but you don't want to remove all of mommy's default
 compliments/encouragements, you can set forbidden words, and mommy will not use templates with those words in them.
 if there are multiple words, separate them with a `/`.
 for example, write
@@ -136,7 +137,6 @@ but if you uninstall mommy, you should manually uninstall your daddy by running
 sudo rm /usr/bin/daddy
 sudo rm /usr/share/man/man1/daddy.1
 ```
-
 
 ## development
 to build your own mommy, first install the requirements.
