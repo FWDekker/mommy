@@ -29,7 +29,7 @@ Describe "mommy"
         Describe "custom configuration file"
             It "ignores an invalid path"
                 When run "$mommy" -c "./does_not_exist" true
-                The output should not equal ""
+                The error should not equal ""
                 The status should be success
             End
 
@@ -37,17 +37,17 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='apply news';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "apply news"
+                The error should equal "apply news"
                 The status should be success
             End
         End
 
         Describe "command"
-            It "writes a compliment to stdout if the command returns 0 status"
+            It "writes a compliment to stderr if the command returns 0 status"
                 echo "MOMMY_COMPLIMENTS='purpose wall';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "purpose wall"
+                The error should equal "purpose wall"
                 The status should be success
             End
 
@@ -69,18 +69,18 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='disagree mean';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" echo a b c
-                The line 1 of output should equal "a b c"
-                The line 2 of output should equal "disagree mean"
+                The output should equal "a b c"
+                The error should equal "disagree mean"
                 The status should be success
             End
         End
 
         Describe "eval"
-            It "writes a compliment to stdout if the evaluated command returns 0 status"
+            It "writes a compliment to stderr if the evaluated command returns 0 status"
                 echo "MOMMY_COMPLIMENTS='bold accord';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" -e "true"
-                The output should equal "bold accord"
+                The error should equal "bold accord"
                 The status should be success
             End
 
@@ -102,8 +102,8 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='desire bread';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" -e "echo a b c"
-                The line 1 of output should equal "a b c"
-                The line 2 of output should equal "desire bread"
+                The output should equal "a b c"
+                The error should equal "desire bread"
                 The status should be success
             End
 
@@ -111,7 +111,8 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='milk literary';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" -e "echo 'a/b/c' | cut -d '/' -f 1"
-                The line 2 of output should equal "milk literary"
+                The output should be present
+                The error should equal "milk literary"
                 The status should be success
             End
 
@@ -125,11 +126,11 @@ Describe "mommy"
         End
 
         Describe "status"
-            It "writes a compliment to stdout if the status is 0"
+            It "writes a compliment to stderr if the status is 0"
                 echo "MOMMY_COMPLIMENTS='station top';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" -s 0
-                The output should equal "station top"
+                The error should equal "station top"
                 The status should be success
             End
 
@@ -155,7 +156,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='>%%SWEETIE%%<';MOMMY_SUFFIX='';MOMMY_SWEETIE='attempt'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal ">attempt<"
+                The error should equal ">attempt<"
                 The status should be success
             End
 
@@ -163,7 +164,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR='respect'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal ">respect<"
+                The error should equal ">respect<"
                 The status should be success
             End
 
@@ -171,7 +172,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='>%%CAREGIVER%%<';MOMMY_SUFFIX='';MOMMY_CAREGIVER='help'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal ">help<"
+                The error should equal ">help<"
                 The status should be success
             End
 
@@ -179,7 +180,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='>';MOMMY_SUFFIX='respect'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal ">respect"
+                The error should equal ">respect"
                 The status should be success
             End
 
@@ -190,11 +191,11 @@ Describe "mommy"
                 pronouns="a/b/c/d/e/f/g/h/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z"
                 echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR='$pronouns'" > "$config"
 
-                output1=$("$mommy" -c "$config" true)
-                output2=$("$mommy" -c "$config" true)
-                output3=$("$mommy" -c "$config" true)
-                output4=$("$mommy" -c "$config" true)
-                output5=$("$mommy" -c "$config" true)
+                output1=$("$mommy" -c "$config" true 2>&1)
+                output2=$("$mommy" -c "$config" true 2>&1)
+                output3=$("$mommy" -c "$config" true 2>&1)
+                output4=$("$mommy" -c "$config" true 2>&1)
+                output5=$("$mommy" -c "$config" true 2>&1)
 
                 [ "$output1" != "$output2" ] || [ "$output1" != "$output3" ] \
                                              || [ "$output1" != "$output4" ] \
@@ -209,7 +210,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_SUFFIX='';MOMMY_THEIR=''" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "><"
+                The error should equal "><"
                 The status should be success
             End
         End
@@ -219,7 +220,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='Alive station';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='0'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "alive station"
+                The error should equal "alive station"
                 The status should be success
             End
 
@@ -227,7 +228,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='inquiry speech';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='1'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "Inquiry speech"
+                The error should equal "Inquiry speech"
                 The status should be success
             End
 
@@ -235,7 +236,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='Medicine frighten';MOMMY_SUFFIX='';MOMMY_CAPITALIZE=" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "Medicine frighten"
+                The error should equal "Medicine frighten"
                 The status should be success
             End
 
@@ -243,7 +244,7 @@ Describe "mommy"
                 echo "MOMMY_COMPLIMENTS='Belong shore';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='2'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "Belong shore"
+                The error should equal "Belong shore"
                 The status should be success
             End
 
@@ -252,7 +253,7 @@ Describe "mommy"
 fashion';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='1'" > "$config"
 
                 When run "$mommy" -c "$config" true
-                The output should equal "Luck
+                The error should equal "Luck
 Fashion"
                 The status should be success
             End
@@ -264,7 +265,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "spill drown"
+                    The error should equal "spill drown"
                     The status should be success
                 End
 
@@ -272,7 +273,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='bill lump';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "bill lump"
+                    The error should equal "bill lump"
                     The status should be success
                 End
 
@@ -282,7 +283,7 @@ Fashion"
     bank';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "loud
+                    The error should equal "loud
     bank"
                     The status should be success
                 End
@@ -291,7 +292,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal ""
+                    The error should equal ""
                     The status should be success
                 End
             End
@@ -301,7 +302,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should not equal "curse dear"
+                    The error should not equal "curse dear"
                     The status should be success
                 End
 
@@ -311,7 +312,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='/////////////////////////////boy only';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "boy only"
+                    The error should equal "boy only"
                     The status should be success
                 End
 
@@ -321,7 +322,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='salt staff/////////////////////////////';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "salt staff"
+                    The error should equal "salt staff"
                     The status should be success
                 End
 
@@ -331,7 +332,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='end spring/////////////////////////////end spring';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "end spring"
+                    The error should equal "end spring"
                     The status should be success
                 End
 
@@ -341,7 +342,7 @@ Fashion"
                     echo "MOMMY_COMPLIMENTS='attempt cheap///////////////';MOMMY_COMPLIMENTS_EXTRA='//////////////attempt cheap';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "attempt cheap"
+                    The error should equal "attempt cheap"
                     The status should be success
                 End
             End
@@ -352,7 +353,7 @@ Fashion"
 quick elastic';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "quick elastic"
+                    The error should equal "quick elastic"
                     The status should be success
                 End
 
@@ -361,7 +362,7 @@ quick elastic';MOMMY_SUFFIX=''" > "$config"
 ';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "happy airplane"
+                    The error should equal "happy airplane"
                     The status should be success
                 End
 
@@ -370,7 +371,7 @@ quick elastic';MOMMY_SUFFIX=''" > "$config"
 forward';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "mineral
+                    The error should equal "mineral
 forward"
                     The status should be success
                 End
@@ -379,7 +380,7 @@ forward"
                     echo "MOMMY_COMPLIMENTS=' rake fix';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal " rake fix"
+                    The error should equal " rake fix"
                     The status should be success
                 End
 
@@ -387,7 +388,7 @@ forward"
                     echo "MOMMY_COMPLIMENTS='read wealth ';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "read wealth "
+                    The error should equal "read wealth "
                     The status should be success
                 End
             End
@@ -399,7 +400,7 @@ forward"
 can';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "weaken
+                    The error should equal "weaken
 can"
                     The status should be success
                 End
@@ -410,7 +411,7 @@ can"
 absence';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "dish
+                    The error should equal "dish
  #seat
 absence"
                     The status should be success
@@ -422,7 +423,7 @@ absence"
 home';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "speed
+                    The error should equal "speed
  lo#ud
 home"
                     The status should be success
@@ -434,7 +435,7 @@ home"
 wear';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "figure
+                    The error should equal "figure
 wear"
                     The status should be success
                 End
@@ -445,7 +446,7 @@ wear"
                     echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal ""
+                    The error should equal ""
                     The status should be success
                 End
 
@@ -453,7 +454,7 @@ wear"
                     echo "MOMMY_ENCOURAGEMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" false
-                    The output should equal ""
+                    The error should equal ""
                     The status should be failure
                 End
             End
@@ -463,7 +464,7 @@ wear"
                     echo "MOMMY_COMPLIMENTS='mother search/fierce along';MOMMY_FORBIDDEN_WORDS='search';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "fierce along"
+                    The error should equal "fierce along"
                     The status should be success
                 End
 
@@ -471,7 +472,7 @@ wear"
                     echo "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The output should equal "failure school"
+                    The error should equal "failure school"
                     The status should be success
                 End
             End

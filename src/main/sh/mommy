@@ -292,7 +292,7 @@ else
 
     if [ $command_exit_code -eq 0 ]; then
         if [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
-            echo "$compliment" | color_cat "$MOMMY_COLOR"
+            echo "$compliment" | color_cat "$MOMMY_COLOR" >&2
         fi
         return 0
     else
