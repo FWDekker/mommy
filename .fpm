@@ -2,9 +2,9 @@
 --name mommy
 --license unlicense
 --architecture all
---depends coreutils --depends grep
+--depends coreutils --depends awk --depends grep --depends sed
 --description "Mommy's here to support you~"
 --url "https://github.com/FWDekker/mommy"
 --maintainer "Florine W. Dekker"
 
-build/mommy=/usr/bin/mommy build/mommy.1=/usr/share/man/man1/mommy.1
+build/mommy=/usr/bin/mommy build/mommy.1.gz=/usr/share/man/man1/mommy.1.gz
