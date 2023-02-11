@@ -3,8 +3,6 @@
 ## Defaults
 ### Options
 MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
-MOMMY_OPT_HELP=""
-MOMMY_OPT_EVAL=""
 
 ### Configuration
 MOMMY_CAREGIVER="mommy"
@@ -166,11 +164,11 @@ list_choose_random() {
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_cat() {
     if [ "$1" = "lolcat" ]; then
-        cat | lolcat
-    elif [ -z "$1" ] || [ ! -t 1 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
+        cat | lolcat -f
+    elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
         cat
     else
-        echo "$(tput setaf "$1")$(cat)"
+        echo "$(tput setaf "$1")$(cat)$(tput sgr0)"
     fi
     return 0
 }
