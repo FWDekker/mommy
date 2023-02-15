@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Script to help create `demo.gif` reproducibly. Requires `xdotool`.
 #
 # 1. Set font size to 32

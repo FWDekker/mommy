@@ -4,12 +4,18 @@ mommy's here to support you~ ❤️
 ![mommy demo](.github/demo.gif)
 
 ## installation
+mommy should work on any UNIX system.
+she has been tested on Ubuntu, Debian, macOS, FreeBSD, NetBSD, and Solaris, and also has releases for Alpine Linux,
+ArchLinux, and Red Hat~
+
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
 
 for example, on Ubuntu/Debian/etc, just run
 ```shell
 sudo apt install ./mommy-0.0.5.deb
 ```
+
+after installation, you can [integrate mommy with your shell](#shell-integration)~
 
 ## usage
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
@@ -195,15 +201,17 @@ log out and back in, and mommy will appear in your shell~
 
 ## development
 to build your own mommy, first install the requirements.
-on Debian-like machines, run
+on Debian-like systems, run
 ```shell
+sudo apt install build-essential gzip rubygems
 sudo gem install fpm
-sudo apt install build-essential squashfs-tools rpm gzip
 ```
 
-after that, just run `./build.sh` (or better: `mommy ./build.sh`), and outputs appear in `dist/`~
+after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
+replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html)~
 
-for a new release, make sure to update the version number in `./version` and `./README.md`~
+before a new release, make sure to update the version number in `./version` and `./README.md`, and to update the
+`CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `mommy ./test.sh`~
 

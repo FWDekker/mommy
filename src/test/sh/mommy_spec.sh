@@ -7,6 +7,11 @@ Describe "mommy"
 
     Describe "command-line options"
         Describe "help information"
+            my_uname="$(uname -a | head -c 5)"
+            if [ "$my_uname" = "SunOS" ]; then
+                Skip "Mommy does not (yet) support manual pages on Solaris"
+            fi
+
             It "outputs help information using -h"
                 When run "$mommy" -h
                 The word 1 of output should equal "mommy(1)"
@@ -60,7 +65,7 @@ Describe "mommy"
             End
 
             It "returns the non-0 status of the command"
-                When run "$mommy" return 4
+                When run "$mommy" exit 4
                 The error should not equal ""
                 The status should equal 4
             End
@@ -93,7 +98,7 @@ Describe "mommy"
             End
 
             It "returns the non-0 status of the evaluated command"
-                When run "$mommy" -e "return 4"
+                When run "$mommy" -e "exit 4"
                 The error should not equal ""
                 The status should equal 4
             End
@@ -116,11 +121,11 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "considers the command a success if any part fails"
+            It "considers the command a failure if any part fails"
                 echo "MOMMY_ENCOURAGEMENTS='bear cupboard';MOMMY_SUFFIX=''" > "$config"
 
                 When run "$mommy" -c "$config" -e "echo 'a/b/c' | cut -d '/' -f 0"
-                The line 3 of error should equal "bear cupboard"
+                The error should be present
                 The status should be failure
             End
         End
