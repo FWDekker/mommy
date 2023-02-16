@@ -7,11 +7,6 @@ Describe "mommy"
 
     Describe "command-line options"
         Describe "help information"
-            my_uname="$(uname -a | head -c 5)"
-            if [ "$my_uname" = "SunOS" ]; then
-                Skip "Mommy does not (yet) support manual pages on Solaris"
-            fi
-
             It "outputs help information using -h"
                 When run "$mommy" -h
                 The word 1 of output should equal "mommy(1)"

@@ -55,17 +55,3 @@ jobs:
             pkgin -y install git
             git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
           run: PATH="$HOME/shellspec:$PATH" ./test.sh
-
-  test-solaris:
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install ShellSpec && Run tests
-        uses: vmactions/solaris-vm@v0
-        with:
-          usesh: true
-          copyback: false
-          prepare: |
-            pkg install git
-            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
-          run: PATH="$HOME/shellspec:$PATH" ./test.sh

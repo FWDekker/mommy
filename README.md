@@ -5,8 +5,8 @@ mommy's here to support you~ ❤️
 
 ## installation
 mommy should work on any UNIX system.
-she has been tested on Ubuntu, Debian, macOS, FreeBSD, NetBSD, and Solaris, and also has releases for Alpine Linux,
-ArchLinux, and Red Hat~
+she has been tested on Ubuntu, Debian, macOS, FreeBSD, and NetBSD, and also has releases for Alpine Linux, ArchLinux,
+and Red Hat~
 
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
 
