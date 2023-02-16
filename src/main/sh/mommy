@@ -219,13 +219,14 @@ test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
 
 ## Output
 if [ -n "$MOMMY_OPT_HELP" ]; then
-    global_man_path="/usr/share/man/man1/mommy.1.gz"
     local_man_path="$(dirname -- "$0")/../resources/mommy.1"
+    global_man_path1="/usr/share/man/man1/mommy.1.gz"
+    global_man_path2="/usr/local/share/man/man1/mommy.1.gz"
 
     if [ -f "$local_man_path" ]; then
         man "$local_man_path" | cat
         exit 0
-    elif [ -f "$global_man_path" ]; then
+    elif [ -f "$global_man_path1" ] || [ -f "$global_man_path2" ]; then
         man mommy | cat
         exit 0
     else

@@ -1,7 +1,7 @@
-Describe "mommy"
-    config="./config"
-    mommy="../../main/sh/mommy"
+config="./config"
+[ -z "$mommy" ] && mommy="../../main/sh/mommy"
 
+Describe "mommy"
     clean_config() { rm -f "$config"; }
     After "clean_config"
 
