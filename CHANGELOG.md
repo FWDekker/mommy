@@ -1,7 +1,8 @@
 # Changelog
 ## [Unreleased]
 * mommy is much faster now that she only calculates when needed~
-* mommy now works on macOS, FreeBSD, NetBSD, and Solaris~
+* mommy now works on macOS, *BSD, and probably on Solaris~
+* mommy has an installer script for any POSIX system~
 * mommy does ci/cd now~
 
 

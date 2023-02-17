@@ -2,11 +2,11 @@ name: CD
 
 on:
   push:
-#    branches:
-#      - main
-#  pull_request:
-#    branches:
-#      - main
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -23,6 +23,8 @@ jobs:
           sudo gem install --no-document fpm
       - name: Build executable
         run: ./build.sh apk deb rpm pacman installer raw
+      - name: Extract version number
+        run: echo "VERSION=\"$(cat ./version)\"" >> $GITHUB_ENV
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
@@ -33,6 +35,6 @@ jobs:
         with:
           draft: true
           prerelease: false
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.VERSION }}
           body_path: RELEASE_NOTES.md
           files: dist/mommy-*.*

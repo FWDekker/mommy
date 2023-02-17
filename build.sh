@@ -1,32 +1,39 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -e
+cd -P -- "$(dirname -- "$0")"
 
 # Load configuration
-version=$(cat version)
-manual_date=$(git log -1 --pretty="format:%cs" src/main/resources/mommy.1)
+version="$(cat version)"
+manual_date="$(git log -1 --pretty="format:%cs" src/main/resources/mommy.1)"
 
-# Clean up
-rm -rf build/
-rm -rf dist/
+# Clean
+rm -rf build/ dist/
 
-# Prepare build
+# Prepare
 mkdir build/
 cp src/main/sh/install.sh src/main/sh/mommy src/main/resources/mommy.1 build/
 sed -i".bak" "s/%%VERSION_NUMBER%%/$version/g;s/%%MANUAL_DATE%%/$manual_date/g" build/*
 gzip build/mommy.1
 
-# Build packages
+# Build
 mkdir dist/
 for target in "$@"; do
     echo "# Build $target"
 
-    if [ "$target" = "raw" ]; then
+    case "$target" in
+    raw)
         cp build/mommy "dist/mommy-$version.sh"
-    elif [ "$target" = "installer" ]; then
+        ;;
+    installer)
+        # To extract from project root directory into `./installer/`, run:
+        #   tar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+
         cd build/
         tar -czf "../dist/mommy-$version.any-system.tar.gz" "install.sh" "mommy" "mommy.1.gz"
-        cd ../
-    else
+        cd -
+        ;;
+    *)
         fpm -t "$target" -p "dist/mommy-$version.$target" --version "$version"
-    fi
+        ;;
+    esac
 done

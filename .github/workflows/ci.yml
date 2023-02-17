@@ -13,7 +13,7 @@ jobs:
         run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
-      - name: Install fpm
+      - name: Install fpm and build dependencies
         run: |
           sudo apt install -y build-essential gzip libarchive-tools rpm rubygems squashfs-tools
           sudo gem install --no-document fpm
@@ -39,8 +39,6 @@ jobs:
         run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
-      - name: Install fpm
-        run: sudo gem install --no-document fpm
       - name: Install gtar
         run: |
           NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -58,7 +56,7 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build installer && Test installer
+      - name: Install ShellSpec && Test script && Build installer && Test installer
         uses: vmactions/freebsd-vm@v0
         with:
           usesh: true
@@ -66,10 +64,6 @@ jobs:
             echo "# Install ShellSpec"
             pkg install -y git
             git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
-
-            echo "# Install fpm"
-            pkg install -y bash devel/ruby-gems
-            gem install --no-document fpm
 
             echo "# Install gtar"
             pkg install -y gtar
@@ -93,7 +87,7 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build installer && Test installer
+      - name: Install ShellSpec && Test script && Build installer && Test installer
         uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
@@ -104,17 +98,8 @@ jobs:
             pkgin -y install git
             git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
 
-            echo "# Install Ruby"
-            pkgin -y install bsdtar curl gtar ruby31
-            curl https://rubygems.org/rubygems/rubygems-3.4.7.zip > rubygems.zip
-            mkdir rubygems
-            bsdtar --strip-components=1 -x -C rubygems -f rubygems.zip
-            cd rubygems
-            ruby31 setup.rb
-            cd ../
-
-            echo "# Install fpm"
-            gem install --no-document fpm
+            echo "# Install gtar"
+            pkgin -y install gtar
 
             echo "# Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -123,7 +108,7 @@ jobs:
             PATH="$HOME/shellspec:$PATH" ./test.sh
 
             echo "# Build installer"
-            PATH="/sbin:/usr/sbin:/usr/pkg/sbin:/usr/local/sbin:$PATH" ./build.sh installer
+            ./build.sh installer
 
             echo "# Test installer"
             gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
