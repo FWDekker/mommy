@@ -9,6 +9,7 @@ n="
 
 Describe "mommy"
     clean_config() { rm -f "$config"; }
+    Before "clean_config"
     After "clean_config"
 
     Describe "command-line options"

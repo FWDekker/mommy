@@ -94,8 +94,8 @@ list_contains_any() {
 list_sanitize() {
     cat |
         grep -v "^#" |
-        sed -e "s/\//\n/g" |
-        grep "\S" |
+        awk -v RS="/" "{print}" |
+        grep -v "^[[:space:]]*\$" |
         while IFS="$n" read -r line; do list_contains_any "$line" "$1" || echo "$line"; done
     return 0
 }
