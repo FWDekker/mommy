@@ -75,35 +75,14 @@ MOMMY_FORBIDDEN_WORDS=""
 # whitespace character. A list is represented by a string, consisting of the entries separated by `/`s. A list does not
 # have leading or trailing `/`s.
 
-# Joins all lists from the input arguments into a single list.
-lists_join() {
-    printf "%s/" "$@" | head -c -1
-}
-
-# Takes the list in stdin and removes both (1) all whitespace-only entries and (2) all lines starting with `#`. As a
-# result of (1), consecutive `/`s and leading and trailing `/`s are removed.
-list_sanitize() {
-    list="$(cat | grep -v "^#")/"
-
-    sanitized_list=""
-    while [ -n "$list" ]; do
-        entry="${list%%/*}"
-
-        if [ -n "$(printf "%s" "$entry" | tr -d "[:space:]")" ]; then
-            sanitized_list="$sanitized_list$entry/"
-        fi
-
-        list="${list#*/}"
-    done
-
-    printf "%s" "$sanitized_list" | head -c -1
-    return 0
-}
-
-# Outputs 0 if the string `$1` contains any of the substrings in the list `$2`, and outputs 1 otherwise.
+# Outputs `0` if the string `$1` contains any of the substrings in the list `$2`, and outputs `1` otherwise.
 list_contains_any() {
-    list="$2/"
+    if [ "$2" = "" ]; then
+        printf "1"
+        return 0
+    fi
 
+    list="$2/"
     while [ -n "$list" ]; do
         if [ -z "${1##*"${list%%/*}"*}" ]; then
             printf "0"
@@ -117,34 +96,36 @@ list_contains_any() {
     return 0
 }
 
-# Removes all entries from the list in stdin that contain any of the entries in `$1` as a substring.
-list_exclude_if_contains() {
-    if [ -z "$1" ]; then
-        cat
-        return 0
-    fi
+# Takes the list in stdin and removes (1) all whitespace-only entries, (2) all entries containing one of the words in
+# the list in `$1`, and (3) all lines starting with `#`. As a result of (1), consecutive `/`s and leading and trailing
+# `/`s are removed.
+list_sanitize() {
+    list="$(cat | grep -v "^#")/"
 
-    list="$(cat)/"
-    filtered_list=""
+    sanitized_list=""
     while [ -n "$list" ]; do
         entry="${list%%/*}"
 
-        if [ "$(list_contains_any "$entry" "$1")" -ne 0 ]; then
-            filtered_list="$filtered_list$entry/"
+        if [ -n "$(printf "%s" "$entry" | tr -d "[:space:]")" ] && [ "$(list_contains_any "$entry" "$1")" -ne 0 ]; then
+            sanitized_list="$sanitized_list$entry/"
         fi
 
         list="${list#*/}"
     done
 
-    printf "%s" "$filtered_list" | head -c -1
+    printf "%s" "${sanitized_list%?}"
     return 0
 }
 
 # Writes a random entry from the list in stdin to stdout.
-list_choose_random() {
+list_choose() {
     list="$(cat)/"
-    count="$(printf "%s" "$list" | grep -o "/" | wc -l)"
-    idx="$(shuf -i 1-"$count" -n 1)"
+    count="$(printf "%s" "$list" | tr -cd "/" | wc -c)"
+    if [ -x "$(command -v shuf)" ]; then
+        idx="$(shuf -i 1-"$count" -n 1)"
+    else
+        idx="$(jot -r 1 1 "$count")"
+    fi
 
     i="1"
     while [ -n "$list" ]; do
@@ -163,12 +144,13 @@ list_choose_random() {
 # Prints stdin, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_cat() {
+    input="$(cat)"
     if [ "$1" = "lolcat" ]; then
-        cat | lolcat -f
+        echo "$input" | lolcat -f
     elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
-        cat
+        echo "$input"
     else
-        echo "$(tput setaf "$1")$(cat)$(tput sgr0)"
+        echo "$(tput setaf "$1")$input$(tput sgr0)"
     fi
     return 0
 }
@@ -176,41 +158,39 @@ color_cat() {
 # Reads stdin; if `$1` is `0`, the first character on each line is changed to lowercase, if `$1` is `1`, the first
 # character on each line is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
 capitalize_lines() {
-    entry="$(cat)"
     if [ "$1" = "0" ]; then
         mapping="tolower"
     elif [ "$1" = "1" ]; then
         mapping="toupper"
     else
-        printf "%s" "$entry"
+        cat
         return 0
     fi
 
-    printf "%s" "$entry" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    cat | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
 # Reads stdin, and
 # 1. replaces
-#    * `%%SWEETIE%%` with `$1`,
-#    * `%%THEIR%%` with `$2`, and
-#    * `%%CAREGIVER%%` with `$3`;
+#    * `%%SWEETIE%%` with a random entry from `$1`,
+#    * `%%THEIR%%` with a random entry from `$2`, and
+#    * `%%CAREGIVER%%` with a random entry from `$3`;
 # 2. applies `capitalize_lines` using `$5` as the choice parameter;
 # 3. removes leading and trailing newlines;
 # 4. appends `$4`; and
 # 5. writes to stdout.
 fill_template() {
-    output=$(cat |
-                 sed -e "s/%%SWEETIE%%/$1/g" -e "s/%%THEIR%%/$2/g" -e "s/%%CAREGIVER%%/$3/g" |
-                 capitalize_lines "$5" |
-                 sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//")
-    printf "%s" "$output" "$4"
-    return 0
-}
+    sweetie=$(printf "%s" "$1" | list_sanitize | list_choose)
+    their=$(printf "%s" "$2" | list_sanitize | list_choose)
+    caregiver=$(printf "%s" "$3" | list_sanitize | list_choose)
+    suffix=$(printf "%s" "$4" | list_sanitize | list_choose)
 
-# Reads stdin and invokes `fill_template` using the expected global parameters.
-g_fill_template() {
-    cat | fill_template "$pet_name" "$pronoun" "$role" "$suffix" "$MOMMY_CAPITALIZE"
+    output="$(printf "%s\n" "$(cat)" |
+                  sed -e "s/%%SWEETIE%%/$sweetie/g" -e "s/%%THEIR%%/$their/g" -e "s/%%CAREGIVER%%/$caregiver/g" |
+                  capitalize_lines "$5" |
+                  sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//")"
+    printf "%s" "$output" "$suffix"
     return 0
 }
 
@@ -237,68 +217,44 @@ shift "$((OPTIND - 1))"
 # shellcheck source=/dev/null
 test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
 
-# Read lists
-forbidden_words=$(printf "%s" "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
-
-compliments=$(lists_join "$MOMMY_COMPLIMENTS" "$MOMMY_COMPLIMENTS_EXTRA" |
-                  list_sanitize |
-                  list_exclude_if_contains "$forbidden_words")
-encouragements=$(lists_join "$MOMMY_ENCOURAGEMENTS" "$MOMMY_ENCOURAGEMENTS_EXTRA" |
-                     list_sanitize |
-                     list_exclude_if_contains "$forbidden_words")
-
-sweetie_list=$(printf "%s" "$MOMMY_SWEETIE" | list_sanitize)
-pronoun_list=$(printf "%s" "$MOMMY_THEIR" | list_sanitize)
-role_list=$(printf "%s" "$MOMMY_CAREGIVER" | list_sanitize)
-suffix_list=$(printf "%s" "$MOMMY_SUFFIX" | list_sanitize)
-color_list=$(printf "%s" "$MOMMY_COLOR" | list_sanitize)
-
-# Randomize
-pet_name=$(printf "%s" "$sweetie_list" | list_choose_random)
-pronoun=$(printf "%s" "$pronoun_list" | list_choose_random)
-role=$(printf "%s" "$role_list" | list_choose_random)
-suffix=$(printf "%s" "$suffix_list" | list_choose_random)
-color=$(printf "%s" "$color_list" | list_choose_random)
-
-compliment=$(printf "%s" "$compliments" | list_choose_random | g_fill_template)
-encouragement=$(printf "%s" "$encouragements" | list_choose_random | g_fill_template)
-
 
 ## Output
 if [ -n "$MOMMY_OPT_HELP" ]; then
-    global_man_path="/usr/share/man/man1/mommy.1.gz"
     local_man_path="$(dirname -- "$0")/../resources/mommy.1"
 
     if [ -f "$local_man_path" ]; then
-        man -l "$local_man_path" | cat
-        return 0
-    elif [ -f "$global_man_path" ]; then
-        man mommy | cat
-        return 0
+        man "$local_man_path"
+        exit "$?"
     else
-        echo "could not find the manual page~" | g_fill_template >&2
-        return 1
+        man mommy
+        exit "$?"
     fi
 else
     if [ -n "$MOMMY_OPT_EVAL" ]; then
         (eval "$MOMMY_OPT_EVAL")
-        command_exit_code=$?
+        command_exit_code="$?"
     elif [ -n "$MOMMY_OPT_STATUS" ]; then
-        command_exit_code=$MOMMY_OPT_STATUS
+        command_exit_code="$MOMMY_OPT_STATUS"
     else
         ("$@")
-        command_exit_code=$?
+        command_exit_code="$?"
     fi
 
-    if [ $command_exit_code -eq 0 ]; then
-        if [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
-            echo "$compliment" | color_cat "$color" >&2
-        fi
-        return 0
+    if [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
+        templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
+    elif [ "$command_exit_code" -ne 0 ] && [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
+        templates="$MOMMY_ENCOURAGEMENTS/$MOMMY_ENCOURAGEMENTS_EXTRA"
     else
-        if [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
-            echo "$encouragement" | color_cat "$color" >&2
-        fi
-        return $command_exit_code
+        exit "$command_exit_code"
     fi
+
+    color=$(printf "%s" "$MOMMY_COLOR" | list_sanitize | list_choose)
+    forbidden_words=$(printf "%s" "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
+
+    printf "%s" "$templates" |
+        list_sanitize "$forbidden_words" |
+        list_choose |
+        fill_template "$MOMMY_SWEETIE" "$MOMMY_THEIR" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE" |
+        color_cat "$color" >&2
+    exit "$command_exit_code"
 fi

@@ -1,0 +1,40 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install packages
+        run: |
+          sudo apt install -y build-essential gzip libarchive-tools rpm rubygems squashfs-tools
+          sudo gem install --no-document fpm
+      - name: Build executable
+        run: ./build.sh apk deb rpm pacman installer raw
+      - name: Extract version number
+        run: echo "VERSION=\"$(cat ./version)\"" >> $GITHUB_ENV
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+        with:
+          release_notes_file: RELEASE_NOTES.md
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: false
+          tag_name: ${{ env.VERSION }}
+          body_path: RELEASE_NOTES.md
+          files: dist/mommy-*.*

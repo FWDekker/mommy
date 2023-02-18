@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec
+        run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+      - name: Test script
+        run: PATH="$HOME/shellspec:$PATH" ./test.sh
+      - name: Install fpm and build dependencies
+        run: |
+          sudo apt install -y build-essential gzip libarchive-tools rpm rubygems squashfs-tools
+          sudo gem install --no-document fpm
+      - name: Build package and installer
+        run: ./build.sh deb installer
+      - name: Test package
+        run: |
+          sudo apt install -y ./dist/*.deb
+          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          sudo apt purge -y mommy
+      - name: Test installer
+        run: |
+          tar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+          sudo installer/install.sh '' '' -y
+          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec
+        run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+      - name: Test script
+        run: PATH="$HOME/shellspec:$PATH" ./test.sh
+      - name: Install gtar
+        run: |
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install gnu-tar
+      - name: Build installer
+        run: ./build.sh installer
+      - name: Test installer
+        run: |
+          gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+          sudo installer/install.sh '' '' -y
+          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+
+  test-freebsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec && Test script && Build installer && Test installer
+        uses: vmactions/freebsd-vm@v0
+        with:
+          usesh: true
+          # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
+          # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
+          prepare: |
+            echo "# Install ShellSpec"
+            pkg install -y git || exit 1
+            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/" || exit 1
+
+            echo "# Install gtar"
+            pkg install -y gtar || exit 1
+
+            echo "# Ignore ownership issues"
+            git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
+          run: |
+            set -e
+
+            echo "# Test script"
+            PATH="$HOME/shellspec:$PATH" ./test.sh
+
+            echo "# Build installer"
+            ./build.sh installer
+
+            echo "# Test installer"
+            gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+            installer/install.sh '' '' -y
+            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+
+  test-netbsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec && Test script && Build installer && Test installer
+        uses: vmactions/netbsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            set -e
+
+            pkg_add pkgin
+
+            echo "# Install ShellSpec"
+            pkgin -y install git
+            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+
+            echo "# Install gtar"
+            pkgin -y install gtar
+
+            echo "# Ignore ownership issues"
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          run: |
+            set -e
+
+            echo "# Test script"
+            PATH="$HOME/shellspec:$PATH" ./test.sh
+
+            echo "# Build installer"
+            ./build.sh installer
+
+            echo "# Test installer"
+            gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+            installer/install.sh '' /usr/local/man/man1/mommy.1.gz -y
+            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz

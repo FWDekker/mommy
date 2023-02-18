@@ -4,12 +4,19 @@ mommy's here to support you~ ❤️
 ![mommy demo](.github/demo.gif)
 
 ## installation
-[download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual~
+mommy works on any POSIX system.
+mommy is tested on Ubuntu, Debian, macOS, FreeBSD, and NetBSD~
 
-for example, on Ubuntu/Debian/etc, just run
-```shell
-sudo apt install ./mommy-0.0.5.deb
-```
+[download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
+* on Debian/Ubuntu/etc, run `sudo apt install ./mommy-0.0.5.deb`,
+* on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-0.0.5.rpm`,
+* on ArchLinux, run `sudo pacman -U ./mommy-0.0.5.pac`,
+* on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-0.0.5.apk`, and
+* on macOS, FreeBSD/NetBSD/OpenBSD/etc, and any other POSIX system, you have two choices:
+  * extract `./mommy-0.0.5.any-system.tar.gz` and run `sudo ./install.sh` to install mommy and the manual page, or
+  * download `./mommy-0.0.5.sh` directly and put it wherever you want~
+
+after installation, you can [integrate mommy with your shell](#shell-integration)~
 
 ## usage
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
@@ -122,17 +129,21 @@ and mommy will not use a template that contains either `cat` or `dog`~
 
 ### renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, then run the following:
-
-```shell
-sudo ln -s /usr/bin/mommy /usr/bin/daddy
-sudo ln -s /usr/share/man/man1/mommy.1 /usr/share/man/man1/daddy.1
-```
+* if you installed with a package manager (`apt`, `rpm`, etc), do:
+  ```shell
+  sudo ln -fs /usr/bin/mommy /usr/bin/daddy
+  sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
+  ```
+* if you installed with `./install.sh`, do:
+  ```shell
+  sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
+  sudo ln -fs /usr/local/share/man/man1/mommy.1.gz /usr/local/share/man/man1/daddy.1.gz
+  ```
 
 if you update mommy, then your daddy will also be updated.
 but if you uninstall mommy, you should manually uninstall your daddy by running
 ```shell
-sudo rm /usr/bin/daddy
-sudo rm /usr/share/man/man1/daddy.1
+sudo rm -f /usr/bin/daddy /usr/share/man/man1/daddy.1.gz /usr/local/bin/daddy /usr/local/share/man/man1/daddy.1.gz
 ```
 
 
@@ -195,17 +206,22 @@ log out and back in, and mommy will appear in your shell~
 
 ## development
 to build your own mommy, first install the requirements.
-on Debian-like machines, run
+on Debian-like systems, run
 ```shell
+sudo apt install build-essential gzip rubygems
 sudo gem install fpm
-sudo apt install build-essential squashfs-tools rpm gzip
 ```
 
-after that, just run `./build.sh` (or better: `mommy ./build.sh`), and outputs appear in `dist/`~
+after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
+replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html), 
+and/or use custom formats `raw` and `installer`~
 
-for a new release, make sure to update the version number in `./version` and `./README.md`~
+before a new release, make sure to update the version number in `./version` and `./README.md`, and to update the
+`CHANGELOG.md`~
 
-to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `mommy ./test.sh`~
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
+by default, tests are run against `src/main/sh/mommy`.
+to change that, set the `mommy` variable before running tests, as in `mommy=/usr/bin/mommy ./test.sh`~
 
 
 ## acknowledgements
