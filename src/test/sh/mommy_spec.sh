@@ -1,5 +1,11 @@
-config="./config"
+# Configurable
 [ -z "$mommy" ] && mommy="../../main/sh/mommy"
+
+# Constants
+config="./config"
+n="
+"
+
 
 Describe "mommy"
     clean_config() { rm -f "$config"; }
@@ -216,7 +222,7 @@ Describe "mommy"
         End
 
         Describe "capitalization"
-            It "changes to the first character to lowercase if configured to 0"
+            It "changes the first character to lowercase if configured to 0"
                 echo "MOMMY_COMPLIMENTS='Alive station';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='0'" > "$config"
 
                 When run "$mommy" -c "$config" true
@@ -224,7 +230,7 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "changes to the first character to uppercase if configured to 1"
+            It "changes the first character to uppercase if configured to 1"
                 echo "MOMMY_COMPLIMENTS='inquiry speech';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='1'" > "$config"
 
                 When run "$mommy" -c "$config" true
@@ -247,20 +253,10 @@ Describe "mommy"
                 The error should equal "Belong shore"
                 The status should be success
             End
-
-            It "changes capitalization on all lines"
-                echo "MOMMY_COMPLIMENTS='luck
-fashion';MOMMY_SUFFIX='';MOMMY_CAPITALIZE='1'" > "$config"
-
-                When run "$mommy" -c "$config" true
-                The error should equal "Luck
-Fashion"
-                The status should be success
-            End
         End
 
         Describe "compliments/encouragements"
-            Describe "selection"
+            Describe "selection sources"
                 It "chooses from 'MOMMY_COMPLIMENTS'"
                     echo "MOMMY_COMPLIMENTS='spill drown';MOMMY_SUFFIX=''" > "$config"
 
@@ -277,17 +273,6 @@ Fashion"
                     The status should be success
                 End
 
-                It "chooses a multiline compliment"
-                    echo "MOMMY_COMPLIMENTS='loud
-    bank/loud
-    bank';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "loud
-    bank"
-                    The status should be success
-                End
-
                 It "outputs nothing if no compliments are set"
                     echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='';MOMMY_SUFFIX=''" > "$config"
 
@@ -297,8 +282,8 @@ Fashion"
                 End
             End
 
-            Describe "slashes"
-                It "inserts a virtual / in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
+            Describe "separators"
+                It "inserts a separator between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
                     echo "MOMMY_COMPLIMENTS='curse';MOMMY_COMPLIMENTS_EXTRA='dear';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
@@ -306,77 +291,69 @@ Fashion"
                     The status should be success
                 End
 
-                It "ignores leading slashes"
-                    # Probability of ~1/30 to pass even if code is buggy
-
-                    echo "MOMMY_COMPLIMENTS='/////////////////////////////boy only';MOMMY_SUFFIX=''" > "$config"
+                It "uses / as a separator"
+                    echo "MOMMY_COMPLIMENTS='boy/only';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "boy only"
+                    The error should not equal "boy/only"
                     The status should be success
                 End
 
-                It "ignores trailing slashes"
-                    # Probability of ~1/30 to pass even if code is buggy
-
-                    echo "MOMMY_COMPLIMENTS='';MOMMY_COMPLIMENTS_EXTRA='salt staff/////////////////////////////';MOMMY_SUFFIX=''" > "$config"
+                It "uses a newline as a separator"
+                    echo "MOMMY_COMPLIMENTS='salt${n}staff';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "salt staff"
+                    The error should not equal "salt${n}staff"
                     The status should be success
                 End
 
-                It "ignores slashes in the middle"
+                It "removes entries containing only whitespace"
                     # Probability of ~1/30 to pass even if code is buggy
 
-                    echo "MOMMY_COMPLIMENTS='end spring/////////////////////////////end spring';MOMMY_SUFFIX=''" > "$config"
+                    echo "MOMMY_COMPLIMENTS='  /  /wage rot/  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  /  ';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "end spring"
-                    The status should be success
-                End
-
-                It "ignores slashes in between 'MOMMY_COMPLIMENTS' and 'MOMMY_COMPLIMENTS_EXTRA'"
-                    # Probability of ~1/30 to pass even if code is buggy
-
-                    echo "MOMMY_COMPLIMENTS='attempt cheap///////////////';MOMMY_COMPLIMENTS_EXTRA='//////////////attempt cheap';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "attempt cheap"
+                    The error should equal "wage rot"
                     The status should be success
                 End
             End
 
-            Describe "newlines and whitespace"
-                It "removes leading newlines"
-                    echo "MOMMY_COMPLIMENTS='
-quick elastic';MOMMY_SUFFIX=''" > "$config"
+            Describe "comments"
+                It "ignores lines starting with '#'"
+                    echo "MOMMY_COMPLIMENTS='weaken${n}#egg';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "quick elastic"
+                    The error should equal "weaken"
                     The status should be success
                 End
 
-                It "removes trailing newlines"
-                    echo "MOMMY_COMPLIMENTS='happy airplane
-';MOMMY_SUFFIX=''" > "$config"
+                It "does not ignore lines starting with ' #'"
+                    echo "MOMMY_COMPLIMENTS=' #seat';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "happy airplane"
+                    The error should equal " #seat"
                     The status should be success
                 End
 
-                It "retains newlines inside a compliment"
-                    echo "MOMMY_COMPLIMENTS='mineral
-forward';MOMMY_SUFFIX=''" > "$config"
+                It "does not ignore lines with a '#' not at the start"
+                    echo "MOMMY_COMPLIMENTS='lo#ud';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
-                    The error should equal "mineral
-forward"
+                    The error should equal "lo#ud"
                     The status should be success
                 End
 
-                It "retains leading whitespace"
+                It "ignores the '/' in a comment line"
+                    echo "MOMMY_COMPLIMENTS='figure${n}#penny/some';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The error should equal "figure"
+                    The status should be success
+                End
+            End
+
+            Describe "whitespace in entries"
+                It "retains leading whitespace in an entry"
                     echo "MOMMY_COMPLIMENTS=' rake fix';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
@@ -384,7 +361,7 @@ forward"
                     The status should be success
                 End
 
-                It "retains trailing whitespace"
+                It "retains trailing whitespace in an entry"
                     echo "MOMMY_COMPLIMENTS='read wealth ';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
@@ -393,56 +370,8 @@ forward"
                 End
             End
 
-            Describe "comments"
-                It "ignores lines starting with '#'"
-                    echo "MOMMY_COMPLIMENTS='weaken
-#egg
-can';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "weaken
-can"
-                    The status should be success
-                End
-
-                It "does not ignore lines starting with ' #'"
-                    echo "MOMMY_COMPLIMENTS='dish
- #seat
-absence';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "dish
- #seat
-absence"
-                    The status should be success
-                End
-
-                It "does not ignore lines with a '#' not at the start"
-                    echo "MOMMY_COMPLIMENTS='speed
- lo#ud
-home';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "speed
- lo#ud
-home"
-                    The status should be success
-                End
-
-                It "ignores the '/' in a comment line"
-                    echo "MOMMY_COMPLIMENTS='figure
-#penny/some
-wear';MOMMY_SUFFIX=''" > "$config"
-
-                    When run "$mommy" -c "$config" true
-                    The error should equal "figure
-wear"
-                    The status should be success
-                End
-            End
-
             Describe "toggling"
-                It "outputs nothing if a command passes but compliments are disabled"
+                It "outputs nothing if a command succeeds but compliments are disabled"
                     echo "MOMMY_COMPLIMENTS_ENABLED='0';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
@@ -460,7 +389,7 @@ wear"
             End
 
             Describe "forbidden words"
-                It "outputs the compliment that does not contain the forbidden word"
+                It "does not output a compliment containing the forbidden word"
                     echo "MOMMY_COMPLIMENTS='mother search/fierce along';MOMMY_FORBIDDEN_WORDS='search';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
@@ -468,11 +397,19 @@ wear"
                     The status should be success
                 End
 
-                It "outputs the only compliment that does not contain a forbidden word"
+                It "does not output a compliment containing at least one of the forbidden words"
                     echo "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary';MOMMY_SUFFIX=''" > "$config"
 
                     When run "$mommy" -c "$config" true
                     The error should equal "failure school"
+                    The status should be success
+                End
+
+                It "does not output compliments containing a forbidden phrase"
+                    echo "MOMMY_COMPLIMENTS='member rid letter/rid wish over growth/member letter improve';MOMMY_FORBIDDEN_WORDS='member letter/wish over';MOMMY_SUFFIX=''" > "$config"
+
+                    When run "$mommy" -c "$config" true
+                    The error should equal "member rid letter"
                     The status should be success
                 End
             End

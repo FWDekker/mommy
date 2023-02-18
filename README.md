@@ -88,22 +88,14 @@ inside compliments and encouragements, you can use several variables:
 | `%%SWEETIE%%`   | what mommy calls you        |
 
 a few notes on compliments and encouragements:
-* you can add multiple of them by separating them with `/`~
-* in between the `"`, you can add newlines.
+* you can add multiple of them by putting them on separate lines or by separating them with `/`~
+* lines containing only space are ignored~
+* in between the `""`, lines starting with `#` are ignored.
   for example:
   ```shell
-  MOMMY_COMPLIMENTS="
-  /%%CAREGIVER%% loves you
-  /good %%SWEETIE%%
-  "
-  ```
-* newlines are trimmed from the start and end of each entry
-* in between the `"`, lines starting with `#` are ignored.
-  for example:
-  ```shell
-  MOMMY_COMPLIMENTS="/meow meow
+  MOMMY_COMPLIMENTS="meow meow
   # this line is ignored
-  /prr prrr
+  prr prrr
   "
   ```
 
@@ -192,8 +184,9 @@ RPS1="\$(mommy -s \$? 2>&1)"
 as a generic method, in any POSIX shell (including `sh`, `ash`, `dash`, `bash`) you can change the prompt itself to
 contain a message from mommy by setting the `$PS1` variable:
 ```shell
-export PS1="\$(mommy -s \$? 2>&1) $PS1 "
+export PS1="\$(mommy -s \$? 2>&1)$PS1"
 ```
+to improve the spacing, set `MOMMY_SUFFIX="~ "` in mommy's config file.
 add the above line to the config file for your shell.
 some shells (`dash`, `pdksh`) do not have a non-login config file by default, so to enable that you should add the 
 following to `~/.profile`:

@@ -1,6 +1,7 @@
 # Changelog
 ## [Unreleased]
-
+* mommy is even faster now with much simpler code~
+* mommy no longer supports multi-line templates and variables~
 
 
 ## [0.0.6] -- 2023-02-18
