@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install packages
         run: |
-          sudo apt install -y build-essential gzip libarchive-tools rpm rubygems squashfs-tools
+          sudo apt install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
       - name: Build executable
         run: ./build.sh apk deb rpm pacman installer raw

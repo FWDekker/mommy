@@ -8,13 +8,13 @@ mommy works on any POSIX system.
 mommy is tested on Ubuntu, Debian, macOS, FreeBSD, and NetBSD~
 
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
-* on Debian/Ubuntu/etc, run `sudo apt install ./mommy-0.0.5.deb`,
-* on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-0.0.5.rpm`,
-* on ArchLinux, run `sudo pacman -U ./mommy-0.0.5.pac`,
-* on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-0.0.5.apk`, and
+* on Debian/Ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
+* on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
+* on ArchLinux, run `sudo pacman -U ./mommy-*.pac`,
+* on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`, and
 * on macOS, FreeBSD/NetBSD/OpenBSD/etc, and any other POSIX system, you have two choices:
-  * extract `./mommy-0.0.5.any-system.tar.gz` and run `sudo ./install.sh` to install mommy and the manual page, or
-  * download `./mommy-0.0.5.sh` directly and put it wherever you want~
+  * extract `./mommy-*.any-system.tar.gz` and run `sudo ./install.sh` to install mommy and the manual page, or
+  * download `./mommy-*.sh` directly and put it wherever you want~
 
 after installation, you can [integrate mommy with your shell](#shell-integration)~
 
@@ -208,7 +208,7 @@ log out and back in, and mommy will appear in your shell~
 to build your own mommy, first install the requirements.
 on Debian-like systems, run
 ```shell
-sudo apt install build-essential gzip rubygems
+sudo apt install rubygems libarchive-tools rpm zstd
 sudo gem install fpm
 ```
 
@@ -216,8 +216,7 @@ after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and o
 replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html), 
 and/or use custom formats `raw` and `installer`~
 
-before a new release, make sure to update the version number in `./version` and `./README.md`, and to update the
-`CHANGELOG.md`~
+before a new release, make sure to update the version number in `./version` and to update the `CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
 by default, tests are run against `src/main/sh/mommy`.
