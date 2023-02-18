@@ -60,17 +60,21 @@ jobs:
         uses: vmactions/freebsd-vm@v0
         with:
           usesh: true
+          # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
+          # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
           prepare: |
             echo "# Install ShellSpec"
-            pkg install -y git
-            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            pkg install -y git || exit 1
+            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/" || exit 1
 
             echo "# Install gtar"
-            pkg install -y gtar
+            pkg install -y gtar || exit 1
 
             echo "# Ignore ownership issues"
-            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
           run: |
+            set -e
+
             echo "# Test script"
             PATH="$HOME/shellspec:$PATH" ./test.sh
 
@@ -92,6 +96,8 @@ jobs:
         with:
           usesh: true
           prepare: |
+            set -e
+
             pkg_add pkgin
 
             echo "# Install ShellSpec"
@@ -104,6 +110,8 @@ jobs:
             echo "# Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
           run: |
+            set -e
+
             echo "# Test script"
             PATH="$HOME/shellspec:$PATH" ./test.sh
 
