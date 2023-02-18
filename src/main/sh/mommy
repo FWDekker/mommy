@@ -144,12 +144,13 @@ list_choose() {
 # Prints stdin, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_cat() {
+    input="$(cat)"
     if [ "$1" = "lolcat" ]; then
-        cat | lolcat -f
+        echo "$input" | lolcat -f
     elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
-        cat
+        echo "$input"
     else
-        echo "$(tput setaf "$1")$(cat)$(tput sgr0)"
+        echo "$(tput setaf "$1")$input$(tput sgr0)"
     fi
     return 0
 }

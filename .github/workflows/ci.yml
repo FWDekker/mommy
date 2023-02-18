@@ -120,6 +120,6 @@ jobs:
 
             echo "# Test installer"
             gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-            installer/install.sh '' '' -y
+            installer/install.sh '' /usr/local/man/man1/mommy.1.gz -y
             mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
             rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
