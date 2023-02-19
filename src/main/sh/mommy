@@ -124,7 +124,11 @@ color_cat() {
     elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
         cat
     else
-        echo "$(tput setaf "$1")$(cat)$(tput sgr0)"
+        # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
+        tput setaf 0 1>/dev/null 2>/dev/null || tput_bug="0 0"
+
+        # shellcheck disable=SC2086 # OpenBSD workaround requires two arguments
+        echo "$(tput setaf "$1" $tput_bug)$(cat)$(tput sgr0)"
     fi
     return 0
 }

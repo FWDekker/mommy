@@ -5,16 +5,16 @@ mommy's here to support you~ ❤️
 
 ## installation
 mommy works on any POSIX system.
-mommy is tested on Ubuntu, Debian, macOS, FreeBSD, and NetBSD~
+mommy is tested on Ubuntu, Debian, macOS, FreeBSD, NetBSD, and OpenBSD~
 
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
 * on Debian/Ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
 * on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
 * on ArchLinux, run `sudo pacman -U ./mommy-*.pac`,
 * on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`, and
-* on macOS, FreeBSD/NetBSD/OpenBSD/etc, and any other POSIX system, you have two choices:
-  * extract `./mommy-*.any-system.tar.gz` and run `sudo ./install.sh` to install mommy and the manual page, or
-  * download `./mommy-*.sh` directly and put it wherever you want~
+* on macOS, FreeBSD/NetBSD/OpenBSD/etc, download and extract `./mommy-*.any-system.tar.gz`, and either:
+  * run the configurable installer with `sudo ./install.sh`, or
+  * copy `./mommy-*.sh` to whichever place you think is appropriate~
 
 after installation, you can [integrate mommy with your shell](#shell-integration)~
 
@@ -207,7 +207,7 @@ sudo gem install fpm
 
 after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
 replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html), 
-and/or use custom formats `raw` and `installer`~
+and/or use custom format `installer`~
 
 before a new release, make sure to update the version number in `./version` and to update the `CHANGELOG.md`~
 

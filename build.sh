@@ -21,9 +21,6 @@ for target in "$@"; do
     echo "# Build $target"
 
     case "$target" in
-    raw)
-        cp build/mommy "dist/mommy-$version.sh"
-        ;;
     installer)
         # To extract from project root directory into `./installer/`, run:
         #   tar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer

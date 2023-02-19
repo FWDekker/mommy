@@ -98,14 +98,12 @@ jobs:
           prepare: |
             set -e
 
-            pkg_add pkgin
-
             echo "# Install ShellSpec"
-            pkgin -y install git
+            pkg_add git
             git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
 
             echo "# Install gtar"
-            pkgin -y install gtar
+            pkg_add gtar
 
             echo "# Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -122,4 +120,39 @@ jobs:
             gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
             installer/install.sh '' /usr/local/man/man1/mommy.1.gz -y
             mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
-            rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+            rm -f /usr/local/bin/mommy /usr/local/man/man1/mommy.1.gz
+
+  test-openbsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec && Test script && Build installer && Test installer
+        uses: vmactions/openbsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            set -e
+
+            echo "# Install ShellSpec"
+            pkg_add git
+            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+
+            echo "# Install gtar"
+            pkg_add gtar-1.34
+
+            echo "# Ignore ownership issues"
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          run: |
+            set -e
+
+            echo "# Test script"
+            PATH="$HOME/shellspec:$PATH" ./test.sh
+
+            echo "# Build installer"
+            ./build.sh installer
+
+            echo "# Test installer"
+            gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
+            installer/install.sh '' /usr/local/man/man1/mommy.1.gz -y
+            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            rm -f /usr/local/bin/mommy /usr/local/man/man1/mommy.1.gz

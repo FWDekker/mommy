@@ -22,7 +22,7 @@ jobs:
           sudo apt install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
       - name: Build executable
-        run: ./build.sh apk deb rpm pacman installer raw
+        run: ./build.sh apk deb rpm pacman installer
       - name: Extract version number
         run: echo "VERSION=\"$(cat ./version)\"" >> $GITHUB_ENV
       - name: Extract release notes
