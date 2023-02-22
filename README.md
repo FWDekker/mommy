@@ -4,19 +4,26 @@ mommy's here to support you~ ❤️
 ![mommy demo](.github/demo.gif)
 
 ## installation
-mommy works on any POSIX system.
-mommy is tested on Ubuntu, Debian, macOS, FreeBSD, NetBSD, and OpenBSD~
+mommy works on any unix system.
+mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
-* on Debian/Ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
-* on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
-* on ArchLinux, run `sudo pacman -U ./mommy-*.pac`,
-* on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`, and
-* on macOS, FreeBSD/NetBSD/OpenBSD/etc, download and extract `./mommy-*.any-system.tar.gz`, and either:
-  * run the configurable installer with `sudo ./install.sh`, or
-  * copy `./mommy-*.sh` to whichever place you think is appropriate~
+* on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
+* on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
+* on archlinux, run `sudo pacman -U ./mommy-*.pac`,
+* on alpine linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`,
+* on macos, run `sudo installer -pkg ./mommy*+osx.pkg -target /`,
+* on freebsd, run `pkg add ./mommy-*.freebsd`,
+* on netbsd, run `pkg_add ./mommy-*+netbsd.tgz`,
+* on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
+* on other unix systems, download and extract the source code `.zip`, and copy `./src/main/sh/mommy` into the
+  appropriate directory
+  (usually `/usr/local/bin/`)
+  (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
 after installation, you can [integrate mommy with your shell](#shell-integration)~
+
+to update mommy, just repeat the installation process~
 
 ## usage
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
@@ -120,22 +127,22 @@ MOMMY_FORBIDDEN_WORDS="cat/dog"
 and mommy will not use a template that contains either `cat` or `dog`~
 
 ### renaming the mommy executable
-if you want to write `daddy npm test` instead of `mommy npm test`, then run the following:
-* if you installed with a package manager (`apt`, `rpm`, etc), do:
-  ```shell
-  sudo ln -fs /usr/bin/mommy /usr/bin/daddy
-  sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
-  ```
-* if you installed with `./install.sh`, do:
-  ```shell
-  sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
-  sudo ln -fs /usr/local/share/man/man1/mommy.1.gz /usr/local/share/man/man1/daddy.1.gz
-  ```
-
-if you update mommy, then your daddy will also be updated.
-but if you uninstall mommy, you should manually uninstall your daddy by running
+if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
+mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
+installed with `whereis mommy`:
 ```shell
-sudo rm -f /usr/bin/daddy /usr/share/man/man1/daddy.1.gz /usr/local/bin/daddy /usr/local/share/man/man1/daddy.1.gz
+$ whereis mommy
+mommy: /usr/local/bin/mommy /usr/local/man/man1/mommy.1.gz
+```
+the exact format may differ depending on your system, but in this case you can see that the program is installed in
+`/usr/local/bin/mommy` and the manual page in `/usr/local/man/man1/mommy.1.gz`.
+if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
+
+anyway, after finding mommy, you can just symlink using the following commands:
+(if `whereis` gave different paths than seen above, you should adapt these commands accordingly)
+```shell
+sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
+sudo ln -fs /usr/local/man/man1/mommy.1.gz /usr/local/man/man1/daddy.1.gz
 ```
 
 
@@ -206,14 +213,13 @@ sudo gem install fpm
 ```
 
 after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
-replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html), 
-and/or use custom format `installer`~
+replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html)~
 
 before a new release, make sure to update the version number in `./version` and to update the `CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
-by default, tests are run against `src/main/sh/mommy`.
-to change that, set the `mommy` variable before running tests, as in `mommy=/usr/bin/mommy ./test.sh`~
+by default, tests are run against `./src/main/sh/mommy`.
+to change that, set the `mommy` variable before running tests, as in `mommy=/usr/local/bin/mommy ./test.sh`~
 
 
 ## acknowledgements

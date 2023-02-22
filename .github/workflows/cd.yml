@@ -15,14 +15,14 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    needs: [build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd]
+
     steps:
       - uses: actions/checkout@v3
-      - name: Install packages
-        run: |
-          sudo apt install -y rubygems libarchive-tools rpm zstd
-          sudo gem install --no-document fpm
-      - name: Build executable
-        run: ./build.sh apk deb rpm pacman installer
+      - name: Download built packages
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
       - name: Extract version number
         run: echo "VERSION=\"$(cat ./version)\"" >> $GITHUB_ENV
       - name: Extract release notes
@@ -30,11 +30,140 @@ jobs:
         uses: ffurrer2/extract-release-notes@v1
         with:
           release_notes_file: RELEASE_NOTES.md
-      - name: Release
+      - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           prerelease: false
           tag_name: ${{ env.VERSION }}
           body_path: RELEASE_NOTES.md
-          files: dist/mommy-*.*
+          files: mommy*
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install fpm and build dependencies
+        run: |
+          sudo apt install -y rubygems libarchive-tools rpm zstd
+          sudo gem install --no-document fpm
+      - name: Build package
+        run: ./build.sh apk deb rpm pacman
+      - name: Upload built package
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/mommy*
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install fpm
+        run: sudo gem install --no-document fpm
+      - name: Build package
+        run: ./build.sh osxpkg
+      - name: Upload built package
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/mommy*
+
+  build-freebsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install fpm && Build package
+        uses: vmactions/freebsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            # fpm
+              echo "::group::Install fpm: Actually install fpm"
+              pkg install -y devel/ruby-gems || exit 1
+              gem install --no-document fpm || exit 1
+              echo "::endgroup::"
+
+              echo "::group::Install fpm: Install gtar (workaround for https://github.com/jordansissel/fpm/pull/1922)"
+              pkg install -y gtar || exit 1
+              mv /usr/bin/tar /usr/bin/bsdtar || exit 1
+              mv /usr/local/bin/gtar /usr/bin/tar || exit 1
+              echo "::endgroup::"
+            # /fpm
+
+            echo "::group::Ignore ownership issues"
+            pkg install -y git || exit 1
+            git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
+            echo "::endgroup::"
+          run: |
+            set -e
+
+            ./build.sh freebsd
+      - name: Upload built package
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/mommy*
+
+  build-netbsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install fpm && Build package
+        uses: vmactions/netbsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            set -e
+
+            echo "::group::Install fpm"
+            pkg_add ruby
+            /usr/pkg/bin/gem* install --no-document fpm
+            pkg_add pkg_install  # This is necessary to make `fpm` work with `pkgin` format for some reason
+            echo "::endgroup::"
+
+            echo "::group::Ignore ownership issues"
+            pkg_add git
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
+          run: |
+            set -e
+            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
+
+            ./build.sh netbsd
+      - name: Upload built package
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/mommy*
+
+  build-openbsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install fpm && Build package
+        uses: vmactions/openbsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            set -e
+
+            echo "::group::Install fpm"
+            pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
+            /usr/local/bin/gem* install --no-document fpm
+            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink `fpm` to latest version
+            echo "::endgroup::"
+
+            echo "::group::Ignore ownership issues"
+            pkg_add git
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
+          run: |
+            set -e
+
+            ./build.sh openbsd
+      - name: Upload built package
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/mommy*
