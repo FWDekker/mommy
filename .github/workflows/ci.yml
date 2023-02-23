@@ -22,7 +22,7 @@ jobs:
       - name: Test package
         run: |  
           sudo apt install -y ./dist/mommy-*.deb
-          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo apt purge -y mommy
 
   test-macos:
@@ -40,7 +40,7 @@ jobs:
       - name: Test package
         run: |
           sudo installer -pkg ./dist/mommy*+osx.pkg -target /
-          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
 
   test-freebsd:
@@ -88,7 +88,7 @@ jobs:
 
             echo "::group::Test package"
             pkg add ./dist/mommy-*.freebsd
-            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
             pkg delete -y mommy
             echo "::endgroup::"
 
@@ -131,7 +131,7 @@ jobs:
 
             echo "::group::Test package"
             pkg_add ./dist/mommy-*+netbsd.tgz
-            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
             pkg_delete mommy
             echo "::endgroup::"
 
@@ -173,6 +173,6 @@ jobs:
 
             echo "::group::Test package"
             pkg_add -D unsigned ./dist/mommy-*+openbsd.tgz
-            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
             pkg_delete mommy
             echo "::endgroup::"

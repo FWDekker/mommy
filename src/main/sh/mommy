@@ -172,17 +172,27 @@ fill_template() {
 
 
 ## Read options
-if [ "$1" = "--help" ]; then
-    MOMMY_OPT_HELP="1"
-fi
+MOMMY_OPT_HELP=""
+MOMMY_OPT_VERSION=""
+MOMMY_OPT_EVAL=""
+MOMMY_OPT_STATUS=""
 
-while getopts ":hc:e:s:" OPTION; do
+while getopts "hvc:e:s:-:" OPTION; do
+    # Workaround for long options: https://stackoverflow.com/a/28466267/
+    if [ "$OPTION" = "-" ]; then
+        OPTION="${OPTARG%%=*}"
+        OPTARG="${OPTARG#$OPT}"
+        OPTARG="${OPTARG#=}"
+    fi
+
+    # shellcheck disable=SC2214 # Handled by workaround
     case "$OPTION" in
-    h) MOMMY_OPT_HELP="1" ;;
+    h|help) MOMMY_OPT_HELP="1" ;;
+    v|version) MOMMY_OPT_VERSION="1" ;;
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) ;;
+    ?) echo "Illegal option --" ;;
     esac
 done
 
@@ -190,8 +200,8 @@ shift "$((OPTIND - 1))"
 
 
 ## Load configuration
-# shellcheck source=/dev/null
-test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
+# shellcheck disable=SC1090 # User-defined target
+[ -r "$MOMMY_OPT_CONFIG_FILE" ] && . "$MOMMY_OPT_CONFIG_FILE"
 
 
 ## Output
@@ -205,6 +215,9 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         man mommy
         exit "$?"
     fi
+elif [ -n "$MOMMY_OPT_VERSION" ]; then
+    echo "mommy v%%VERSION_NUMBER%%"
+    exit 0
 else
     if [ -n "$MOMMY_OPT_EVAL" ]; then
         (eval "$MOMMY_OPT_EVAL")

@@ -4,6 +4,8 @@
 * mommy is even faster now with much simpler code~
 * mommy now supports OpenBSD~
 * mommy now has installable packages for macOS, FreeBSD, NetBSD, and OpenBSD~
+* mommy has a `--version` option now~
+* mommy has improved documentation~
 * mommy stopped doing the `raw` and `installer` release types because they're redundant~
 
 
