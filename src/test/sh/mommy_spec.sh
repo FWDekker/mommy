@@ -5,9 +5,9 @@ n="
 [ -z "$MOMMY_EXEC" ] && export MOMMY_EXEC="../../main/sh/mommy"
 [ -z "$MOMMY_CONFIG_FILE" ] && export MOMMY_CONFIG_FILE="./config"
 
-# Writes `$1` to the config file, setting `MOMMY_SUFFIX` to the empty string if not set in `$1`.
+# Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
 set_config() {
-    echo "MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
+    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
 }
 
 

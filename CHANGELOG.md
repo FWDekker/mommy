@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+
+
+## [1.0.0] -- 2023-02-23
 * _breaking_: mommy no longer supports multi-line templates and variables~
 * mommy is even faster now with much simpler code~
 * mommy now supports OpenBSD~

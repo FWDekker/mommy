@@ -51,13 +51,13 @@ MOMMY_ENCOURAGEMENTS="
 just know that %%CAREGIVER%% still loves you
 
 # consolation~
+don't worry, it'll be alright
+it's okay to make mistakes
 %%CAREGIVER%% knows it's hard, but it will be okay
 
 # fallback~
 %%CAREGIVER%% is always here for you
-%%CAREGIVER%% is always here for you if you need %%THEIR%%
 come here, sit on my lap while we figure this out together
-%%CAREGIVER%% promises that, whatever happens, %%CAREGIVER%% will be here for you
 
 # encouragement~
 never give up, my love
@@ -65,7 +65,7 @@ just a little further, %%CAREGIVER%% knows you can do it
 %%CAREGIVER%% knows you'll get there, don't worry about it
 
 # clean up~
-did %%CAREGIVER%%'s %%SWEETIE%% make a big mess?
+did %%CAREGIVER%%'s %%SWEETIE%% make a big mess
 "
 MOMMY_ENCOURAGEMENTS_EXTRA=""
 MOMMY_ENCOURAGEMENTS_ENABLED="1"
@@ -121,7 +121,7 @@ fi
 color_cat() {
     if [ "$1" = "lolcat" ]; then
         cat | lolcat -f
-    elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
+    elif [ -z "$1" ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
         cat
     else
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
