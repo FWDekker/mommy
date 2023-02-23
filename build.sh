@@ -11,7 +11,7 @@ rm -rf build/ dist/
 
 # Prepare
 mkdir build/
-cp src/main/sh/install.sh src/main/sh/mommy src/main/resources/mommy.1 build/
+cp src/main/sh/mommy src/main/resources/mommy.1 build/
 sed -i".bak" "s/%%VERSION_NUMBER%%/$version/g;s/%%MANUAL_DATE%%/$manual_date/g" build/*
 gzip build/mommy.1
 
@@ -20,20 +20,116 @@ mkdir dist/
 for target in "$@"; do
     echo "# Build $target"
 
+    # Select targets
     case "$target" in
-    raw)
-        cp build/mommy "dist/mommy-$version.sh"
+    netbsd)
+        target_exe="build/mommy=/usr/pkg/bin/mommy"
+        target_man="build/mommy.1.gz=/usr/pkg/man/man1/mommy.1.gz"
         ;;
-    installer)
-        # To extract from project root directory into `./installer/`, run:
-        #   tar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-
-        cd build/
-        tar -czf "../dist/mommy-$version.any-system.tar.gz" "install.sh" "mommy" "mommy.1.gz"
-        cd -
+    osxpkg)
+        target_exe="build/mommy=/usr/local/bin/mommy"
+        target_man="build/mommy.1.gz=/usr/local/share/man/man1/mommy.1.gz"  # `/usr/local/man` is not on macOS manpath
         ;;
     *)
-        fpm -t "$target" -p "dist/mommy-$version.$target" --version "$version"
+        target_exe="build/mommy=/usr/local/bin/mommy"
+        target_man="build/mommy.1.gz=/usr/local/man/man1/mommy.1.gz"
+        ;;
+    esac
+
+    # Pre-process
+    case "$target" in
+    netbsd|openbsd)
+        # Extract properties
+        comment="$(<"./.fpm" grep -- "--description")"
+        comment="$(echo "${comment#* }" | tr -d "\"")"
+
+        maintainer="$(<"./.fpm" grep -- "--maintainer")"
+        maintainer="$(echo "${maintainer#* }" | tr -d "\"")"
+
+        # Prepare tmp directory
+        rm -rf /tmp/mommy
+        mkdir -p /tmp/mommy
+
+        # Copy input files
+        mkdir -p "/tmp/mommy/$(dirname "${target_exe#*=}")" "/tmp/mommy/$(dirname "${target_man#*=}")"
+        cp "./${target_exe%=*}" "/tmp/mommy/${target_exe#*=}"
+        cp "./${target_man%=*}" "/tmp/mommy/${target_man#*=}"
+
+        # Create control files
+        cd /tmp/mommy
+
+        ## Comment
+        echo "$comment" >> ./+COMMENT
+
+        ## Description
+        {
+            echo "$comment"
+            echo ""
+            echo "Maintainer: $maintainer"
+        } >> ./+DESC
+
+        ## Pack file
+        {
+            echo "./${target_exe#*=}"
+            echo "./${target_man#*=}"
+        } >> ./+CONTENTS
+
+        # Build info
+        if [ "$target" = "netbsd" ]; then
+            {
+                echo "MACHINE_ARCH=$(uname -p)"
+                echo "OPSYS=$(uname)"
+                echo "OS_VERSION=$(uname -r)"
+                echo "PKGTOOLS_VERSION=$(pkg_create -V)"
+            } >> ./+BUILD_INFO
+        fi
+
+        cd -
+        ;;
+    esac
+
+    # Process
+    case "$target" in
+    netbsd)
+        cd /tmp/mommy
+        pkg_create \
+            -B ./+BUILD_INFO \
+            -c ./+COMMENT \
+            -d ./+DESC \
+            -f ./+CONTENTS \
+            -I / \
+            -p . \
+            "./mommy-$version+netbsd.tgz"
+        cd -
+        mv /tmp/mommy/mommy*.tgz ./dist/
+        ;;
+    openbsd)
+        cd /tmp/mommy
+        pkg_create \
+            -d ./+DESC \
+            -D COMMENT="$comment" \
+            -D FULLPKGPATH="mommy-$version+netbsd" \
+            -f ./+CONTENTS \
+            -B /tmp/mommy \
+            -p / \
+            "./mommy-$version+openbsd.tgz"
+        cd -
+        mv /tmp/mommy/mommy*.tgz ./dist/
+        ;;
+    *)
+        fpm -t "$target" -p "./dist/mommy-$version.$target" --version "$version" "$target_exe" "$target_man"
+        ;;
+    esac
+
+    # Post-process
+    case "$target" in
+    netbsd|openbsd)
+        # Clean up
+        rm -rf /tmp/mommy
+        ;;
+    osxpkg)
+        # `installer` program requires `pkg` extension
+        mv ./dist/*.osxpkg "./dist/mommy-$version+osx.pkg"
         ;;
     esac
 done

@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+## [1.0.0] -- 2023-02-23
+* _breaking_: mommy no longer supports multi-line templates and variables~
+* mommy is even faster now with much simpler code~
+* mommy now supports OpenBSD~
+* mommy now has installable packages for macOS, FreeBSD, NetBSD, and OpenBSD~
+* mommy has a `--version` option now~
+* mommy has improved documentation~
+* mommy stopped doing the `raw` and `installer` release types because they're redundant~
+
 
 ## [0.0.6] -- 2023-02-18
 * mommy is much faster now that she only calculates when needed~

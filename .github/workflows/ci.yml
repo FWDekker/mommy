@@ -10,116 +10,169 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install ShellSpec
-        run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
       - name: Install fpm and build dependencies
         run: |
-          sudo apt install -y build-essential gzip libarchive-tools rpm rubygems squashfs-tools
+          sudo apt install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
-      - name: Build package and installer
-        run: ./build.sh deb installer
+      - name: Build package
+        run: ./build.sh deb
       - name: Test package
-        run: |
-          sudo apt install -y ./dist/*.deb
-          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+        run: |  
+          sudo apt install -y ./dist/mommy-*.deb
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo apt purge -y mommy
-      - name: Test installer
-        run: |
-          tar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-          sudo installer/install.sh '' '' -y
-          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
-          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
 
   test-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Install ShellSpec
-        run: git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
-      - name: Install gtar
+      - name: Install fpm
+        run: sudo gem install --no-document fpm
+      - name: Build package
+        run: ./build.sh osxpkg
+      - name: Test package
         run: |
-          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install gnu-tar
-      - name: Build installer
-        run: ./build.sh installer
-      - name: Test installer
-        run: |
-          gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-          sudo installer/install.sh '' '' -y
-          mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          sudo installer -pkg ./dist/mommy*+osx.pkg -target /
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
 
   test-freebsd:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Install ShellSpec && Test script && Build installer && Test installer
+      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
         uses: vmactions/freebsd-vm@v0
         with:
           usesh: true
           # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
           # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
           prepare: |
-            echo "# Install ShellSpec"
+            echo "::group::Install ShellSpec"
             pkg install -y git || exit 1
-            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/" || exit 1
+            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/" || exit 1
+            echo "::endgroup::"
 
-            echo "# Install gtar"
-            pkg install -y gtar || exit 1
+            # fpm
+              echo "::group::Install fpm: Actually install fpm"
+              pkg install -y devel/ruby-gems || exit 1
+              gem install --no-document fpm || exit 1
+              echo "::endgroup::"
 
-            echo "# Ignore ownership issues"
+              echo "::group::Install fpm: Install gtar (workaround for https://github.com/jordansissel/fpm/pull/1922)"
+              pkg install -y gtar || exit 1
+              mv /usr/bin/tar /usr/bin/bsdtar || exit 1
+              mv /usr/local/bin/gtar /usr/bin/tar || exit 1
+              echo "::endgroup::"
+            # /fpm
+
+            echo "::group::Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
+            echo "::endgroup::"
           run: |
             set -e
 
-            echo "# Test script"
+            echo "::group::Test script"
             PATH="$HOME/shellspec:$PATH" ./test.sh
+            echo "::endgroup::"
 
-            echo "# Build installer"
-            ./build.sh installer
+            echo "::group::Build package"
+            ./build.sh freebsd
+            echo "::endgroup::"
 
-            echo "# Test installer"
-            gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-            installer/install.sh '' '' -y
-            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
-            rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+            echo "::group::Test package"
+            pkg add ./dist/mommy-*.freebsd
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            pkg delete -y mommy
+            echo "::endgroup::"
 
   test-netbsd:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Install ShellSpec && Test script && Build installer && Test installer
+      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
         uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
           prepare: |
             set -e
 
-            pkg_add pkgin
+            echo "::group::Install ShellSpec"
+            pkg_add git
+            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            echo "::endgroup::"
 
-            echo "# Install ShellSpec"
-            pkgin -y install git
-            git clone https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            echo "::group::Install fpm"
+            pkg_add ruby
+            /usr/pkg/bin/gem* install --no-document fpm
+            pkg_add pkg_install  # This is necessary to make `fpm` work with `pkgin` format for some reason
+            echo "::endgroup::"
 
-            echo "# Install gtar"
-            pkgin -y install gtar
-
-            echo "# Ignore ownership issues"
+            echo "::group::Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
+          run: |
+            set -e
+            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
+
+            echo "::group::Test script"
+            PATH="$HOME/shellspec:$PATH" ./test.sh
+            echo "::endgroup::"
+
+            echo "::group::Build package"
+            ./build.sh netbsd
+            echo "::endgroup::"
+
+            echo "::group::Test package"
+            pkg_add ./dist/mommy-*+netbsd.tgz
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            pkg_delete mommy
+            echo "::endgroup::"
+
+  test-openbsd:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install ShellSpec && Test script && Build package && Test package
+        uses: vmactions/openbsd-vm@v0
+        with:
+          usesh: true
+          prepare: |
+            set -e
+
+            echo "::group::Install ShellSpec"
+            pkg_add git
+            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            echo "::endgroup::"
+
+            echo "::group::Install fpm"
+            pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
+            /usr/local/bin/gem* install --no-document fpm
+            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink `fpm` to latest version
+            echo "::endgroup::"
+
+            echo "::group::Ignore ownership issues"
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
           run: |
             set -e
 
-            echo "# Test script"
+            echo "::group::Test script"
             PATH="$HOME/shellspec:$PATH" ./test.sh
+            echo "::endgroup::"
 
-            echo "# Build installer"
-            ./build.sh installer
+            echo "::group::Build package"
+            ./build.sh openbsd
+            echo "::endgroup::"
 
-            echo "# Test installer"
-            gtar -xvzf dist/mommy-*.any-system.tar.gz --one-top-level=installer
-            installer/install.sh '' /usr/local/man/man1/mommy.1.gz -y
-            mommy=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
-            rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+            echo "::group::Test package"
+            pkg_add -D unsigned ./dist/mommy-*+openbsd.tgz
+            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            pkg_delete mommy
+            echo "::endgroup::"

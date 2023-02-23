@@ -1,5 +1,8 @@
 #!/bin/sh
 
+n="
+"
+
 ## Defaults
 ### Options
 MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
@@ -15,54 +18,54 @@ MOMMY_CAPITALIZE="0"
 
 MOMMY_COMPLIMENTS="
 # generic~
-/*pets your head*
-/amazing work as always
+*pets your head*
+amazing work as always
 
 # good X~
-/good %%SWEETIE%%
-/good job, %%SWEETIE%%
-/that's a good %%SWEETIE%%
-/who's my good %%SWEETIE%%
+good %%SWEETIE%%
+good job, %%SWEETIE%%
+that's a good %%SWEETIE%%
+who's my good %%SWEETIE%%
 
 # proud~
-/%%CAREGIVER%% is very proud of you
-/%%CAREGIVER%% is so proud of you
-/%%CAREGIVER%% knew you could do it
-/%%CAREGIVER%% loves you, you are doing amazing
+%%CAREGIVER%% is very proud of you
+%%CAREGIVER%% is so proud of you
+%%CAREGIVER%% knew you could do it
+%%CAREGIVER%% loves you, you are doing amazing
 
 # compliment~
-/%%CAREGIVER%%'s %%SWEETIE%% is so smart
+%%CAREGIVER%%'s %%SWEETIE%% is so smart
 
 # reward~
-/%%CAREGIVER%% thinks you deserve a special treat for that
-/my little %%SWEETIE%% deserves a big fat kiss for that
+%%CAREGIVER%% thinks you deserve a special treat for that
+my little %%SWEETIE%% deserves a big fat kiss for that
 "
 MOMMY_COMPLIMENTS_EXTRA=""
 MOMMY_COMPLIMENTS_ENABLED="1"
 
 MOMMY_ENCOURAGEMENTS="
 # trust~
-/%%CAREGIVER%% believes in you
-/%%CAREGIVER%% knows you'll get there
-/%%CAREGIVER%% knows %%THEIR%% little %%SWEETIE%% can do better
-/just know that %%CAREGIVER%% still loves you
+%%CAREGIVER%% believes in you
+%%CAREGIVER%% knows you'll get there
+%%CAREGIVER%% knows %%THEIR%% little %%SWEETIE%% can do better
+just know that %%CAREGIVER%% still loves you
 
 # consolation~
-/%%CAREGIVER%% knows it's hard, but it will be okay
+don't worry, it'll be alright
+it's okay to make mistakes
+%%CAREGIVER%% knows it's hard, but it will be okay
 
 # fallback~
-/%%CAREGIVER%% is always here for you
-/%%CAREGIVER%% is always here for you if you need %%THEIR%%
-/come here, sit on my lap while we figure this out together
-/%%CAREGIVER%% promises that, whatever happens, %%CAREGIVER%% will be here for you
+%%CAREGIVER%% is always here for you
+come here, sit on my lap while we figure this out together
 
 # encouragement~
-/never give up, my love
-/just a little further, %%CAREGIVER%% knows you can do it
-/%%CAREGIVER%% knows you'll get there, don't worry about it
+never give up, my love
+just a little further, %%CAREGIVER%% knows you can do it
+%%CAREGIVER%% knows you'll get there, don't worry about it
 
 # clean up~
-/did %%CAREGIVER%%'s %%SWEETIE%% make a big mess?
+did %%CAREGIVER%%'s %%SWEETIE%% make a big mess
 "
 MOMMY_ENCOURAGEMENTS_EXTRA=""
 MOMMY_ENCOURAGEMENTS_ENABLED="1"
@@ -71,93 +74,68 @@ MOMMY_FORBIDDEN_WORDS=""
 
 
 ## Lists
-# A list is a collection of entries. An entry is a string, possibly multiline. An entry does not start or end with a
-# whitespace character. A list is represented by a string, consisting of the entries separated by `/`s. A list does not
-# have leading or trailing `/`s.
+# A list is a collection of entries. Entries are separated by a forward slash (`/`) or by a newline. Entries containing
+# only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#` and
+# contains a `/`, the `/` is not a separator but part of the comment. A sanitized list is a list in which there are no
+# forward slashes (`/`) and in which there are no comments.
 
-# Outputs `0` if the string `$1` contains any of the substrings in the list `$2`, and outputs `1` otherwise.
+# Returns `0` if the string `$1` contains any of the entries in the sanitized list `$2` as a substring, and returns `1`
+# otherwise.
 list_contains_any() {
-    if [ "$2" = "" ]; then
-        printf "1"
-        return 0
-    fi
+    if [ -z "$2" ]; then return 1; fi
 
-    list="$2/"
-    while [ -n "$list" ]; do
-        if [ -z "${1##*"${list%%/*}"*}" ]; then
-            printf "0"
-            return 0
-        fi
-
-        list="${list#*/}"
-    done
-
-    printf "1"
-    return 0
+    echo "$2" | while IFS="$n" read -r needle; do [ -z "${1##*"$needle"*}" ] && return 0; done
+    return "$?"
 }
 
-# Takes the list in stdin and removes (1) all whitespace-only entries, (2) all entries containing one of the words in
-# the list in `$1`, and (3) all lines starting with `#`. As a result of (1), consecutive `/`s and leading and trailing
-# `/`s are removed.
+# Takes the list in stdin and (1) removes all lines starting with `#`, (2) replaces each `/` with a newline, (3) removes
+# all blank lines, and (4) removes all entries that contain any of the entries in the sanitized list `$1` as a
+# substring.
 list_sanitize() {
-    list="$(cat | grep -v "^#")/"
-
-    sanitized_list=""
-    while [ -n "$list" ]; do
-        entry="${list%%/*}"
-
-        if [ -n "$(printf "%s" "$entry" | tr -d "[:space:]")" ] && [ "$(list_contains_any "$entry" "$1")" -ne 0 ]; then
-            sanitized_list="$sanitized_list$entry/"
-        fi
-
-        list="${list#*/}"
-    done
-
-    printf "%s" "${sanitized_list%?}"
+    cat |
+        grep -v "^#" |
+        awk -v RS="/" "{print}" |
+        grep -v "^[[:space:]]*\$" |
+        while IFS="$n" read -r line; do list_contains_any "$line" "$1" || echo "$line"; done
     return 0
 }
 
 # Writes a random entry from the list in stdin to stdout.
-list_choose() {
-    list="$(cat)/"
-    count="$(printf "%s" "$list" | tr -cd "/" | wc -c)"
-    if [ -x "$(command -v shuf)" ]; then
-        idx="$(shuf -i 1-"$count" -n 1)"
-    else
+if [ -x "$(command -v shuf)" ]; then
+    list_choose() {
+        cat | shuf -n1
+    }
+else
+    list_choose() {
+        lines="$(cat)"
+        count="$(echo "$lines" | wc -l)"
         idx="$(jot -r 1 1 "$count")"
-    fi
-
-    i="1"
-    while [ -n "$list" ]; do
-        if [ "$i" -eq "$idx" ]; then
-            printf "%s" "${list%%/*}"
-            return 0
-        fi
-
-        list="${list#*/}"
-        i="$((i+1))"
-    done
-}
+        echo "$lines" | sed "${idx}q;d"
+    }
+fi
 
 
 ## Functions
 # Prints stdin, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_cat() {
-    input="$(cat)"
     if [ "$1" = "lolcat" ]; then
-        echo "$input" | lolcat -f
-    elif [ -z "$1" ] || [ ! -t 1 ] && [ ! -t 2 ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
-        echo "$input"
+        cat | lolcat -f
+    elif [ -z "$1" ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
+        cat
     else
-        echo "$(tput setaf "$1")$input$(tput sgr0)"
+        # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
+        tput setaf 0 1>/dev/null 2>/dev/null || tput_bug="0 0"
+
+        # shellcheck disable=SC2086 # OpenBSD workaround requires two arguments
+        echo "$(tput setaf "$1" $tput_bug)$(cat)$(tput sgr0)"
     fi
     return 0
 }
 
-# Reads stdin; if `$1` is `0`, the first character on each line is changed to lowercase, if `$1` is `1`, the first
-# character on each line is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
-capitalize_lines() {
+# Reads stdin; if `$1` is `0`, the first character the line is changed to lowercase, if `$1` is `1`, the first character
+# is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
+capitalize() {
     if [ "$1" = "0" ]; then
         mapping="tolower"
     elif [ "$1" = "1" ]; then
@@ -181,32 +159,40 @@ capitalize_lines() {
 # 4. appends `$4`; and
 # 5. writes to stdout.
 fill_template() {
-    sweetie=$(printf "%s" "$1" | list_sanitize | list_choose)
-    their=$(printf "%s" "$2" | list_sanitize | list_choose)
-    caregiver=$(printf "%s" "$3" | list_sanitize | list_choose)
-    suffix=$(printf "%s" "$4" | list_sanitize | list_choose)
+    sweetie="$(echo "$1" | list_sanitize | list_choose)"
+    their="$(echo "$2" | list_sanitize | list_choose)"
+    caregiver="$(echo "$3" | list_sanitize | list_choose)"
+    suffix="$(echo "$4" | list_sanitize | list_choose)"
 
-    output="$(printf "%s\n" "$(cat)" |
-                  sed -e "s/%%SWEETIE%%/$sweetie/g" -e "s/%%THEIR%%/$their/g" -e "s/%%CAREGIVER%%/$caregiver/g" |
-                  capitalize_lines "$5" |
-                  sed -e "1h;2,\$H;\$!d;g" -e "s/^\n*//" -e "s/\n*$//")"
-    printf "%s" "$output" "$suffix"
+    template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" -e "s/%%THEIR%%/$their/g" -e "s/%%CAREGIVER%%/$caregiver/g")"
+
+    printf "%s" "$template" "$suffix" | capitalize "$5"
     return 0
 }
 
 
 ## Read options
-if [ "$1" = "--help" ]; then
-    MOMMY_OPT_HELP="1"
-fi
+MOMMY_OPT_HELP=""
+MOMMY_OPT_VERSION=""
+MOMMY_OPT_EVAL=""
+MOMMY_OPT_STATUS=""
 
-while getopts ":hc:e:s:" OPTION; do
+while getopts "hvc:e:s:-:" OPTION; do
+    # Workaround for long options: https://stackoverflow.com/a/28466267/
+    if [ "$OPTION" = "-" ]; then
+        OPTION="${OPTARG%%=*}"
+        OPTARG="${OPTARG#$OPT}"
+        OPTARG="${OPTARG#=}"
+    fi
+
+    # shellcheck disable=SC2214 # Handled by workaround
     case "$OPTION" in
-    h) MOMMY_OPT_HELP="1" ;;
+    h|help) MOMMY_OPT_HELP="1" ;;
+    v|version) MOMMY_OPT_VERSION="1" ;;
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) ;;
+    ?) echo "Illegal option --" ;;
     esac
 done
 
@@ -214,8 +200,8 @@ shift "$((OPTIND - 1))"
 
 
 ## Load configuration
-# shellcheck source=/dev/null
-test -f "$MOMMY_OPT_CONFIG_FILE" && . "$MOMMY_OPT_CONFIG_FILE"
+# shellcheck disable=SC1090 # User-defined target
+[ -r "$MOMMY_OPT_CONFIG_FILE" ] && . "$MOMMY_OPT_CONFIG_FILE"
 
 
 ## Output
@@ -229,6 +215,9 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         man mommy
         exit "$?"
     fi
+elif [ -n "$MOMMY_OPT_VERSION" ]; then
+    echo "mommy v%%VERSION_NUMBER%%"
+    exit 0
 else
     if [ -n "$MOMMY_OPT_EVAL" ]; then
         (eval "$MOMMY_OPT_EVAL")
@@ -248,10 +237,10 @@ else
         exit "$command_exit_code"
     fi
 
-    color=$(printf "%s" "$MOMMY_COLOR" | list_sanitize | list_choose)
-    forbidden_words=$(printf "%s" "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)
+    color="$(echo "$MOMMY_COLOR" | list_sanitize | list_choose)"
+    forbidden_words="$(echo "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)"
 
-    printf "%s" "$templates" |
+    echo "$templates" |
         list_sanitize "$forbidden_words" |
         list_choose |
         fill_template "$MOMMY_SWEETIE" "$MOMMY_THEIR" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE" |

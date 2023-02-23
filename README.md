@@ -1,22 +1,36 @@
 # mommy
 mommy's here to support you~ ❤️
 
+mommy is fully customizable, integrates with any shell, works on any unix system, and most importantly, loves you very
+much~
+
 ![mommy demo](.github/demo.gif)
 
+
 ## installation
-mommy works on any POSIX system.
-mommy is tested on Ubuntu, Debian, macOS, FreeBSD, and NetBSD~
+mommy works on any unix system.
+mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
-* on Debian/Ubuntu/etc, run `sudo apt install ./mommy-0.0.5.deb`,
-* on Red Hat/Fedora/etc, run `sudo dnf install ./mommy-0.0.5.rpm`,
-* on ArchLinux, run `sudo pacman -U ./mommy-0.0.5.pac`,
-* on Alpine Linux, run `sudo apk add --allow-untrusted ./mommy-0.0.5.apk`, and
-* on macOS, FreeBSD/NetBSD/OpenBSD/etc, and any other POSIX system, you have two choices:
-  * extract `./mommy-0.0.5.any-system.tar.gz` and run `sudo ./install.sh` to install mommy and the manual page, or
-  * download `./mommy-0.0.5.sh` directly and put it wherever you want~
+* on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
+* on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
+* on archlinux, run `sudo pacman -U ./mommy-*.pacman`,
+* on alpine linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`,
+* on macos, run `sudo installer -pkg ./mommy*+osx.pkg -target /`,
+* on freebsd, run `pkg add ./mommy-*.freebsd`,
+* on netbsd, run `pkg_add ./mommy-*+netbsd.tgz`,
+* on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
+* on other unix systems, download and extract the source code `.zip`, and copy `./src/main/sh/mommy` into the
+  appropriate directory
+  (usually `/usr/local/bin/`)
+  (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
-after installation, you can [integrate mommy with your shell](#shell-integration)~
+after installation, you can [configure mommy](#configuration) and [integrate mommy with your shell](#shell-integration)~
+
+to update mommy, just repeat the installation process~
+
+![mommy integrated with the fish shell](.github/sample1.png)
+
 
 ## usage
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
@@ -33,9 +47,10 @@ $ mommy [-c config] -s status
 # e.g. `mommy -s $?`
 ```
 
+
 ## configuration
-mommy's behavior can be configured by editing `~/.config/mommy/config.sh`.
-or specify another config file with `mommy -c ./my_config.sh [other options]`~
+mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
+or specify a different config file with `mommy -c ./my_config.sh [other options]`~
 
 ### config file format
 mommy executes the config file as a shell script and keeps the environment variables.
@@ -45,41 +60,56 @@ MOMMY_PRONOUN="their"
 ```
 make sure you do not put spaces around the `=`~
 
+### available settings
+| variable                       | description                                                                                                                                                                                                                                                                                                                                                  | list? | default      |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|--------------|
+| `MOMMY_CAREGIVER`              | what mommy calls herself                                                                                                                                                                                                                                                                                                                                     | yes   | `mommy`      |
+| `MOMMY_THEIR`                  | mommy's pronoun for herself                                                                                                                                                                                                                                                                                                                                  | yes   | `her`        |
+| `MOMMY_SWEETIE`                | what mommy calls you                                                                                                                                                                                                                                                                                                                                         | yes   | `girl`       |
+| `MOMMY_SUFFIX`                 | what mommy puts at the end of each sentence                                                                                                                                                                                                                                                                                                                  | yes   | `~`          |
+| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                                                                                                                                                                                                                      | no    | `0`          |
+| `MOMMY_COLOR`                  | color of mommy's text. you can use any [xterm color code](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg), or write `lolcat` to use [lolcat](https://github.com/busyloop/lolcat) (install separately). specify multiple colors separated by `/` to randomly select one. set to empty string for your terminal's default color. | yes   | `005`        |
+| `MOMMY_COMPLIMENTS`            | default compliment templates                                                                                                                                                                                                                                                                                                                                 | yes   | &lt;various> |
+| `MOMMY_COMPLIMENTS_EXTRA`      | additional compliment templates you can specify                                                                                                                                                                                                                                                                                                              | yes   | &lt;empty>   |
+| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                                                                                                                                                                                                                                                                                          | no    | `1`          |
+| `MOMMY_ENCOURAGEMENTS`         | default encouragement templates                                                                                                                                                                                                                                                                                                                              | yes   | &lt;various> |
+| `MOMMY_ENCOURAGEMENTS_EXTRA`   | additional encouragement templates you can specify                                                                                                                                                                                                                                                                                                           | yes   | &lt;empty>   |
+| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                                                                                                                                                                                                                                                                                       | no    | `1`          |
+| `MOMMY_FORBIDDEN_WORDS`        | mommy will not use templates that contain forbidden / trigger words                                                                                                                                                                                                                                                                                          | yes   | &lt;empty>   |
+
+### lists
+some of these settings support lists.
+mommy chooses a random element from each list each time she is called by you.
+(except for `MOMMY_FORBIDDEN_WORDS`, where all elements of the list are always forbidden.)
+in a list, elements are separated by a newline or by a `/`.
+elements that contain whitespace only, and elements that start with a `#` are ignored~
+
+* for example, if you set
+  ```shell
+  MOMMY_SWEETIE="girl/kitten"
+  ```
+  then mommy will sometimes call you `girl`, and sometimes `kitten`~
+* if you set
+  ```shell
+  MOMMY_PRONOUN="their
+  faer/#her/its"
+  ```
+  then mommy will use pronouns `their`, `faer`, and `its`, but not `her`~
+* if you set
+  ```shell
+  MOMMY_FORBIDDEN_WORDS="cat/dog"
+  ```
+  then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
+
+### custom templates
+if you change `MOMMY_COMPLIMENTS` in your config file, then you lose the default compliments that mommy knows.
+if you want both the default and your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`.
+similarly so for encouragements~
+
 ### template variables
-you can change the words mommy uses to describe herself and you by changing the following variables in your config file:
-
-| variable          | description                                 | default |
-|-------------------|---------------------------------------------|---------|
-| `MOMMY_CAREGIVER` | what mommy calls herself                    | `mommy` |
-| `MOMMY_THEIR`     | mommy's pronoun for herself                 | `her`   |
-| `MOMMY_SWEETIE`   | what mommy calls you                        | `girl`  |
-| `MOMMY_SUFFIX`    | what mommy puts at the end of each sentence | `~`     |
-
-for each of these variables, you can specify multiple values separated by `/`, and mommy will choose a random one
-each time.
-for example, if you set
-```shell
-MOMMY_SWEETIE="girl/cat"
-```
-then mommy will sometimes call you `girl`, and sometimes `cat`~
-
-### compliments and encouragements
-you can change the sentences mommy says when she compliments or encourages you.
-compliments are when things go well, and encouragements are when things are not going so well~
-
-| variable                      | description                                   |
-|-------------------------------|-----------------------------------------------|
-| `MOMMY_COMPLIMENTS`           | default list of compliments                   |
-| `MOMMY_COMPLIMENTS_CUSTOM`    | custom list of compliments you can specify    |
-| `MOMMY_ENCOURAGEMENTS`        | default list of encouragements                |
-| `MOMMY_ENCOURAGEMENTS_CUSTOM` | custom list of encouragements you can specify |
-
-when choosing a compliment, mommy looks at all the compliments in both `MOMMY_COMPLIMENTS` and
-`MOMMY_COMPLIMENTS_CUSTOM`.
-so, add your own compliments to `MOMMY_COMPLIMENTS_CUSTOM`.
-if you want to disable the default compliments and only use your custom compliments, also set `MOMMY_COMPLIMENTS=""`~
-
-inside compliments and encouragements, you can use several variables:
+inside compliments and encouragements, you can put placeholders that contain the random values that mommy chose.
+for example, if you add the compliment `%%CAREGIVER%% loves you`, and `MOMMY_CAREGIVER=your mommy`, then mommy outputs
+`your mommy loves you`~
 
 | variable        | description                 |
 |-----------------|-----------------------------|
@@ -87,65 +117,24 @@ inside compliments and encouragements, you can use several variables:
 | `%%THEIR%%`     | mommy's pronoun for herself |
 | `%%SWEETIE%%`   | what mommy calls you        |
 
-a few notes on compliments and encouragements:
-* you can add multiple of them by separating them with `/`~
-* in between the `"`, you can add newlines.
-  for example:
-  ```shell
-  MOMMY_COMPLIMENTS="
-  /%%CAREGIVER%% loves you
-  /good %%SWEETIE%%
-  "
-  ```
-* newlines are trimmed from the start and end of each entry
-* in between the `"`, lines starting with `#` are ignored.
-  for example:
-  ```shell
-  MOMMY_COMPLIMENTS="/meow meow
-  # this line is ignored
-  /prr prrr
-  "
-  ```
-
-### miscellaneous features
-there are a few features that you can disable, enable, or otherwise customise~
-
-| variable                       | description                                                                                                                                                                                                                                                                                                                           | default |
-|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                                                                                                                                                                                                                                                                   | `1`     |
-| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                                                                                                                                                                                                                                                                | `1`     |
-| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                                                                                                                                                                                               | `0`     |
-| `MOMMY_COLOR`                  | color of mommy's text. you can use any [xterm color code](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg), or write `lolcat` to use [lolcat](https://github.com/busyloop/lolcat) (install separately). specify multiple colors separated by `/` to randomly select one. empty string for default color. | `005`   |
-
-### forbidden words / trigger words
-if mommy uses a word that you really don't like, but you don't want to remove all of mommy's default
-compliments/encouragements, you can set forbidden words, and mommy will not use templates with those words in them.
-to set multiple forbidden words, separate them with a `/`.
-for example, write
-```shell
-MOMMY_FORBIDDEN_WORDS="cat/dog"
-```
-and mommy will not use a template that contains either `cat` or `dog`~
-
 ### renaming the mommy executable
-if you want to write `daddy npm test` instead of `mommy npm test`, then run the following:
-* if you installed with a package manager (`apt`, `rpm`, etc), do:
-  ```shell
-  sudo ln -fs /usr/bin/mommy /usr/bin/daddy
-  sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
-  ```
-* if you installed with `./install.sh`, do:
-  ```shell
-  sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
-  sudo ln -fs /usr/local/share/man/man1/mommy.1.gz /usr/local/share/man/man1/daddy.1.gz
-  ```
-
-if you update mommy, then your daddy will also be updated.
-but if you uninstall mommy, you should manually uninstall your daddy by running
+if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
+mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
+installed with `whereis mommy`:
 ```shell
-sudo rm -f /usr/bin/daddy /usr/share/man/man1/daddy.1.gz /usr/local/bin/daddy /usr/local/share/man/man1/daddy.1.gz
+$ whereis mommy
+mommy: /usr/local/bin/mommy /usr/local/man/man1/mommy.1.gz
 ```
+the exact format may differ depending on your system, but in this case you can see that the program is installed in
+`/usr/local/bin/mommy` and the manual page in `/usr/local/man/man1/mommy.1.gz`.
+if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
 
+anyway, after finding mommy, you can just symlink using the following commands:
+(if `whereis` gave different paths than seen above, you should adapt these commands accordingly)
+```shell
+sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
+sudo ln -fs /usr/local/man/man1/mommy.1.gz /usr/local/man/man1/daddy.1.gz
+```
 
 ## shell integration
 instead of calling mommy for each command, you can also fully integrate mommy with your shell to get mommy's output each
@@ -171,9 +160,9 @@ function fish_right_prompt
     mommy -s $status 2>&1
 end
 ```
-if you have an [oh my fish](https://github.com/oh-my-fish/oh-my-fish) theme installed, check the docs of your theme to 
+if you have an [oh my fish](https://github.com/oh-my-fish/oh-my-fish) theme installed, check the docs of your theme to
 see if there's an easy way to extend the theme's right prompt.
-if not, you can either overwrite it with the above code, or copy-paste the theme's code into your own config file and 
+if not, you can either overwrite it with the above code, or copy-paste the theme's code into your own config file and
 then add mommy yourself~
 
 ### zsh
@@ -192,10 +181,11 @@ RPS1="\$(mommy -s \$? 2>&1)"
 as a generic method, in any POSIX shell (including `sh`, `ash`, `dash`, `bash`) you can change the prompt itself to
 contain a message from mommy by setting the `$PS1` variable:
 ```shell
-export PS1="\$(mommy -s \$? 2>&1) $PS1 "
+export PS1="\$(mommy -s \$? 2>&1)$PS1"
 ```
+to improve the spacing, set `MOMMY_SUFFIX="~ "` in mommy's config file.
 add the above line to the config file for your shell.
-some shells (`dash`, `pdksh`) do not have a non-login config file by default, so to enable that you should add the 
+some shells (`dash`, `pdksh`) do not have a default (non-login) config file, so to enable that you should add the
 following to `~/.profile`:
 ```shell
 export ENV="$HOME/.shrc"
@@ -206,22 +196,22 @@ log out and back in, and mommy will appear in your shell~
 
 ## development
 to build your own mommy, first install the requirements.
-on Debian-like systems, run
+on debian-like systems, run
 ```shell
-sudo apt install build-essential gzip rubygems
+sudo apt install rubygems libarchive-tools rpm zstd
 sudo gem install fpm
 ```
 
 after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
-replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html), 
-and/or use custom formats `raw` and `installer`~
+replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html).
+except don't use `pkgin`, but use `openbsd` for openbsd, and use `netbsd` for netbsd~
 
-before a new release, make sure to update the version number in `./version` and `./README.md`, and to update the
-`CHANGELOG.md`~
+before a new release, make sure to update the version number in `./version` and to update the `./CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
-by default, tests are run against `src/main/sh/mommy`.
-to change that, set the `mommy` variable before running tests, as in `mommy=/usr/bin/mommy ./test.sh`~
+by default, tests are run against `./src/main/sh/mommy`.
+to change that, set the `MOMMY_EXEC` environment variable before running tests, as in
+`MOMMY_EXEC=/usr/local/bin/mommy ./test.sh`~
 
 
 ## acknowledgements
