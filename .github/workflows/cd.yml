@@ -25,7 +25,7 @@ jobs:
         with:
           name: dist
       - name: Extract version number
-        run: echo "VERSION=$(cat ./version)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat ./version)" >> $GITHUB_ENV
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1

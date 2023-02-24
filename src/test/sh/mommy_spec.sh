@@ -18,7 +18,19 @@ Describe "mommy"
     AfterEach "clean_config"
 
     Describe "command-line options"
-        Describe "help information"
+        It "gives an error for unknown short options"
+            When run "$MOMMY_EXEC" -d
+            The error should equal "Illegal option -d"
+            The status should be failure
+        End
+
+        It "gives an error for unknown long options"
+            When run "$MOMMY_EXEC" --doesnotexist
+            The error should equal "Illegal option --doesnotexist"
+            The status should be failure
+        End
+
+        Describe "-h/--help: help information"
             It "outputs help information using -h"
                 When run "$MOMMY_EXEC" -h
                 The word 1 of output should equal "mommy(1)"
@@ -44,7 +56,7 @@ Describe "mommy"
             End
         End
 
-        Describe "version information"
+        Describe "-v/--help: version information"
             It "outputs version information using -v"
                 When run "$MOMMY_EXEC" -v
                 The word 1 of output should equal "mommy"
@@ -74,7 +86,27 @@ Describe "mommy"
             End
         End
 
-        Describe "custom configuration file"
+        Describe "-1: output to stdout"
+            It "outputs to stderr by default"
+                set_config "MOMMY_COMPLIMENTS='desk copper'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The output should equal ""
+                The error should equal "desk copper"
+                The status should be success
+            End
+
+            It "outputs to stdout if -1 is given"
+                set_config "MOMMY_COMPLIMENTS='gate friendly'"
+
+                When run "$MOMMY_EXEC" -1 -c "$MOMMY_CONFIG_FILE" true
+                The output should equal "gate friendly"
+                The error should equal ""
+                The status should be success
+            End
+        End
+
+        Describe "-c: custom configuration file"
             It "ignores an invalid path"
                 When run "$MOMMY_EXEC" -c "./does_not_exist" true
                 The error should not equal ""
@@ -90,7 +122,7 @@ Describe "mommy"
             End
         End
 
-        Describe "command"
+        Describe "vararg: command"
             It "writes a compliment to stderr if the command returns 0 status"
                 set_config "MOMMY_COMPLIMENTS='purpose wall'"
 
@@ -123,7 +155,7 @@ Describe "mommy"
             End
         End
 
-        Describe "eval"
+        Describe "-e: eval"
             It "writes a compliment to stderr if the evaluated command returns 0 status"
                 set_config "MOMMY_COMPLIMENTS='bold accord'"
 
@@ -173,7 +205,7 @@ Describe "mommy"
             End
         End
 
-        Describe "status"
+        Describe "-s: status"
             It "writes a compliment to stderr if the status is 0"
                 set_config "MOMMY_COMPLIMENTS='station top'"
 
@@ -350,6 +382,14 @@ Describe "mommy"
                 The status should be success
             End
 
+            It "prepends the prefix"
+                set_config "MOMMY_COMPLIMENTS='<';MOMMY_PREFIX='woolen'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "woolen<"
+                The status should be success
+            End
+
             It "appends the suffix"
                 set_config "MOMMY_COMPLIMENTS='>';MOMMY_SUFFIX='respect'"
 
@@ -480,6 +520,44 @@ Describe "mommy"
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                 The error should equal "member rid letter"
                 The status should be success
+            End
+        End
+
+        Describe "ignore specific exit codes"
+            It "by default, outputs something"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 0
+                The error should not equal ""
+                The status should be success
+            End
+
+            It "by default, outputs nothing if the exit code is 130"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 130
+                The error should equal ""
+                The status should equal 130
+            End
+
+            It "outputs something if no exit code is suppressed"
+                set_config "MOMMY_IGNORED_STATUSES=''"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 130
+                The error should not equal ""
+                The status should equal 130
+            End
+
+            It "output nothing if the exit code is the configured value"
+                set_config "MOMMY_IGNORED_STATUSES='32'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 32
+                The error should equal ""
+                The status should equal 32
+            End
+
+            It "does not output anything if the exit code is one of the configured values"
+                set_config "MOMMY_IGNORED_STATUSES='32/84/89'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 84
+                The error should equal ""
+                The status should equal 84
             End
         End
     End

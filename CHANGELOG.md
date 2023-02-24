@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 
+## [1.2.0] -- 2023-02-24
+* mommy can output to stdout without redirection by giving her the `-1` option~
+* mommy ignores exit code `130` by default, but you can change this by setting `MOMMY_IGNORED_STATUSES`~
+* mommy supports prefixes for her messages, and explains how to use them to get colors in zsh~
+* mommy improved her readme a bit~
+
+
 ## [1.1.0] -- 2023-02-24
 * _breaking_: mommy supports different pronoun forms.  
   instead of `MOMMY_THEIR="her"` and using variable `%%THEIR%%`, you should now write `MOMMY_PRONOUN="she her her"` and use variables `%%THEY%%`, `%%THEM%%`, and `%%THEIR`~
