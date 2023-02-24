@@ -75,6 +75,7 @@ make sure you do not put spaces around the `=`~
 | `MOMMY_CAREGIVER`              | what mommy calls herself                                                                                                                                                                                                                                                                                                                                    | yes   | `mommy`       |
 | `MOMMY_PRONOUNS`               | mommy's pronouns for herself. should be three words separated by spaces, as in `they them their` (subject, object, possessive)                                                                                                                                                                                                                              | yes   | `she her her` |
 | `MOMMY_SWEETIE`                | what mommy calls you                                                                                                                                                                                                                                                                                                                                        | yes   | `girl`        |
+| `MOMMY_PREFIX`                 | what mommy puts at the start of each sentence                                                                                                                                                                                                                                                                                                               | yes   | &lt;empty>    |
 | `MOMMY_SUFFIX`                 | what mommy puts at the end of each sentence                                                                                                                                                                                                                                                                                                                 | yes   | `~`           |
 | `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                                                                                                                                                                                                                     | no    | `0`           |
 | `MOMMY_COLOR`                  | color of mommy's text. you can use any [xterm color code](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg), or write `lolcat` to use [lolcat](https://github.com/busyloop/lolcat) (install separately). specify multiple colors separated by `/` to randomly select one. set to empty string for your terminal's default color | yes   | `005`         |
@@ -196,7 +197,16 @@ to put mommy's output on the right side, add the following to `~/.zshrc`:
 set -o PROMPT_SUBST
 RPS1='$(mommy -1 -s $?)'
 ```
-unfortunately, the `RPS1` solution [does not work well with colours](https://github.com/FWDekker/mommy/issues/35)~
+unfortunately, the `RPS1` solution does not work well with `MOMMY_COLOR`.
+instead, you'll have to use a special zsh syntax for
+[xterm color codes](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg) by adding the
+following to your config:
+```shell
+MOMMY_COLOR=""
+MOMMY_PREFIX="%F{005}/%F{006}"
+MOMMY_SUFFIX="~%f"
+```
+this code randomly changes the output between magenta and cyan~
 
 <img width="450px" src=".github/img/sample2.png" alt="mommy integrated with the zsh shell" />
 

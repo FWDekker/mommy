@@ -7,6 +7,7 @@ n="
 MOMMY_CAREGIVER="mommy"
 MOMMY_PRONOUNS="she her her"
 MOMMY_SWEETIE="girl"
+MOMMY_PREFIX=""
 MOMMY_SUFFIX="~"
 
 MOMMY_CAPITALIZE="0"
@@ -125,7 +126,7 @@ color_cat() {
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
         tput setaf 0 1>/dev/null 2>/dev/null || tput_bug="0 0"
 
-        # shellcheck disable=SC2086 # OpenBSD workaround requires two arguments
+        # shellcheck disable=SC2086 # Intentional word splitting: OpenBSD workaround requires two arguments
         echo "$(tput setaf "$1" $tput_bug)$(cat)$(tput sgr0)"
     fi
     return 0
@@ -165,15 +166,17 @@ split_pronouns() {
 #    * `%%THEM%%` with the second word in `$2`,
 #    * `%%THEIR%%` with the third word in `$2`, and
 #    * `%%CAREGIVER%%` with a random entry from `$3`;
-# 2. applies `capitalize_lines` using `$5` as the choice parameter;
+# 2. applies `capitalize_lines` using `$6` as the choice parameter;
 # 3. removes leading and trailing newlines;
-# 4. appends `$4`; and
+# 4. prepends `$4` and appends `$5`; and
 # 5. writes to stdout.
 fill_template() {
     sweetie="$(echo "$1" | list_sanitize | list_choose)"
     split_pronouns "$(echo "$2" | list_sanitize | list_choose)"
     caregiver="$(echo "$3" | list_sanitize | list_choose)"
-    suffix="$(echo "$4" | list_sanitize | list_choose)"
+
+    prefix="$(echo "$4" | list_sanitize | list_choose)"
+    suffix="$(echo "$5" | list_sanitize | list_choose)"
 
     template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" \
                           -e "s/%%THEY%%/$they/g" \
@@ -181,7 +184,7 @@ fill_template() {
                           -e "s/%%THEIR%%/$their/g" \
                           -e "s/%%CAREGIVER%%/$caregiver/g")"
 
-    printf "%s" "$template" "$suffix" | capitalize "$5"
+    printf "%s" "$prefix" "$template" "$suffix" | capitalize "$6"
     return 0
 }
 
@@ -266,8 +269,8 @@ else
     response="$(echo "$templates" |
                     list_sanitize "$forbidden_words" |
                     list_choose |
-                    fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" \
-                                  "$MOMMY_CAPITALIZE")"
+                    fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" \
+                                  "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE")"
 
     # Output template
     case "$MOMMY_OPT_TARGET" in

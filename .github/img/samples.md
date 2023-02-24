@@ -7,7 +7,7 @@
    ```
 2. Use the following settings in `~/.config/mommy/config.sh`:
    ```shell
-   MOMMY_COMPLIMENTS_ENABLED=0;MOMMY_ENCOURAGEMENTS="it's okay to make mistakes";MOMMY_COLOR="lolcat"
+   MOMMY_COMPLIMENTS_ENABLED="0";MOMMY_ENCOURAGEMENTS="it's okay to make mistakes";MOMMY_COLOR="lolcat"
    ```
 3. Open Konsole, set font size to 32, set window size to 60x12, and hide window borders.
 4. Run
@@ -26,7 +26,7 @@
    ```
 2. Use the following settings in `~/.config/mommy/config.sh`:
    ```shell
-   MOMMY_COMPLIMENTS_ENABLED=0;MOMMY_ENCOURAGEMENTS="never give up, my love";MOMMY_COLOR=""
+   MOMMY_COMPLIMENTS_ENABLED="0";MOMMY_COLOR="";MOMMY_PREFIX="%F{005}";MOMMY_SUFFIX="~%f";MOMMY_ENCOURAGEMENTS="never give up, my love"
    ```
 3. Open Konsole, set font size to 32, set window size to 60x12, and hide window borders.
 4. Run

@@ -1,7 +1,8 @@
 # Changelog
 ## [Unreleased]
 * mommy can output to stdout without redirection by giving her the `-1` option~
-* mommy now ignores exit code `130` by default, but you can change this by setting `MOMMY_IGNORED_STATUSES`~
+* mommy ignores exit code `130` by default, but you can change this by setting `MOMMY_IGNORED_STATUSES`~
+* mommy supports prefixes for her messages, and explains how to use them to get colors in zsh~
 * mommy improved her readme a bit~
 
 
