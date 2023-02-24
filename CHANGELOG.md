@@ -2,6 +2,11 @@
 ## [Unreleased]
 
 
+## [1.1.0] -- 2023-02-24
+* _breaking_: mommy supports different pronoun forms.  
+  instead of `MOMMY_THEIR="her"` and using variable `%%THEIR%%`, you should now write `MOMMY_PRONOUN="she her her"` and use variables `%%THEY%%`, `%%THEM%%`, and `%%THEIR`~
+
+
 ## [1.0.0] -- 2023-02-23
 * _breaking_: mommy no longer supports multi-line templates and variables~
 * mommy is even faster now with much simpler code~

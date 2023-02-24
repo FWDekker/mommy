@@ -9,7 +9,7 @@ MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
 
 ### Configuration
 MOMMY_CAREGIVER="mommy"
-MOMMY_THEIR="her"
+MOMMY_PRONOUNS="she her her"
 MOMMY_SWEETIE="girl"
 MOMMY_SUFFIX="~"
 MOMMY_COLOR="005"
@@ -57,6 +57,7 @@ it's okay to make mistakes
 
 # fallback~
 %%CAREGIVER%% is always here for you
+%%CAREGIVER%% is always here for you if you need %%THEM%%
 come here, sit on my lap while we figure this out together
 
 # encouragement~
@@ -149,10 +150,23 @@ capitalize() {
     return 0
 }
 
+# Given the whitespace-separated list of three words in `$1`, stores the three words in `$they`, `$them`, and `$their`,
+# respectively.
+split_pronouns() {
+    they="${1%% *}"
+    remainder="${1#* }"
+    them="${remainder%% *}"
+    their="${remainder##* }"
+
+    return 0
+}
+
 # Reads stdin, and
 # 1. replaces
 #    * `%%SWEETIE%%` with a random entry from `$1`,
-#    * `%%THEIR%%` with a random entry from `$2`, and
+#    * `%%THEY%%` with the first word in `$2`,
+#    * `%%THEM%%` with the second word in `$2`,
+#    * `%%THEIR%%` with the third word in `$2`, and
 #    * `%%CAREGIVER%%` with a random entry from `$3`;
 # 2. applies `capitalize_lines` using `$5` as the choice parameter;
 # 3. removes leading and trailing newlines;
@@ -160,11 +174,15 @@ capitalize() {
 # 5. writes to stdout.
 fill_template() {
     sweetie="$(echo "$1" | list_sanitize | list_choose)"
-    their="$(echo "$2" | list_sanitize | list_choose)"
+    split_pronouns "$(echo "$2" | list_sanitize | list_choose)"
     caregiver="$(echo "$3" | list_sanitize | list_choose)"
     suffix="$(echo "$4" | list_sanitize | list_choose)"
 
-    template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" -e "s/%%THEIR%%/$their/g" -e "s/%%CAREGIVER%%/$caregiver/g")"
+    template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" \
+                          -e "s/%%THEY%%/$they/g" \
+                          -e "s/%%THEM%%/$them/g" \
+                          -e "s/%%THEIR%%/$their/g" \
+                          -e "s/%%CAREGIVER%%/$caregiver/g")"
 
     printf "%s" "$template" "$suffix" | capitalize "$5"
     return 0
@@ -181,7 +199,7 @@ while getopts "hvc:e:s:-:" OPTION; do
     # Workaround for long options: https://stackoverflow.com/a/28466267/
     if [ "$OPTION" = "-" ]; then
         OPTION="${OPTARG%%=*}"
-        OPTARG="${OPTARG#$OPT}"
+        OPTARG="${OPTARG#$OPTION}"
         OPTARG="${OPTARG#=}"
     fi
 
@@ -243,7 +261,7 @@ else
     echo "$templates" |
         list_sanitize "$forbidden_words" |
         list_choose |
-        fill_template "$MOMMY_SWEETIE" "$MOMMY_THEIR" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE" |
+        fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE" |
         color_cat "$color" >&2
     exit "$command_exit_code"
 fi
