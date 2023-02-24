@@ -1,5 +1,7 @@
 # Changelog
 ## [Unreleased]
+* mommy can output to stdout without redirection by giving her the `-1` option~
+* mommy improved her readme a bit~
 
 
 ## [1.1.0] -- 2023-02-24

@@ -18,7 +18,7 @@ Describe "mommy"
     AfterEach "clean_config"
 
     Describe "command-line options"
-        Describe "help information"
+        Describe "-h/--help: help information"
             It "outputs help information using -h"
                 When run "$MOMMY_EXEC" -h
                 The word 1 of output should equal "mommy(1)"
@@ -44,7 +44,7 @@ Describe "mommy"
             End
         End
 
-        Describe "version information"
+        Describe "-v/--help: version information"
             It "outputs version information using -v"
                 When run "$MOMMY_EXEC" -v
                 The word 1 of output should equal "mommy"
@@ -74,7 +74,27 @@ Describe "mommy"
             End
         End
 
-        Describe "custom configuration file"
+        Describe "-1: output to stdout"
+            It "outputs to stderr by default"
+                set_config "MOMMY_COMPLIMENTS='desk copper'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The output should equal ""
+                The error should equal "desk copper"
+                The status should be success
+            End
+
+            It "outputs to stdout if -1 is given"
+                set_config "MOMMY_COMPLIMENTS='gate friendly'"
+
+                When run "$MOMMY_EXEC" -1 -c "$MOMMY_CONFIG_FILE" true
+                The output should equal "gate friendly"
+                The error should equal ""
+                The status should be success
+            End
+        End
+
+        Describe "-c: custom configuration file"
             It "ignores an invalid path"
                 When run "$MOMMY_EXEC" -c "./does_not_exist" true
                 The error should not equal ""
@@ -90,7 +110,7 @@ Describe "mommy"
             End
         End
 
-        Describe "command"
+        Describe "vararg: command"
             It "writes a compliment to stderr if the command returns 0 status"
                 set_config "MOMMY_COMPLIMENTS='purpose wall'"
 
@@ -123,7 +143,7 @@ Describe "mommy"
             End
         End
 
-        Describe "eval"
+        Describe "-e: eval"
             It "writes a compliment to stderr if the evaluated command returns 0 status"
                 set_config "MOMMY_COMPLIMENTS='bold accord'"
 
@@ -173,7 +193,7 @@ Describe "mommy"
             End
         End
 
-        Describe "status"
+        Describe "-s: status"
             It "writes a compliment to stderr if the status is 0"
                 set_config "MOMMY_COMPLIMENTS='station top'"
 

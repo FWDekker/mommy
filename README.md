@@ -1,10 +1,16 @@
 # mommy
-mommy's here to support you~ ❤️
+[![github latest release](https://img.shields.io/github/v/release/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/releases/latest)
+[![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
+[![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
+
+
+mommy's here to support you! mommy will compliment you if things go well, and will encourage you if things are not going
+so well~
 
 mommy is fully customizable, integrates with any shell, works on any unix system, and most importantly, loves you very
-much~
+much~ ❤️
 
-![mommy demo](.github/demo.gif)
+![mommy demo](.github/img/demo.gif)
 
 
 ## installation
@@ -20,8 +26,8 @@ mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 * on freebsd, run `pkg add ./mommy-*.freebsd`,
 * on netbsd, run `pkg_add ./mommy-*+netbsd.tgz`,
 * on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
-* on other unix systems, download and extract the source code `.zip`, and copy `./src/main/sh/mommy` into the
-  appropriate directory
+* alternatively, on any unix system you can also download and extract the source code `.zip`, and copy
+  `./src/main/sh/mommy` into the appropriate directory
   (usually `/usr/local/bin/`)
   (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
@@ -29,7 +35,7 @@ after installation, you can [configure mommy](#configuration) and [integrate mom
 
 to update mommy, just repeat the installation process~
 
-![mommy integrated with the fish shell](.github/sample1.png)
+<img width="450px" src=".github/img/sample1.png" alt="mommy integrated with the fish shell" />
 
 
 ## usage
@@ -37,15 +43,17 @@ mommy integrates with your normal command-line usage and compliments you if the 
 it fails~
 
 ```shell
-$ mommy [-c config] [command] ...
+$ mommy [-1] [-c config] [command] ...
 # e.g. `mommy npm test`
 
-$ mommy [-c config] -e eval
+$ mommy [-1] [-c config] -e eval
 # e.g. `mommy -e "ls -l | wc -l"`
 
-$ mommy [-c config] -s status
+$ mommy [-1] [-c config] -s status
 # e.g. `mommy -s $?`
 ```
+
+by default, mommy outputs to stderr, but if you use `mommy -1 [other options]` she'll output to stdout~
 
 
 ## configuration
@@ -107,9 +115,12 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
 
 ### custom templates
-if you change `MOMMY_COMPLIMENTS` in your config file, then you lose the default compliments that mommy knows.
-if you want both the default and your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`.
-similarly so for encouragements~
+you can add your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but there is a slight
+difference:
+* if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`, but
+* if you want your own compliments and _not_ the default compliments, add your own compliments to `MOMMY_COMPLIMENTS`~
+
+and similarly so for encouragements~
 
 ### template variables
 inside compliments and encouragements, you can put placeholders that contain the random values that mommy chose.
@@ -156,7 +167,7 @@ in bash you can set
 mommy after each command.
 just add the following line to `~/.bashrc`:
 ```shell
-PROMPT_COMMAND="mommy -s \$? 2>&1; $PROMPT_COMMAND"
+PROMPT_COMMAND="mommy -1 -s \$?; $PROMPT_COMMAND"
 ```
 
 ### fish
@@ -164,7 +175,7 @@ in fish you can have mommy output a message on the right side of your prompt by 
 `~/.config/fish/functions/fish_right_prompt.fish` with the following contents:
 ```shell
 function fish_right_prompt
-    mommy -s $status 2>&1
+    mommy -1 -s $status
 end
 ```
 if you have an [oh my fish](https://github.com/oh-my-fish/oh-my-fish) theme installed, check the docs of your theme to
@@ -175,20 +186,23 @@ then add mommy yourself~
 ### zsh
 in zsh you can put mommy's output after each command by adding the following line to `~/.zshrc`:
 ```shell
-precmd() { mommy -s $status 2>&1 }
+precmd() { mommy -1 -s $? }
 ```
 
 to put mommy's output on the right side, add the following to `~/.zshrc`:
 ```shell
 set -o PROMPT_SUBST
-RPS1="\$(mommy -s \$? 2>&1)"
+RPS1='$(mommy -1 -s $?)'
 ```
+unfortunately, the `RPS1` solution [does not work well with colours](https://github.com/FWDekker/mommy/issues/35)~
+
+<img width="450px" src=".github/img/sample2.png" alt="mommy integrated with the zsh shell" />
 
 ### other shells
 as a generic method, in any posix shell (including `sh`, `ash`, `dash`, `bash`) you can change the prompt itself to
 contain a message from mommy by setting the `$PS1` variable:
 ```shell
-export PS1="\$(mommy -s \$? 2>&1)$PS1"
+export PS1="\$(mommy -1 -s \$?)$PS1"
 ```
 to improve the spacing, set `MOMMY_SUFFIX="~ "` in mommy's config file.
 add the above line to the config file for your shell.

@@ -194,8 +194,9 @@ MOMMY_OPT_HELP=""
 MOMMY_OPT_VERSION=""
 MOMMY_OPT_EVAL=""
 MOMMY_OPT_STATUS=""
+MOMMY_OPT_TARGET="2"
 
-while getopts "hvc:e:s:-:" OPTION; do
+while getopts "hv1c:e:s:-:" OPTION; do
     # Workaround for long options: https://stackoverflow.com/a/28466267/
     if [ "$OPTION" = "-" ]; then
         OPTION="${OPTARG%%=*}"
@@ -207,6 +208,7 @@ while getopts "hvc:e:s:-:" OPTION; do
     case "$OPTION" in
     h|help) MOMMY_OPT_HELP="1" ;;
     v|version) MOMMY_OPT_VERSION="1" ;;
+    1) MOMMY_OPT_TARGET="1" ;;
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
@@ -237,6 +239,7 @@ elif [ -n "$MOMMY_OPT_VERSION" ]; then
     echo "mommy v%%VERSION_NUMBER%%"
     exit 0
 else
+    # Run command
     if [ -n "$MOMMY_OPT_EVAL" ]; then
         (eval "$MOMMY_OPT_EVAL")
         command_exit_code="$?"
@@ -247,6 +250,7 @@ else
         command_exit_code="$?"
     fi
 
+    # Choose and fill template (if enabled)
     if [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
         templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
     elif [ "$command_exit_code" -ne 0 ] && [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
@@ -258,10 +262,17 @@ else
     color="$(echo "$MOMMY_COLOR" | list_sanitize | list_choose)"
     forbidden_words="$(echo "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)"
 
-    echo "$templates" |
-        list_sanitize "$forbidden_words" |
-        list_choose |
-        fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE" |
-        color_cat "$color" >&2
+    response="$(echo "$templates" |
+                    list_sanitize "$forbidden_words" |
+                    list_choose |
+                    fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_SUFFIX" \
+                                  "$MOMMY_CAPITALIZE")"
+
+    # Output template
+    case "$MOMMY_OPT_TARGET" in
+    1) echo "$response" | color_cat "$color" >&1 ;;
+    2) echo "$response" | color_cat "$color" >&2 ;;
+    esac
+
     exit "$command_exit_code"
 fi
