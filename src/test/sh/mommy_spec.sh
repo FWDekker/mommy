@@ -18,6 +18,18 @@ Describe "mommy"
     AfterEach "clean_config"
 
     Describe "command-line options"
+        It "gives an error for unknown short options"
+            When run "$MOMMY_EXEC" -d
+            The error should equal "Illegal option -d"
+            The status should be failure
+        End
+
+        It "gives an error for unknown long options"
+            When run "$MOMMY_EXEC" --doesnotexist
+            The error should equal "Illegal option --doesnotexist"
+            The status should be failure
+        End
+
         Describe "-h/--help: help information"
             It "outputs help information using -h"
                 When run "$MOMMY_EXEC" -h
@@ -500,6 +512,44 @@ Describe "mommy"
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                 The error should equal "member rid letter"
                 The status should be success
+            End
+        End
+
+        Describe "ignore specific exit codes"
+            It "by default, outputs something"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 0
+                The error should not equal ""
+                The status should be success
+            End
+
+            It "by default, outputs nothing if the exit code is 130"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 130
+                The error should equal ""
+                The status should equal 130
+            End
+
+            It "outputs something if no exit code is suppressed"
+                set_config "MOMMY_IGNORED_STATUSES=''"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 130
+                The error should not equal ""
+                The status should equal 130
+            End
+
+            It "output nothing if the exit code is the configured value"
+                set_config "MOMMY_IGNORED_STATUSES='32'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 32
+                The error should equal ""
+                The status should equal 32
+            End
+
+            It "does not output anything if the exit code is one of the configured values"
+                set_config "MOMMY_IGNORED_STATUSES='32/84/89'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" exit 84
+                The error should equal ""
+                The status should equal 84
             End
         End
     End

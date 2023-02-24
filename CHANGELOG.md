@@ -1,6 +1,7 @@
 # Changelog
 ## [Unreleased]
 * mommy can output to stdout without redirection by giving her the `-1` option~
+* mommy now ignores exit code `130` by default, but you can change this by setting `MOMMY_IGNORED_STATUSES`~
 * mommy improved her readme a bit~
 
 

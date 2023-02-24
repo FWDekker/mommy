@@ -3,18 +3,14 @@
 n="
 "
 
-## Defaults
-### Options
-MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
-
-### Configuration
+## Configuration
 MOMMY_CAREGIVER="mommy"
 MOMMY_PRONOUNS="she her her"
 MOMMY_SWEETIE="girl"
 MOMMY_SUFFIX="~"
-MOMMY_COLOR="005"
 
 MOMMY_CAPITALIZE="0"
+MOMMY_COLOR="005"
 
 MOMMY_COMPLIMENTS="
 # generic~
@@ -72,6 +68,7 @@ MOMMY_ENCOURAGEMENTS_EXTRA=""
 MOMMY_ENCOURAGEMENTS_ENABLED="1"
 
 MOMMY_FORBIDDEN_WORDS=""
+MOMMY_IGNORED_STATUSES="130"
 
 
 ## Lists
@@ -192,11 +189,12 @@ fill_template() {
 ## Read options
 MOMMY_OPT_HELP=""
 MOMMY_OPT_VERSION=""
+MOMMY_OPT_TARGET="2"
+MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
 MOMMY_OPT_EVAL=""
 MOMMY_OPT_STATUS=""
-MOMMY_OPT_TARGET="2"
 
-while getopts "hv1c:e:s:-:" OPTION; do
+while getopts ":hv1c:e:s:-:" OPTION; do
     # Workaround for long options: https://stackoverflow.com/a/28466267/
     if [ "$OPTION" = "-" ]; then
         OPTION="${OPTARG%%=*}"
@@ -212,7 +210,8 @@ while getopts "hv1c:e:s:-:" OPTION; do
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) echo "Illegal option --" ;;
+    ?) echo "Illegal option -$OPTARG" >&2; exit 1 ;;
+    *) echo "Illegal option --$OPTION" >&2; exit 1 ;;
     esac
 done
 
@@ -251,7 +250,9 @@ else
     fi
 
     # Choose and fill template (if enabled)
-    if [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
+    if list_contains_any "$command_exit_code" "$(echo "$MOMMY_IGNORED_STATUSES" | list_sanitize)"; then
+        exit "$command_exit_code"
+    elif [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
         templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
     elif [ "$command_exit_code" -ne 0 ] && [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
         templates="$MOMMY_ENCOURAGEMENTS/$MOMMY_ENCOURAGEMENTS_EXTRA"
