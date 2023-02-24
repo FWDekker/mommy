@@ -342,14 +342,6 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "replaces %%THEIR%%"
-                set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_THEIR='respect'"
-
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
-                The error should equal ">respect<"
-                The status should be success
-            End
-
             It "replaces %%CAREGIVER%%"
                 set_config "MOMMY_COMPLIMENTS='>%%CAREGIVER%%<';MOMMY_CAREGIVER='help'"
 
@@ -366,12 +358,12 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "chooses a random pronoun"
+            It "chooses a random word for a variable"
                 # Runs mommy several times and checks if output is different at least once.
                 # Probability of 1/(26^4)=1/456976 to fail even if code is correct.
 
-                pronouns="a/b/c/d/e/f/g/h/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z"
-                set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_THEIR='$pronouns'"
+                caregiver="a/b/c/d/e/f/g/h/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z"
+                set_config "MOMMY_COMPLIMENTS='>%%CAREGIVER%%<';MOMMY_CAREGIVER='$caregiver'"
 
                 output1=$("$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true 2>&1)
                 output2=$("$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true 2>&1)
@@ -388,12 +380,46 @@ Describe "mommy"
                 The status should be success
             End
 
-            It "chooses the empty string if no pronouns are set"
-                set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_THEIR=''"
+            It "chooses the empty string if a variable is not set"
+                set_config "MOMMY_COMPLIMENTS='>%%SWEETIE%%|%%THEIR%%<';MOMMY_SWEETIE='';MOMMY_PRONOUNS=''"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
-                The error should equal "><"
+                The error should equal ">|<"
                 The status should be success
+            End
+
+            Describe "pronouns"
+                It "replaces %%THEY%%"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%<';MOMMY_PRONOUNS='front lean weekend'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">front<"
+                    The status should be success
+                End
+
+                It "replaces %%THEM%%"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEM%%<';MOMMY_PRONOUNS='paint heighten well'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">heighten<"
+                    The status should be success
+                End
+
+                It "replaces %%THEIR%%"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_PRONOUNS='sink satisfy razor'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">razor<"
+                    The status should be success
+                End
+
+                It "chooses a consistent set of pronouns"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%.%%THEM%%.%%THEIR%%<';MOMMY_PRONOUNS='a b c/d e f'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should match pattern ">a.b.c<|>d.e.f<"
+                    The status should be success
+                End
             End
         End
 
