@@ -74,9 +74,9 @@ MOMMY_IGNORED_STATUSES="130"
 
 ## Lists
 # A list is a collection of entries. Entries are separated by a forward slash (`/`) or by a newline. Entries containing
-# only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#` and
-# contains a `/`, the `/` is not a separator but part of the comment. A sanitized list is a list in which there are no
-# forward slashes (`/`) and in which there are no comments.
+# only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#`, all `/`
+# on that line are part of the comment and are not considered separators. A sanitized list is a list in which there are
+# no forward slashes (`/`) and in which there are no comments.
 
 # Returns `0` if the string `$1` contains any of the entries in the sanitized list `$2` as a substring, and returns `1`
 # otherwise.
@@ -93,13 +93,13 @@ list_contains_any() {
 list_sanitize() {
     cat |
         grep -v "^#" |
-        awk -v RS="/" "{print}" |
+        tr "/" "$n" |
         grep -v "^[[:space:]]*\$" |
         while IFS="$n" read -r line; do list_contains_any "$line" "$1" || echo "$line"; done
     return 0
 }
 
-# Writes a random entry from the list in stdin to stdout.
+# Writes a random entry from the sanitized list in stdin to stdout.
 if [ -x "$(command -v shuf)" ]; then
     list_choose() {
         cat | shuf -n1
@@ -115,36 +115,35 @@ fi
 
 
 ## Functions
-# Prints stdin, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
+# Prints `$2`, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
-color_cat() {
+color_echo() {
+    colors="$(tput colors 2>/dev/null)"
+
     if [ "$1" = "lolcat" ]; then
-        cat | lolcat -f
-    elif [ -z "$1" ] || [ -z "$(tput colors)" ] || [ "$(tput colors)" -lt 8 ]; then
-        cat
+        echo "$2" | lolcat -f
+    elif [ -z "$1" ] || [ -z "$colors" ] || [ "$colors" -lt 8 ]; then
+        echo "$2"
     else
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
         tput setaf 0 1>/dev/null 2>/dev/null || tput_bug="0 0"
 
         # shellcheck disable=SC2086 # Intentional word splitting: OpenBSD workaround requires two arguments
-        echo "$(tput setaf "$1" $tput_bug)$(cat)$(tput sgr0)"
+        echo "$(tput setaf "$1" $tput_bug)$2$(tput sgr0)"
     fi
     return 0
 }
 
-# Reads stdin; if `$1` is `0`, the first character the line is changed to lowercase, if `$1` is `1`, the first character
-# is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
+# Reads `$1`; if `$2` is `0`, the first character on the line is changed to lowercase, if `$2` is `1`, the first
+# character is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
 capitalize() {
-    if [ "$1" = "0" ]; then
-        mapping="tolower"
-    elif [ "$1" = "1" ]; then
-        mapping="toupper"
-    else
-        cat
-        return 0
-    fi
+    case "$2" in
+    0) mapping="tolower" ;;
+    1) mapping="toupper" ;;
+    *) echo "$1"; return 0 ;;
+    esac
 
-    cat | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    echo "$1" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
@@ -162,9 +161,9 @@ split_pronouns() {
 # Reads stdin, and
 # 1. replaces
 #    * `%%SWEETIE%%` with a random entry from `$1`,
-#    * `%%THEY%%` with the first word in `$2`,
-#    * `%%THEM%%` with the second word in `$2`,
-#    * `%%THEIR%%` with the third word in `$2`, and
+#    * `%%THEY%%` with the first word of a random entry from `$2`,
+#    * `%%THEM%%` with the second word of the same random entry from `$2`,
+#    * `%%THEIR%%` with the third word of the same random entry from `$2`, and
 #    * `%%CAREGIVER%%` with a random entry from `$3`;
 # 2. applies `capitalize_lines` using `$6` as the choice parameter;
 # 3. removes leading and trailing newlines;
@@ -184,7 +183,7 @@ fill_template() {
                           -e "s/%%THEIR%%/$their/g" \
                           -e "s/%%CAREGIVER%%/$caregiver/g")"
 
-    printf "%s" "$prefix" "$template" "$suffix" | capitalize "$6"
+    capitalize "$prefix$template$suffix" "$6"
     return 0
 }
 
@@ -230,7 +229,7 @@ shift "$((OPTIND - 1))"
 if [ -n "$MOMMY_OPT_HELP" ]; then
     local_man_path="$(dirname -- "$0")/../resources/mommy.1"
 
-    if [ -f "$local_man_path" ]; then
+    if [ -r "$local_man_path" ]; then
         man "$local_man_path"
         exit "$?"
     else
@@ -274,8 +273,8 @@ else
 
     # Output template
     case "$MOMMY_OPT_TARGET" in
-    1) echo "$response" | color_cat "$color" >&1 ;;
-    2) echo "$response" | color_cat "$color" >&2 ;;
+    1) color_echo "$color" "$response" >&1 ;;
+    2) color_echo "$color" "$response" >&2 ;;
     esac
 
     exit "$command_exit_code"
