@@ -19,13 +19,14 @@ jobs:
     if: github.ref == 'refs/heads/main'  # For other branches, artifacts are attached to the workflow run as `dist.zip`
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Download built packages
         uses: actions/download-artifact@v3
         with:
           name: dist
       - name: Extract version number
-        run: echo "VERSION=v$(cat ./version)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(head -n 1 ./version)" >> $GITHUB_ENV
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
@@ -43,7 +44,8 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install fpm and build dependencies
         run: |
           sudo apt install -y rubygems libarchive-tools rpm zstd
@@ -59,7 +61,8 @@ jobs:
   build-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install fpm
         run: sudo gem install --no-document fpm
       - name: Build package
@@ -73,7 +76,8 @@ jobs:
   build-freebsd:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install fpm && Build package
         uses: vmactions/freebsd-vm@v0
         with:
@@ -109,7 +113,8 @@ jobs:
   build-netbsd:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install fpm && Build package
         uses: vmactions/netbsd-vm@v0
         with:
@@ -141,7 +146,8 @@ jobs:
   build-openbsd:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install fpm && Build package
         uses: vmactions/openbsd-vm@v0
         with:

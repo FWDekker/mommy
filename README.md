@@ -16,6 +16,14 @@ much~ ❤️
 mommy works on any unix system.
 mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 
+### package manager
+#### homebrew/linuxbrew
+```shell
+brew tap FWDekker/mommy
+brew install mommy
+```
+
+### distribution archives
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
 * on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
 * on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
@@ -30,6 +38,7 @@ mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
   (usually `/usr/local/bin/`)
   (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
+### what's next?
 after installation, you can [configure mommy](#configuration) and [integrate mommy with your shell](#shell-integration)~
 
 to update mommy, just repeat the installation process~
@@ -239,7 +248,7 @@ after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and o
 replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html).
 except don't use `pkgin`, but use `openbsd` for openbsd, and use `netbsd` for netbsd~
 
-before a new release, make sure to update the version number in `./version` and to update the `./CHANGELOG.md`~
+before a new release, make sure to update `./version` and `./CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
 by default, tests are run against `./src/main/sh/mommy`.

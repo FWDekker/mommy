@@ -59,29 +59,33 @@ Describe "mommy"
         Describe "-v/--help: version information"
             It "outputs version information using -v"
                 When run "$MOMMY_EXEC" -v
-                The word 1 of output should equal "mommy"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%|v[0-9a-z\.\+]*"
+                The word 1 of output should equal "mommy,"
+                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
+                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
                 The status should be success
             End
 
             It "outputs version information using --version"
                 When run "$MOMMY_EXEC" --version
-                The word 1 of output should equal "mommy"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%|v[0-9a-z\.\+]*"
+                The word 1 of output should equal "mommy,"
+                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
+                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
                 The status should be success
             End
 
             It "outputs version information even when --v is not the first option"
                 When run "$MOMMY_EXEC" -s 138 --v
-                The word 1 of output should equal "mommy"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%|v[0-9a-z\.\+]*"
+                The word 1 of output should equal "mommy,"
+                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
+                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
                 The status should be success
             End
 
             It "outputs version information even when --version is not the first option"
                 When run "$MOMMY_EXEC" -s 911 --version
-                The word 1 of output should equal "mommy"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%|v[0-9a-z\.\+]*"
+                The word 1 of output should equal "mommy,"
+                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
+                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
                 The status should be success
             End
         End

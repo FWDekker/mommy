@@ -3,8 +3,8 @@ set -e
 cd -P -- "$(dirname -- "$0")"
 
 # Load configuration
-version="$(cat version)"
-manual_date="$(git log -1 --pretty="format:%cs" src/main/resources/mommy.1)"
+version="$(head -n 1 ./version)"
+date="$(tail -n 1 ./version)"
 
 # Clean
 rm -rf build/ dist/
@@ -12,7 +12,7 @@ rm -rf build/ dist/
 # Prepare
 mkdir build/
 cp src/main/sh/mommy src/main/resources/mommy.1 build/
-sed -i".bak" "s/%%VERSION_NUMBER%%/$version/g;s/%%MANUAL_DATE%%/$manual_date/g" build/*
+sed -i".bak" "s/%%VERSION_NUMBER%%/$version/g;s/%%VERSION_DATE%%/$date/g" build/*
 gzip build/mommy.1
 
 # Build
@@ -22,6 +22,10 @@ for target in "$@"; do
 
     # Select targets
     case "$target" in
+    brew_install)
+        target_exe="build/mommy=${PREFIX:?Prefix not specified}/bin/mommy"
+        target_man="build/mommy.1.gz=$PREFIX/share/man/man1/mommy.1.gz"
+        ;;
     netbsd)
         target_exe="build/mommy=/usr/pkg/bin/mommy"
         target_man="build/mommy.1.gz=/usr/pkg/man/man1/mommy.1.gz"
@@ -38,6 +42,9 @@ for target in "$@"; do
 
     # Pre-process
     case "$target" in
+    brew_install)
+        # Do nothing
+        ;;
     netbsd|openbsd)
         # Extract properties
         comment="$(<"./.fpm" grep -- "--description")"
@@ -52,8 +59,8 @@ for target in "$@"; do
 
         # Copy input files
         mkdir -p "/tmp/mommy/$(dirname "${target_exe#*=}")" "/tmp/mommy/$(dirname "${target_man#*=}")"
-        cp "./${target_exe%=*}" "/tmp/mommy/${target_exe#*=}"
-        cp "./${target_man%=*}" "/tmp/mommy/${target_man#*=}"
+        cp "./${target_exe%%=*}" "/tmp/mommy/${target_exe#*=}"
+        cp "./${target_man%%=*}" "/tmp/mommy/${target_man#*=}"
 
         # Create control files
         cd /tmp/mommy
@@ -86,10 +93,18 @@ for target in "$@"; do
 
         cd -
         ;;
+    *)
+        # Do nothing
+        ;;
     esac
 
     # Process
     case "$target" in
+    brew_install)
+        mkdir -p "$(dirname "${target_exe#*=}")" "$(dirname "${target_man#*=}")"
+        cp "./${target_exe%%=*}" "${target_exe#*=}"
+        cp "./${target_man%%=*}" "${target_man#*=}"
+        ;;
     netbsd)
         cd /tmp/mommy
         pkg_create \
@@ -123,6 +138,9 @@ for target in "$@"; do
 
     # Post-process
     case "$target" in
+    brew_install)
+        # Do nothing
+        ;;
     netbsd|openbsd)
         # Clean up
         rm -rf /tmp/mommy

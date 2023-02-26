@@ -1,5 +1,6 @@
 # Changelog
 ## [Unreleased]
+* mommy supports homebrew now~
 
 
 ## [1.2.0] -- 2023-02-24
