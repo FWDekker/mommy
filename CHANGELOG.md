@@ -1,6 +1,10 @@
 # Changelog
 ## [Unreleased]
+
+
+## [1.2.1] -- 2023-02-26
 * mommy supports homebrew now~
+* mommy supports arch linux aur now~
 
 
 ## [1.2.0] -- 2023-02-24

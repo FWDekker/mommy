@@ -22,7 +22,7 @@ for target in "$@"; do
 
     # Select targets
     case "$target" in
-    brew_install)
+    install)
         target_exe="build/mommy=${PREFIX:?Prefix not specified}/bin/mommy"
         target_man="build/mommy.1.gz=$PREFIX/share/man/man1/mommy.1.gz"
         ;;
@@ -42,7 +42,7 @@ for target in "$@"; do
 
     # Pre-process
     case "$target" in
-    brew_install)
+    install)
         # Do nothing
         ;;
     netbsd|openbsd)
@@ -100,7 +100,7 @@ for target in "$@"; do
 
     # Process
     case "$target" in
-    brew_install)
+    install)
         mkdir -p "$(dirname "${target_exe#*=}")" "$(dirname "${target_man#*=}")"
         cp "./${target_exe%%=*}" "${target_exe#*=}"
         cp "./${target_man%%=*}" "${target_man#*=}"
@@ -138,7 +138,7 @@ for target in "$@"; do
 
     # Post-process
     case "$target" in
-    brew_install)
+    install)
         # Do nothing
         ;;
     netbsd|openbsd)
