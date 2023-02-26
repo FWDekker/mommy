@@ -2,6 +2,7 @@
 [![github latest release](https://img.shields.io/github/v/release/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/releases/latest)
 [![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
 [![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
+[![mommy is on aur](https://img.shields.io/aur/version/mommy?style=for-the-badge)](https://aur.archlinux.org/packages/mommy/)
 
 mommy's here to support you! mommy will compliment you if things go well, and will encourage you if things are not going
 so well~
@@ -16,6 +17,40 @@ much~ ❤️
 mommy works on any unix system.
 mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 
+### package manager
+_don't see your favorite package manager?
+check the distribution archives below.
+not satisfied?
+[request support for your favorite installation method by opening an issue](https://github.com/FWDekker/mommy/issues)~_
+
+<details>
+<summary>arch linux</summary>
+
+install on arch linux from the [aur mommy package](https://aur.archlinux.org/packages/mommy/), probably easiest with
+[an aur helper](https://wiki.archlinux.org/title/AUR_helpers):
+
+```shell
+# if you use paru
+paru -S mommy
+# if you use aura
+aura -A mommy
+# and so on
+```
+
+</details>
+
+<details>
+<summary>homebrew/linuxbrew</summary>
+
+install with homebrew/linuxbrew from the [mommy tap](https://github.com/FWDekker/homebrew-mommy):
+
+```shell
+brew tap fwdekker/mommy
+brew install mommy
+```
+</details>
+
+### distribution archives
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
 * on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
 * on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
@@ -30,6 +65,7 @@ mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
   (usually `/usr/local/bin/`)
   (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
+### what's next?
 after installation, you can [configure mommy](#configuration) and [integrate mommy with your shell](#shell-integration)~
 
 to update mommy, just repeat the installation process~
@@ -239,7 +275,10 @@ after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and o
 replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html).
 except don't use `pkgin`, but use `openbsd` for openbsd, and use `netbsd` for netbsd~
 
-before a new release, make sure to update the version number in `./version` and to update the `./CHANGELOG.md`~
+you can also run `PREFIX=/usr ./build.sh install` to install mommy into `/usr`, but this is mostly intended for
+integration with package managers such as brew and arch's makepkg~
+
+before a new release, make sure to update `./version` and `./CHANGELOG.md`~
 
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
 by default, tests are run against `./src/main/sh/mommy`.

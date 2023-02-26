@@ -2,6 +2,11 @@
 ## [Unreleased]
 
 
+## [1.2.1] -- 2023-02-26
+* mommy supports homebrew now~
+* mommy supports arch linux aur now~
+
+
 ## [1.2.0] -- 2023-02-24
 * mommy can output to stdout without redirection by giving her the `-1` option~
 * mommy ignores exit code `130` by default, but you can change this by setting `MOMMY_IGNORED_STATUSES`~

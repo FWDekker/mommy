@@ -237,7 +237,7 @@ if [ -n "$MOMMY_OPT_HELP" ]; then
         exit "$?"
     fi
 elif [ -n "$MOMMY_OPT_VERSION" ]; then
-    echo "mommy v%%VERSION_NUMBER%%"
+    echo "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0
 else
     # Run command
