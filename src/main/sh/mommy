@@ -209,9 +209,9 @@ while getopts ":hv1c:e:s:-:" OPTION; do
     h|help) MOMMY_OPT_HELP="1" ;;
     v|version) MOMMY_OPT_VERSION="1" ;;
     1) MOMMY_OPT_TARGET="1" ;;
-    c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
-    e) MOMMY_OPT_EVAL="$OPTARG" ;;
-    s) MOMMY_OPT_STATUS="$OPTARG" ;;
+    c|config) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
+    e|eval) MOMMY_OPT_EVAL="$OPTARG" ;;
+    s|status) MOMMY_OPT_STATUS="$OPTARG" ;;
     ?) echo "mommy does not know option -$OPTARG~" >&2; exit 1 ;;
     *) echo "mommy does not know option --$OPTION~" >&2; exit 1 ;;
     esac

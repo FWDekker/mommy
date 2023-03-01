@@ -1,4 +1,4 @@
-# mommy
+# mommy 💝
 [![github latest release](https://img.shields.io/github/v/release/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/releases/latest)
 [![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
 [![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
@@ -13,11 +13,11 @@ much~ ❤️
 ![mommy demo](.github/img/demo.gif)
 
 
-## installation
+## installation 🚚
 mommy works on any unix system.
 mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
 
-### package manager
+### from a repository 🏤
 _don't see your favorite package manager?
 check the distribution archives below.
 not satisfied?
@@ -50,7 +50,7 @@ brew install mommy
 ```
 </details>
 
-### distribution archives
+### distribution archives 📦
 [download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
 * on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
 * on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
@@ -65,15 +65,16 @@ brew install mommy
   (usually `/usr/local/bin/`)
   (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
-### what's next?
-after installation, you can [configure mommy](#configuration) and [integrate mommy with your shell](#shell-integration)~
-
 to update mommy, just repeat the installation process~
+
+### what's next? 🔮
+check out [how to use mommy](#usage-), read all about [ways you can configure mommy](#configuration-), and
+[integrate mommy with your shell](#shell-integration-)~
 
 <img width="450px" src=".github/img/sample1.png" alt="mommy integrated with the fish shell" />
 
 
-## usage
+## usage 📖
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
 it fails~
 
@@ -93,11 +94,11 @@ by default, mommy outputs to stderr, but if you use `mommy -1 [other options]` s
 use `mommy -v` to see which version of mommy you're using~
 
 
-## configuration
+## configuration 🙋
 mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
 or specify a different config file with `mommy -c ./my_config.sh [other options]`~
 
-### config file format
+### config file format 🗃️
 mommy executes the config file as a shell script and keeps the environment variables.
 so, to change the value of `MOMMY_SWEETIE`, add the following line to your config file:
 ```shell
@@ -105,7 +106,7 @@ MOMMY_SWEETIE="catgirl"
 ```
 make sure you do not put spaces around the `=`~
 
-### available settings
+### available settings 👛
 | variable                       | description                                                                                                                                                                                                                                                                                                                                                 | list? | default       |
 |--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|---------------|
 | `MOMMY_CAREGIVER`              | what mommy calls herself                                                                                                                                                                                                                                                                                                                                    | yes   | `mommy`       |
@@ -124,7 +125,7 @@ make sure you do not put spaces around the `=`~
 | `MOMMY_FORBIDDEN_WORDS`        | mommy will not use templates that contain forbidden / trigger words                                                                                                                                                                                                                                                                                         | yes   | &lt;empty>    |
 | `MOMMY_IGNORED_STATUSES`       | exit codes that mommy should never reply to. set to empty string to ignore nothing                                                                                                                                                                                                                                                                          | yes   | `130`         |
 
-### lists
+### lists 🪣
 some of these settings support lists.
 mommy chooses a random element from each list each time she is called by you.
 (except for `MOMMY_FORBIDDEN_WORDS` and `MOMMY_SUPPRESS_EXIT`, where all elements of the list are always considered.)
@@ -153,7 +154,7 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   ```
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
 
-### custom templates
+### custom templates 🧬
 you can add your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but there is a slight
 difference:
 * if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`, but
@@ -161,7 +162,7 @@ difference:
 
 and similarly so for encouragements~
 
-### template variables
+### template variables 📛
 inside compliments and encouragements, you can put placeholders that contain the random values that mommy chose.
 for example, if you add the compliment `%%CAREGIVER%% loves you`, and have `MOMMY_CAREGIVER=your mommy`, then mommy
 outputs `your mommy loves you`~
@@ -174,7 +175,7 @@ outputs `your mommy loves you`~
 | `%%THEIR%%`     | mommy's possessive pronoun (e.g. his, her, their) |
 | `%%SWEETIE%%`   | what mommy calls you                              |
 
-### renaming the mommy executable
+### renaming the mommy executable ✍️
 if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
@@ -193,14 +194,14 @@ sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
 sudo ln -fs /usr/local/man/man1/mommy.1.gz /usr/local/man/man1/daddy.1.gz
 ```
 
-## shell integration
+## shell integration 🐚
 instead of calling mommy for each command, you can also fully integrate mommy with your shell to get mommy's output each
 time you run any command.
 here are some examples on how you can do that in various shells.
 recall that you can add `MOMMY_COMPLIMENTS_ENABLED=0` to your mommy config file to disable compliments while keeping
 encouragements~
 
-### bash
+### bash 🪅
 in bash you can set
 [`PROMPT_COMMAND`](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-PROMPT_005fCOMMAND) to run
 mommy after each command.
@@ -209,7 +210,7 @@ just add the following line to `~/.bashrc`:
 PROMPT_COMMAND="mommy -1 -s \$?; $PROMPT_COMMAND"
 ```
 
-### fish
+### fish 🐟
 in fish you can have mommy output a message on the right side of your prompt by creating
 `~/.config/fish/functions/fish_right_prompt.fish` with the following contents:
 ```shell
@@ -222,7 +223,7 @@ see if there's an easy way to extend the theme's right prompt.
 if not, you can either overwrite it with the above code, or copy-paste the theme's code into your own config file and
 then add mommy yourself~
 
-### zsh
+### zsh 💤
 in zsh you can put mommy's output after each command by adding the following line to `~/.zshrc`:
 ```shell
 precmd() { mommy -1 -s $? }
@@ -246,7 +247,7 @@ this code randomly changes the output between magenta and cyan~
 
 <img width="450px" src=".github/img/sample2.png" alt="mommy integrated with the zsh shell" />
 
-### other shells
+### other shells 🐌
 as a generic method, in any posix shell (including `sh`, `ash`, `dash`, `bash`) you can change the prompt itself to
 contain a message from mommy by setting the `$PS1` variable:
 ```shell
@@ -263,7 +264,7 @@ after that, add the line that defines `PS1` to `~/.shrc`.
 log out and back in, and mommy will appear in your shell~
 
 
-## development
+## development ⚗️
 to build your own mommy, first install the requirements.
 on debian-like systems, run
 ```shell
@@ -286,5 +287,19 @@ to change that, set the `MOMMY_EXEC` environment variable before running tests, 
 `MOMMY_EXEC=/usr/local/bin/mommy ./test.sh`~
 
 
-## acknowledgements
-mommy was very much inspired by [cargo-mommy](https://github.com/Gankra/cargo-mommy)~
+## acknowledgements 💖
+mommy recognises _all_ contributors, no matter the size of the contribution.
+if mommy should add, remove, or change anything here, [open an issue](https://github.com/FWDekker/mommy/issues/new) or
+[contact the author](https://fwdekker.com/about/)~
+
+* mommy thanks [aria beingessner](https://github.com/Gankra) for creating
+  [cargo-mommy](https://github.com/Gankra/cargo-mommy), which inspired mommy to spawn herself into existence~
+* mommy thanks [austin burk](https://github.com/sudofox) for creating
+  [shell-mommy](https://github.com/sudofox/shell-mommy) and contributing to the mommy-sphere;
+  mommy did not know about shell-mommy before embarking on her journey, but loves her very much~
+* mommy thanks [natawie](https://github.com/FWDekker/mommy/issues/39) for
+  [suggesting publishing mommy on copr](https://github.com/FWDekker/mommy/issues/39)~
+* mommy thanks [amber sprenkels](https://github.com/dsprenkels) for
+  [reporting a bug](https://github.com/FWDekker/mommy/issues/45),
+  [sharing great ideas](https://github.com/FWDekker/mommy/issues/46), and
+  [making mommy talk less like a robot](https://github.com/FWDekker/mommy/pull/47)~ 
