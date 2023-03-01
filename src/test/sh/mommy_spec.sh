@@ -20,13 +20,13 @@ Describe "mommy"
     Describe "command-line options"
         It "gives an error for unknown short options"
             When run "$MOMMY_EXEC" -d
-            The error should equal "Illegal option -d"
+            The error should equal "mommy does not know option -d"
             The status should be failure
         End
 
         It "gives an error for unknown long options"
             When run "$MOMMY_EXEC" --doesnotexist
-            The error should equal "Illegal option --doesnotexist"
+            The error should equal "mommy does not know option --doesnotexist"
             The status should be failure
         End
 
