@@ -212,8 +212,8 @@ while getopts ":hv1c:e:s:-:" OPTION; do
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) echo "Illegal option -$OPTARG" >&2; exit 1 ;;
-    *) echo "Illegal option --$OPTION" >&2; exit 1 ;;
+    ?) echo "mommy does not know option -$OPTARG~" >&2; exit 1 ;;
+    *) echo "mommy does not know option --$OPTION~" >&2; exit 1 ;;
     esac
 done
 
