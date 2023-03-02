@@ -10,10 +10,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install ShellSpec
         run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
+
       - name: Install fpm and build dependencies
         run: |
           sudo apt install -y rubygems libarchive-tools rpm zstd
@@ -26,15 +28,32 @@ jobs:
           MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo apt purge -y mommy
 
+      - name: Install Linuxbrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install mommy#dev from Linuxbrew
+        run: |
+          brew tap fwdekker/mommy
+          brew install mommy --HEAD
+      - name: Test mommy#dev from Linuxbrew
+        run: |
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+      - name: Uninstall mommy#dev from Linuxbrew
+        run: |
+          brew uninstall mommy
+          brew untap fwdekker/mommy
+
+
   test-macos:
     runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install ShellSpec
         run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
+
       - name: Install fpm
         run: sudo gem install --no-document fpm
       - name: Build package
@@ -44,6 +63,21 @@ jobs:
           sudo installer -pkg ./dist/mommy*+osx.pkg -target /
           MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
           sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+
+      - name: Install Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Install mommy#dev from Homebrew
+        run: |
+          brew tap fwdekker/mommy
+          brew install mommy --HEAD
+      - name: Test mommy#dev from Homebrew
+        run: |
+          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+      - name: Uninstall mommy#dev from Homebrew
+        run: |
+          brew uninstall mommy
+          brew untap fwdekker/mommy
+
 
   test-freebsd:
     runs-on: macos-12
@@ -95,6 +129,7 @@ jobs:
             pkg delete -y mommy
             echo "::endgroup::"
 
+
   test-netbsd:
     runs-on: macos-12
     steps:
@@ -138,6 +173,7 @@ jobs:
             MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
             pkg_delete mommy
             echo "::endgroup::"
+
 
   test-openbsd:
     runs-on: macos-12

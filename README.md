@@ -1,8 +1,8 @@
 # mommy 💝
 [![github latest release](https://img.shields.io/github/v/release/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/releases/latest)
+[![mommy is on aur](https://img.shields.io/aur/version/mommy?style=for-the-badge)](https://aur.archlinux.org/packages/mommy/)
 [![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
 [![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
-[![mommy is on aur](https://img.shields.io/aur/version/mommy?style=for-the-badge)](https://aur.archlinux.org/packages/mommy/)
 
 mommy's here to support you! mommy will compliment you if things go well, and will encourage you if things are not going
 so well~
@@ -265,7 +265,12 @@ log out and back in, and mommy will appear in your shell~
 
 
 ## development ⚗️
-to build your own mommy, first install the requirements.
+this section explains how to build mommy from source, in case you want to help with development or for any other reason~
+
+### build/install 🔨
+you can directly run the script in `./src/main/sh/mommy`, though the version number will not be correct~
+
+to build packages, first install the requirements.
 on debian-like systems, run
 ```shell
 sudo apt install rubygems libarchive-tools rpm zstd
@@ -279,12 +284,22 @@ except don't use `pkgin`, but use `openbsd` for openbsd, and use `netbsd` for ne
 you can also run `PREFIX=/usr ./build.sh install` to install mommy into `/usr`, but this is mostly intended for
 integration with package managers such as brew and arch's makepkg~
 
-before a new release, make sure to update `./version` and `./CHANGELOG.md`~
-
+### tests 🧪
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
 by default, tests are run against `./src/main/sh/mommy`.
-to change that, set the `MOMMY_EXEC` environment variable before running tests, as in
+if you want to test a different mommy executable, set the `MOMMY_EXEC` environment variable before running tests, as in
 `MOMMY_EXEC=/usr/local/bin/mommy ./test.sh`~
+
+### contribution guidelines 🤠
+* add relevant documentation and tests~
+* ensure that the tests pass~
+* describe your changes in `./CHANGELOG.md`~
+* your pull request should go into `dev`, not into `main`~
+
+### release 📯
+before a new release, make sure to update `./version` and `./CHANGELOG.md`.
+when a branch is merged into `main`, homebrew is updated automatically.
+make sure to also manually update the aur release~
 
 
 ## acknowledgements 💖
