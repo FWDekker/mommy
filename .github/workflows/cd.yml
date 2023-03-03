@@ -175,24 +175,92 @@ jobs:
           files: mommy*
 
 
-  release-homebrew:
+  release-aur:
     runs-on: ubuntu-latest
+    container: archlinux:latest
     needs: [ release-mommy ]
 
     steps:
-      - name: Checkout
+      - name: Set up basic system
+        run: |
+          echo "::group::Update system"
+          pacman -Syu --noconfirm
+          echo "::endgroup::"
+
+          echo "::group::Install basic packages"
+          pacman -S --noconfirm --needed git base-devel
+          echo "::endgroup::"
+
+          echo "::group::Add non-privileged user to run makepkg"
+          useradd -m build
+          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+          echo "::endgroup::"
+
+      - name: Checkout mommy
         uses: actions/checkout@v3
         with:
           path: mommy
       - name: Extract version number
         run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
-      - name: Clone homebrew-mommy
+
+      - name: Checkout aur-mommy
+        uses: actions/checkout@v3
+        with:
+          repository: FWDekker/aur-mommy
+          path: aur-mommy
+          ref: master
+          fetch-depth: 0
+          # Required to trigger CI action when pushed
+          token: ${{ secrets.personal_access_token }}
+      - name: Update build files
+        working-directory: ./aur-mommy/
+        run: |
+          chown -R build:build ./
+
+          echo "::group::Fast-forward main"
+          git checkout dev
+          git checkout master
+          git merge --commit dev
+          echo "::endgroup::"
+
+          echo "::group::Update build files"
+          ./update.sh "$MOMMY_VERSION"
+          echo "::endgroup::"
+
+          echo "::group::Commit update"
+          git config --global user.name "FWDekkerBot"
+          git config --global user.email "bot@fwdekker.com"
+          git commit -am "mommy updated the build files to mommy $MOMMY_VERSION~"
+          echo "::endgroup::"
+
+          echo "::group::Fast-forward dev"
+          git checkout dev
+          git merge --commit master
+          echo "::endgroup::"
+
+          echo "::group::Push changes"
+          git push origin master dev
+          echo "::endgroup::"
+
+
+  release-homebrew:
+    runs-on: ubuntu-latest
+    needs: [ release-mommy ]
+
+    steps:
+      - name: Checkout mommy
+        uses: actions/checkout@v3
+        with:
+          path: mommy
+      - name: Extract version number
+        run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
+
+      - name: Checkout homebrew-mommy
         uses: actions/checkout@v3
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
           ref: main
-          # Fetch all branches
           fetch-depth: 0
           # Required to trigger CI action when pushed
           token: ${{ secrets.personal_access_token }}

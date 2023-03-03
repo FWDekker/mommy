@@ -101,9 +101,11 @@ for target in "$@"; do
     # Process
     case "$target" in
     install)
-        mkdir -p "$(dirname "${target_exe#*=}")" "$(dirname "${target_man#*=}")"
-        cp "./${target_exe%%=*}" "${target_exe#*=}"
-        cp "./${target_man%%=*}" "${target_man#*=}"
+        install -m 755 -d "$(dirname "${target_exe#*=}")"
+        install -m 755 -d "$(dirname "${target_man#*=}")"
+
+        install -m 755 "./${target_exe%%=*}" "${target_exe#*=}"
+        install -m 644 "./${target_man%%=*}" "${target_man#*=}"
         ;;
     netbsd)
         cd /tmp/mommy

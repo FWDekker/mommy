@@ -1,5 +1,6 @@
 --execdir @specfile
 --no-warning-as-failure
+--skip-message quiet
 
 # OpenBSD: Workaround for https://github.com/shellspec/shellspec/issues/291
 --shell sh

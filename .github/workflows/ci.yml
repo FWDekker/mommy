@@ -8,11 +8,11 @@ jobs:
   test-linux:
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies for mommy
+        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Install ShellSpec
-        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
 
@@ -43,14 +43,82 @@ jobs:
           brew untap fwdekker/mommy
 
 
+  test-archlinux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Set up basic system
+        run: |
+          echo "::group::Update system"
+          pacman -Syu --noconfirm
+          echo "::endgroup::"
+
+          echo "::group::Install basic packages"
+          pacman -S --noconfirm --needed git base-devel
+          echo "::endgroup::"
+
+          echo "::group::Add non-privileged user to run makepkg"
+          useradd -m build
+          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+          echo "::endgroup::"
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install man-db"
+          pacman -S --noconfirm man-db
+          echo "::endgroup::"
+
+          echo "::group::Install ShellSpec"
+          git clone https://aur.archlinux.org/shellspec-bin.git
+          chown -R build:build ./shellspec-bin
+          cd ./shellspec-bin
+          sudo -u build makepkg -si --noconfirm
+          cd -
+          echo "::endgroup::"
+
+      - name: Checkout mommy
+        run: |
+          git clone --depth=1 -b "${{ github.ref_name }}" https://github.com/FWDekker/mommy.git
+          chown -R build:build ./mommy
+      - name: Test script
+        run: PATH="$HOME/shellspec:$PATH" ./mommy/test.sh
+
+      - name: Install fpm
+        run: |
+          pacman -S --noconfirm ruby
+          gem install --no-document fpm
+          ln -s "$HOME/.local/share/gem/ruby/"*"/bin/fpm" /usr/local/bin/fpm  # Symlink `fpm` to latest version
+      - name: Build fpm package
+        run: ./mommy/build.sh pacman
+      - name: Test fpm package
+        working-directory: ./mommy
+        run: |
+          pacman -U --noconfirm ./dist/mommy*.pacman
+          MOMMY_EXEC=mommy ./test.sh
+          pacman -R --noconfirm mommy
+
+      - name: Checkout aur-mommy
+        run: |
+          git clone --depth=1 -b dev https://github.com/FWDekker/aur-mommy.git
+          chown -R build:build ./aur-mommy
+      - name: Patch aur-mommy
+        run: sudo -u build ./aur-mommy/update.sh dev
+      - name: Build and install AUR package
+        working-directory: ./aur-mommy
+        run: sudo -u build makepkg -si --noconfirm
+      - name: Test AUR package
+        run: MOMMY_EXEC=mommy MOMMY_TEST_MAN=0 ./mommy/test.sh
+      - name: Uninstall AUR package
+        run: pacman -R --noconfirm mommy
+
+
   test-macos:
     runs-on: macos-latest
     steps:
+      - name: Install dependencies for mommy
+        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Install ShellSpec
-        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
         run: PATH="$HOME/shellspec:$PATH" ./test.sh
 
@@ -84,7 +152,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
+      - name: Install dependencies for mommy && Install fpm && Test script && Build package && Test package
         uses: vmactions/freebsd-vm@v0
         with:
           usesh: true
@@ -135,7 +203,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
+      - name: Install dependencies for mommy && Install fpm && Test script && Build package && Test package
         uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
@@ -180,7 +248,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Test script && Build package && Test package
+      - name: Install dependencies for mommy && Test script && Build package && Test package
         uses: vmactions/openbsd-vm@v0
         with:
           usesh: true

@@ -2,8 +2,9 @@ n="
 "
 
 # Settings
-[ -z "$MOMMY_EXEC" ] && export MOMMY_EXEC="../../main/sh/mommy"
-[ -z "$MOMMY_CONFIG_FILE" ] && export MOMMY_CONFIG_FILE="./config"
+[ -z "$MOMMY_EXEC" ] && MOMMY_EXEC="../../main/sh/mommy"
+[ -z "$MOMMY_CONFIG_FILE" ] && MOMMY_CONFIG_FILE="./config"
+[ -z "$MOMMY_TEST_MAN" ] && MOMMY_TEST_MAN="1"
 
 # Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
 set_config() {
@@ -31,6 +32,9 @@ Describe "mommy"
         End
 
         Describe "-h/--help: help information"
+            not_mommy_test_man() { [ "$MOMMY_TEST_MAN" != "1" ] >/dev/null 2>&1; }
+            Skip if "man tests disabled" not_mommy_test_man
+
             It "outputs help information using -h"
                 When run "$MOMMY_EXEC" -h
                 The word 1 of output should equal "mommy(1)"

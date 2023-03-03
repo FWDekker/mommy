@@ -298,8 +298,7 @@ if you want to test a different mommy executable, set the `MOMMY_EXEC` environme
 
 ### release 📯
 before a new release, make sure to update `./version` and `./CHANGELOG.md`.
-when a branch is merged into `main`, homebrew is updated automatically.
-make sure to also manually update the aur release~
+when a branch is merged into `main`, all other packages are updated automatically.
 
 
 ## acknowledgements 💖
