@@ -1,8 +1,9 @@
 # Changelog
 ## [Unreleased]
 ### added
-* mommy has shell completions for fish~ 🐟
+* mommy has shell completions for fish and zsh~ 🐟
   ([#43](https://github.com/FWDekker/mommy/issues/43))
+  ([#48](https://github.com/FWDekker/mommy/pull/48))
 
 ### changed
 * mommy no longer talks like a robot when unknown options are used~ 🤖
@@ -10,6 +11,9 @@
 * mommy has a bunch more emoji in her readme~ ⭐
   ([#40](https://github.com/FWDekker/mommy/issues/40))
 * mommy supports long options for more options, including `-c`, `-e`, and `-s` ~ 📐
+* mommy's built system has been revamped~ ⚗️
+  ([#38](https://github.com/FWDekker/mommy/issues/38))
+  ([#42](https://github.com/FWDekker/mommy/issues/42))
 
 ### deprecated
 

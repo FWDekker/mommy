@@ -17,12 +17,12 @@ echo "Waiting 1 second before starting"
 sleep "1"
 
 echo "Run faulty command"
-xdotool type --delay 100 "mommy ./trest.sh"
+xdotool type --delay 100 "mommy make tesr"
 sleep "1.5"
 xdotool key Return
 sleep "2"
 
 echo "Run working command"
-xdotool type --delay 100 "mommy ./test.sh"
+xdotool type --delay 100 "mommy make test"
 sleep "1.5"
 xdotool key Return

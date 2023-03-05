@@ -20,8 +20,8 @@ jobs:
         run: |
           sudo apt install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
-      - name: Build package
-        run: ./build.sh apk deb rpm pacman
+      - name: Build packages
+        run: make apk deb rpm pacman
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
@@ -36,7 +36,7 @@ jobs:
       - name: Install fpm
         run: sudo gem install --no-document fpm
       - name: Build package
-        run: ./build.sh osxpkg
+        run: make osxpkg
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
@@ -53,6 +53,10 @@ jobs:
         with:
           usesh: true
           prepare: |
+            echo "::group::Install basic packages"
+            pkg install -y git gmake || exit 1
+            echo "::endgroup::"
+
             # fpm
               echo "::group::Install fpm: Actually install fpm"
               pkg install -y devel/ruby-gems || exit 1
@@ -67,13 +71,12 @@ jobs:
             # /fpm
 
             echo "::group::Ignore ownership issues"
-            pkg install -y git || exit 1
             git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
             echo "::endgroup::"
           run: |
             set -e
 
-            ./build.sh freebsd
+            gmake freebsd
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
@@ -92,6 +95,10 @@ jobs:
           prepare: |
             set -e
 
+            echo "::group::Install basic packages"
+            pkg_add git gmake || exit 1
+            echo "::endgroup::"
+
             echo "::group::Install fpm"
             pkg_add ruby
             /usr/pkg/bin/gem* install --no-document fpm
@@ -99,14 +106,13 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
-            pkg_add git
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
           run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
 
-            ./build.sh netbsd
+            gmake netbsd
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
@@ -125,6 +131,10 @@ jobs:
           prepare: |
             set -e
 
+            echo "::group::Install basic packages"
+            pkg_add git gmake
+            echo "::endgroup::"
+
             echo "::group::Install fpm"
             pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
             /usr/local/bin/gem* install --no-document fpm
@@ -132,13 +142,12 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
-            pkg_add git
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
           run: |
             set -e
 
-            ./build.sh openbsd
+            gmake openbsd
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
@@ -212,11 +221,11 @@ jobs:
           fetch-depth: 0
           # Required to trigger CI action when pushed
           token: ${{ secrets.personal_access_token }}
+      - name: Fix aur-mommy directory ownership
+        run: chown -R build:build ./aur-mommy/
       - name: Update build files
         working-directory: ./aur-mommy/
         run: |
-          chown -R build:build ./
-
           echo "::group::Fast-forward main"
           git checkout dev
           git checkout master

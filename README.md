@@ -30,13 +30,14 @@ install on arch linux from the [aur mommy package](https://aur.archlinux.org/pac
 [an aur helper](https://wiki.archlinux.org/title/AUR_helpers):
 
 ```shell
+# if you use yay
+yay -S mommy
 # if you use paru
 paru -S mommy
 # if you use aura
 aura -A mommy
 # and so on
 ```
-
 </details>
 
 <details>
@@ -61,9 +62,9 @@ brew install mommy
 * on netbsd, run `pkg_add ./mommy-*+netbsd.tgz`,
 * on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
 * alternatively, on any unix system you can also download and extract the source code `.zip`, and copy
-  `./src/main/sh/mommy` into the appropriate directory
+  `src/main/sh/mommy` into the appropriate directory
   (usually `/usr/local/bin/`)
-  (and optionally also copy `./src/main/resources/mommy.1` into `/usr/local/man/man1/`)
+  (and optionally also copy `src/main/resources/mommy.1` into `/usr/local/man/man1/`)
 
 to update mommy, just repeat the installation process~
 
@@ -267,38 +268,62 @@ log out and back in, and mommy will appear in your shell~
 ## development ⚗️
 this section explains how to build mommy from source, in case you want to help with development or for any other reason~
 
-### build/install 🔨
-you can directly run the script in `./src/main/sh/mommy`, though the version number will not be correct~
+### run 🎬
+you can actually just directly run the script in `src/main/sh/mommy`.
+note that the version number will be a bit off unless you [package mommy](#packaging-)~
 
-to build packages, first install the requirements.
-on debian-like systems, run
+### tests 🧪
+to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `make test`.
+by default, tests are run against `src/main/sh/mommy`.
+if you want to test a different mommy executable, set the `MOMMY_EXEC` environment variable before running tests, as in
+`MOMMY_EXEC=/usr/local/bin/mommy make test`~
+
+### packaging 📦
+mommy can be packaged in different ways.
+mommy uses [fpm](https://github.com/jordansissel/fpm) to create the [distribution archives](#distribution-archives-)
+that are attached to each release.
+but mommy is also [available on some repositories](#from-a-repository-).
+the build files for those repositories are in [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy) and
+[aur-mommy](https://github.com/FWDekker/aur-mommy)~
+
+to build distribution archives, first install the requirements.
+for all systems, you need at least gnu make, ruby, and fpm.
+on debian-like systems, you already have gnu make, so you only need
 ```shell
-sudo apt install rubygems libarchive-tools rpm zstd
+sudo apt install ruby
 sudo gem install fpm
 ```
 
-after that, just run `./build.sh deb` (or better: `mommy ./build.sh deb`), and outputs appear in `dist/`.
-replace `deb` with [one or more supported output types](https://fpm.readthedocs.io/en/v1.15.1/packaging-types.html).
-except don't use `pkgin`, but use `openbsd` for openbsd, and use `netbsd` for netbsd~
+after that, just run `make deb` (or better: `mommy make deb`), and a `.deb` package will be built in `dist/`.
+run `make` or `make list` for a list of valid building targets.
+a special target is `install`, which directly copies the files into the specified directories on your system.
+these directories can be changed by setting `prefix` variables, as in `make prefix=/usr/ install`.
+i recommend running `make --dry-run prefix=/usr/ install` first so you can verify that all directories are calculated
+correctly.
+check the `GNUmakefile` for more details~
 
-you can also run `PREFIX=/usr ./build.sh install` to install mommy into `/usr`, but this is mostly intended for
-integration with package managers such as brew and arch's makepkg~
-
-### tests 🧪
-to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `./test.sh`.
-by default, tests are run against `./src/main/sh/mommy`.
-if you want to test a different mommy executable, set the `MOMMY_EXEC` environment variable before running tests, as in
-`MOMMY_EXEC=/usr/local/bin/mommy ./test.sh`~
+all systems can build packages for themselves without additional dependencies.
+if you want to compile for a different system, you may need additional dependencies.
+for example, if you want to build packages for alpinelinux, archlinux, and rpm from a debian-like system, you will need
+```shell
+sudo apt install libarchive-tools rpm zstd
+```
+and then you can run
+```shell
+make apk pacman rpm
+```
+unfortunately, packages for macos, netbsd, and openbsd cannot be built on systems other than themselves~
 
 ### contribution guidelines 🤠
 * add relevant documentation and tests~
 * ensure that the tests pass~
-* describe your changes in `./CHANGELOG.md`~
+* describe your changes in `CHANGELOG.md`~
 * your pull request should go into `dev`, not into `main`~
 
 ### release 📯
-before a new release, make sure to update `./version` and `./CHANGELOG.md`.
-when a branch is merged into `main`, all other packages are updated automatically.
+before a new release, make sure to update `version`, `CHANGELOG.md`, and the acknowledgements in `README.md`.
+when a branch is merged into `main`, a new release is created automatically, and repository distributions are updated
+automatically~
 
 
 ## acknowledgements 💖
@@ -316,4 +341,6 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
 * mommy thanks [amber sprenkels](https://github.com/dsprenkels) for
   [reporting a bug](https://github.com/FWDekker/mommy/issues/45),
   [sharing great ideas](https://github.com/FWDekker/mommy/issues/46), and
-  [making mommy talk less like a robot](https://github.com/FWDekker/mommy/pull/47)~ 
+  [making mommy talk less like a robot](https://github.com/FWDekker/mommy/pull/47)~
+* mommy thanks [natawie](https://github.com/natawie) for
+  [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
