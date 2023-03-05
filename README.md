@@ -294,7 +294,7 @@ sudo apt install ruby
 sudo gem install fpm
 ```
 
-after that, just run `make deb` (or better: `mommy make deb`), and a `.deb` package will be built in `dist/`.
+after that, just run `make dist/deb` (or better: `mommy make dist/deb`), and a `.deb` package will be built in `dist/`.
 run `make` or `make list` for a list of valid building targets.
 a special target is `install`, which directly copies the files into the specified directories on your system.
 these directories can be changed by setting `prefix` variables, as in `make prefix=/usr/ install`.

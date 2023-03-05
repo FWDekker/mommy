@@ -36,8 +36,15 @@ clean:
 
 # Run tests
 .PHONY: test
-test:
+test: test/mommy test/man
+
+.PHONY: test/mommy
+test/mommy:
 	@shellspec src/test/sh/mommy_spec.sh
+
+.PHONY: test/man
+test/man:
+	@shellspec src/test/sh/man_spec.sh
 
 
 ## Compilation
@@ -88,26 +95,26 @@ endif
 		"build/zsh/_mommy=$(zsh_prefix)/_mommy"
 
 # Build AlpineLinux / Debian / RedHat / FreeBSD package with fpm
-.PHONY: apk deb rpm freebsd
-apk deb rpm freebsd:
-	@$(MAKE) fpm_target="$@" bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/man/man1/' fpm
+.PHONY: dist/apk dist/deb dist/rpm dist/freebsd
+dist/apk dist/deb dist/rpm dist/freebsd:
+	@$(MAKE) fpm_target="$(@:dist/%=%)" bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/man/man1/' fpm
 
 # Build ArchLinux package with fpm
-.PHONY: pacman
-pacman:
-	@$(MAKE) fpm_target="$@" fpm
+.PHONY: dist/pacman
+dist/pacman:
+	@$(MAKE) fpm_target=pacman fpm
 
 # Build macOS package with fpm
-.PHONE: osxpkg
-osxpkg:
-	@$(MAKE) fpm_target=osxpkg bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/share/man/man1/' fpm
+.PHONE: dist/osxpkg
+dist/osxpkg:
+	@$(MAKE) fpm_target=osxpkg prefix='/usr/local/' fpm
 
 	@# `installer` program requires `pkg` extension
 	@mv dist/*.osxpkg "dist/mommy-$(version)+osx.pkg"
 
 # Build NetBSD package manually
-.PHONY: netbsd
-netbsd:
+.PHONY: dist/netbsd
+dist/netbsd:
 	@$(MAKE) prefix='build/netbsd/usr/pkg/' man_prefix='$$(prefix)/man/man1/' install
 
 	@cd build/netbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
@@ -138,8 +145,8 @@ netbsd:
 	@mv build/netbsd/mommy*.tgz dist/
 
 # Build OpenBSD package manually
-.PHONY: openbsd
-openbsd:
+.PHONY: dist/openbsd
+dist/openbsd:
 	@$(MAKE) prefix='build/openbsd/usr/' bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/man/man1/' install
 
 	@cd build/openbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
@@ -154,7 +161,7 @@ openbsd:
 		-d +DESC \
 		-D COMMENT="$(comment)" \
 		-D FULLPKGPATH="mommy-$(version)+netbsd" \
-		-D MAINTAINER="$(maintainer)"
+		-D MAINTAINER="$(maintainer)" \
 		-f +CONTENTS \
 		-B "$$(pwd)/" \
 		-p / \

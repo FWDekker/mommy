@@ -1,16 +1,4 @@
-n="
-"
-
-# Settings
-[ -z "$MOMMY_EXEC" ] && MOMMY_EXEC="../../main/sh/mommy"
-[ -z "$MOMMY_CONFIG_FILE" ] && MOMMY_CONFIG_FILE="./config"
-[ -z "$MOMMY_TEST_MAN" ] && MOMMY_TEST_MAN="1"
-
-# Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
-set_config() {
-    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
-}
-
+. ./helper.sh
 
 # Tests
 Describe "mommy"
@@ -31,34 +19,7 @@ Describe "mommy"
             The status should be failure
         End
 
-        Describe "-h/--help: help information"
-            not_mommy_test_man() { [ "$MOMMY_TEST_MAN" != "1" ] >/dev/null 2>&1; }
-            Skip if "man tests disabled" not_mommy_test_man
-
-            It "outputs help information using -h"
-                When run "$MOMMY_EXEC" -h
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-
-            It "outputs help information using --help"
-                When run "$MOMMY_EXEC" --help
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-
-            It "outputs help information even when -h is not the first option"
-                When run "$MOMMY_EXEC" -s 432 -h
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-
-            It "outputs help information even when --help is not the first option"
-                When run "$MOMMY_EXEC" -s 221 --help
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-        End
+        # -h/--help is tested in `man_spec.sh`
 
         Describe "-v/--help: version information"
             It "outputs version information using -v"
