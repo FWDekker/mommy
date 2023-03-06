@@ -36,15 +36,11 @@ clean:
 
 # Run tests
 .PHONY: test
-test: test/mommy test/man
+test: test/mommy test/man test/fish test/zsh
 
-.PHONY: test/mommy
-test/mommy:
-	@shellspec src/test/sh/mommy_spec.sh
-
-.PHONY: test/man
-test/man:
-	@shellspec src/test/sh/man_spec.sh
+.PHONY: test/%
+test/%:
+	@shellspec src/test/sh/"$(@:test/%=%)"_spec.sh
 
 
 ## Compilation
