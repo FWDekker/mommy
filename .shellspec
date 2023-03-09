@@ -1,6 +1,8 @@
 --execdir @specfile
 --no-warning-as-failure
 --skip-message quiet
+--require spec_helper
+--helperdir src/test/helper/
 
 # OpenBSD: Workaround for https://github.com/shellspec/shellspec/issues/291
 --shell sh

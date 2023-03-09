@@ -11,9 +11,9 @@ _arguments \
     "(- *)"{-h,--help}'[Show manual]' \
     "(- *)"{-v,--version}'[Show version]' \
     -1'[Write to stdout]' \
-    {-c,--config}'[Configuration file]:config:_files' \
-    {-e,--eval}'[Evaluate string]:string' \
-    {-s,--status}'[Exit code]:code:->status' \
+    -c'[Configuration file]:config:_files' \
+    -e'[Evaluate string]:string' \
+    -s'[Exit code]:code:->status' \
     '*::command:'
 
 # suggest exit codes for --status

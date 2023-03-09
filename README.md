@@ -49,6 +49,8 @@ install with homebrew/linuxbrew from the [mommy tap](https://github.com/FWDekker
 brew tap fwdekker/mommy
 brew install mommy
 ```
+
+check the [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
 </details>
 
 ### distribution archives 📦
@@ -274,9 +276,10 @@ note that the version number will be a bit off unless you [package mommy](#packa
 
 ### tests 🧪
 to run tests, install [shellspec](https://github.com/shellspec/shellspec) and run `make test`.
-by default, tests are run against `src/main/sh/mommy`.
-if you want to test a different mommy executable, set the `MOMMY_EXEC` environment variable before running tests, as in
-`MOMMY_EXEC=/usr/local/bin/mommy make test`~
+specifically, run `make test/unit` to test the mommy executable in isolation, and run `make test/integration` to test 
+the integration with external programs (if they are installed).
+by default, tests are run against the files in `src/`.
+if you want to run tests against installed files, run `make system=1 test` instead~
 
 ### packaging 📦
 mommy can be packaged in different ways.

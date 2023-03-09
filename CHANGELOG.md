@@ -6,12 +6,11 @@
   ([#48](https://github.com/FWDekker/mommy/pull/48))
 
 ### changed
-* mommy no longer talks like a robot when unknown options are used~ 🤖
+* mommy no longer talks like a robot when unknown options are used~
   ([#47](https://github.com/FWDekker/mommy/pull/47))
 * mommy has a bunch more emoji in her readme~ ⭐
   ([#40](https://github.com/FWDekker/mommy/issues/40))
-* mommy supports long options for more options, including `-c`, `-e`, and `-s` ~ 📐
-* mommy's built system has been revamped~ ⚗️
+* mommy's build system has been revamped~ ⚗️
   ([#38](https://github.com/FWDekker/mommy/issues/38))
   ([#42](https://github.com/FWDekker/mommy/issues/42))
 
@@ -20,6 +19,7 @@
 ### removed
 
 ### fixed
+* mommy better tolerates missing optional dependencies when installing with aur~ 💪
 
 ### security
 

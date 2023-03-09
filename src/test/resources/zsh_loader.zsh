@@ -1,4 +1,6 @@
 #!/usr/bin/env zsh
+# Extracts zsh's auto-completions using a pseudo-terminal with emulated inputs. In zsh, source this file, then invoke
+# `compget <command to complete>`.
 # Code taken from https://stackoverflow.com/a/69164362/
 
 

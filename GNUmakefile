@@ -11,7 +11,7 @@ maintainer := $(shell grep -- "--maintainer" .fpm | tr -d "\"" | cut -d " " -f 2
 # allows the user to override that default when running `make osxpkg`.
 prefix_default = /usr/
 bin_prefix_default = $(prefix)/bin/
-man_prefix_default = $(prefix)/share/man/man1/
+man_prefix_default = $(prefix)/share/man/
 fish_prefix_default = $(prefix)/share/fish/vendor_completions.d/
 zsh_prefix_default = $(prefix)/share/zsh/site-functions/
 
@@ -22,7 +22,7 @@ install fpm: fish_prefix ?= $(fish_prefix_default)
 install fpm: zsh_prefix ?= $(zsh_prefix_default)
 
 
-# Output list of `make` targets
+# Output list of targets
 .PHONY: list
 list:
 	@# Taken from https://stackoverflow.com/a/26339924/
@@ -36,11 +36,12 @@ clean:
 
 # Run tests
 .PHONY: test
-test: test/mommy test/man test/fish test/zsh
+test: test/unit test/integration
 
 .PHONY: test/%
+test/%: system ?= 0
 test/%:
-	@shellspec src/test/sh/"$(@:test/%=%)"_spec.sh
+	@MOMMY_SYSTEM=$(system) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
 ## Compilation
@@ -49,29 +50,29 @@ test/%:
 build:
 	@# Copy relevant files
 	@mkdir -p build/bin/; cp src/main/sh/mommy build/bin/
-	@mkdir -p build/man/; cp src/main/resources/mommy.1 build/man/
-	@mkdir -p build/fish/; cp src/main/fish/mommy.fish build/fish/
-	@mkdir -p build/zsh/; cp src/main/zsh/_mommy build/zsh/
+	@mkdir -p build/man/man1/; cp src/main/man/man1/mommy.1 build/man/man1/
+	@mkdir -p build/completions/fish/; cp src/main/completions/fish/mommy.fish build/completions/fish/
+	@mkdir -p build/completions/zsh/; cp src/main/completions/zsh/_mommy build/completions/zsh/
 
 	@# Insert version information
-	@sed -i".bak" "s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" build/bin/mommy build/man/mommy.1
-	@rm -f build/bin/mommy.bak build/man/mommy.1.bak
+	@sed -i".bak" "s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" build/bin/mommy build/man/man1/mommy.1
+	@rm -f build/bin/mommy.bak build/man/man1/mommy.1.bak
 
 	@# Compress
-	@gzip -f build/man/mommy.1
+	@gzip -f build/man/man1/mommy.1
 
 
 # Copy built files into appropriate directories
 .PHONY: install
 install: build
 	@# Create directories
-	@install -m 755 -d "$(bin_prefix)" "$(man_prefix)" "$(fish_prefix)" "$(zsh_prefix)"
+	@install -m 755 -d "$(bin_prefix)" "$(man_prefix)/man1/" "$(fish_prefix)" "$(zsh_prefix)"
 
 	@# Copy files
 	@install -m 755 build/bin/* "$(bin_prefix)"
-	@install -m 644 build/man/* "$(man_prefix)"
-	@install -m 644 build/fish/* "$(fish_prefix)"
-	@install -m 644 build/zsh/* "$(zsh_prefix)"
+	@install -m 644 build/man/man1/* "$(man_prefix)/man1/"
+	@install -m 644 build/completions/fish/* "$(fish_prefix)"
+	@install -m 644 build/completions/zsh/* "$(zsh_prefix)"
 
 # Invoke fpm on built files to create `fpm_target` type output
 # For valid `fpm_target`s, see https://fpm.readthedocs.io/en/latest/packaging-types.html
@@ -86,32 +87,37 @@ endif
 		--version "$(version)" \
 		\
 		"build/bin/mommy=$(bin_prefix)/mommy" \
-		"build/man/mommy.1.gz=$(man_prefix)/mommy.1.gz" \
-		"build/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
-		"build/zsh/_mommy=$(zsh_prefix)/_mommy"
+		"build/man/man1/mommy.1.gz=$(man_prefix)/man1/mommy.1.gz" \
+		"build/completions/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
+		"build/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
 
-# Build AlpineLinux / Debian / RedHat / FreeBSD package with fpm
-.PHONY: dist/apk dist/deb dist/rpm dist/freebsd
-dist/apk dist/deb dist/rpm dist/freebsd:
-	@$(MAKE) fpm_target="$(@:dist/%=%)" bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/man/man1/' fpm
+# Build Debian package with fpm
+.PHONY: dist/deb
+dist/deb:
+	@$(MAKE) fpm_target="deb" zsh_prefix='$$(prefix)/share/zsh/vendor-completions/' fpm
 
-# Build ArchLinux package with fpm
-.PHONY: dist/pacman
-dist/pacman:
-	@$(MAKE) fpm_target=pacman fpm
+# Build AlpineLinux / Debian / ArchLinux / RedHat package with fpm
+.PHONY: dist/apk dist/pacman dist/rpm
+dist/apk dist/pacman dist/rpm:
+	@$(MAKE) fpm_target="$(@:dist/%=%)" fpm
 
 # Build macOS package with fpm
 .PHONE: dist/osxpkg
 dist/osxpkg:
-	@$(MAKE) fpm_target=osxpkg prefix='/usr/local/' fpm
+	@$(MAKE) fpm_target="osxpkg" prefix="/usr/local/" fpm
 
 	@# `installer` program requires `pkg` extension
 	@mv dist/*.osxpkg "dist/mommy-$(version)+osx.pkg"
 
+# Build FreeBSD package with fpm
+.PHONY: dist/freebsd
+dist/freebsd:
+	@$(MAKE) fpm_target="freebsd" prefix="/usr/local/" fpm
+
 # Build NetBSD package manually
 .PHONY: dist/netbsd
 dist/netbsd:
-	@$(MAKE) prefix='build/netbsd/usr/pkg/' man_prefix='$$(prefix)/man/man1/' install
+	@$(MAKE) prefix='build/netbsd/usr/pkg/' man_prefix='$$(prefix)/man/' install
 
 	@cd build/netbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 
@@ -143,7 +149,7 @@ dist/netbsd:
 # Build OpenBSD package manually
 .PHONY: dist/openbsd
 dist/openbsd:
-	@$(MAKE) prefix='build/openbsd/usr/' bin_prefix='$$(prefix)/local/bin/' man_prefix='$$(prefix)/local/man/man1/' install
+	@$(MAKE) prefix='build/openbsd/usr/local/' man_prefix='$$(prefix)/man/' install
 
 	@cd build/openbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 

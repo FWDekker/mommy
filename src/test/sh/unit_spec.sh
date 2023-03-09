@@ -1,11 +1,19 @@
-. ./helper.sh
+#!/bin/sh
+## Configuration
+# Temporary file to store mommy's configuration in
+: "${MOMMY_CONFIG_FILE:=$MOMMY_TMP_DIR/config.sh}"
 
-# Tests
+
+## Functions
+# Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
+set_config() {
+    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
+}
+export set_config
+
+
+## Run tests
 Describe "mommy"
-    clean_config() { rm -f "$MOMMY_CONFIG_FILE"; }
-    BeforeEach "clean_config"
-    AfterEach "clean_config"
-
     Describe "command-line options"
         It "gives an error for unknown short options"
             When run "$MOMMY_EXEC" -d
@@ -19,9 +27,9 @@ Describe "mommy"
             The status should be failure
         End
 
-        # -h/--help is tested in `man_spec.sh`
+        # -h/--help is tested in `integration_spec.sh`
 
-        Describe "-v/--help: version information"
+        Describe "-v/--version: version information"
             It "outputs version information using -v"
                 When run "$MOMMY_EXEC" -v
                 The word 1 of output should equal "mommy,"
