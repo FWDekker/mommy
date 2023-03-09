@@ -8,8 +8,9 @@
 #   * Resize window to 80x20
 #   * Hide console border
 # 3. In SimpleScreenRecorder, select console window, and change width to 1900 and height to 800
-# 4. Start recording, activate this script with global shortcut, then stop recording
-# 5. Create a GIF with `ffmpeg -i simplescreenrecorder*.mkv -vf "fps=24,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 demo.gif`
+# 4. Open `sh` shell
+# 5. Start recording, activate this script with global shortcut, then stop recording
+# 6. Create a GIF with `ffmpeg -y -i ~/Videos/simplescreenrecorder*.mkv -vf "fps=24,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 ./.github/img/demo.gif`
 
 set -e
 

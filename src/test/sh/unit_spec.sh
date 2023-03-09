@@ -9,7 +9,6 @@
 set_config() {
     echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
 }
-export set_config
 
 
 ## Run tests
