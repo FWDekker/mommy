@@ -8,58 +8,267 @@ jobs:
   test-linux:
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          sudo make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          sudo apt install fish zsh
+          touch "$HOME/.zshrc"
+          echo "::endgroup::"
+
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec
-        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
-        run: PATH="$HOME/shellspec:$PATH" ./test.sh
+        run: make test
+
       - name: Install fpm and build dependencies
         run: |
           sudo apt install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
-      - name: Build package
-        run: ./build.sh deb
-      - name: Test package
+      - name: Test fpm package
         run: |
+          echo "::group::Build"
+          make dist/deb
+          echo "::endgroup::"
+
+          echo "::group::Install"
           sudo apt install -y ./dist/mommy-*.deb
-          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
           sudo apt purge -y mommy
+          echo "::endgroup::"
+
+      - name: Install Linuxbrew
+        run: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - name: Checkout homebrew-mommy
+        uses: actions/checkout@v3
+        with:
+          repository: FWDekker/homebrew-mommy
+          path: homebrew-mommy
+          ref: dev
+      - name: Test Linuxbrew package
+        run: |
+          echo "::group::Enable Homebrew"
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
+          echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          brew tap local/mommy "$(pwd)/homebrew-mommy"
+          brew install mommy --HEAD
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          brew uninstall mommy
+          brew untap local/mommy
+          echo "::endgroup::"
+
+
+  test-archlinux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Set up basic system
+        run: |
+          echo "::group::Update system"
+          pacman -Syu --noconfirm
+          echo "::endgroup::"
+
+          echo "::group::Install basic packages"
+          pacman -S --noconfirm --needed git base-devel
+          echo "::endgroup::"
+
+          echo "::group::Add non-privileged user to run makepkg"
+          useradd -m build
+          echo "build ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+          echo "::endgroup::"
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install man-db"
+          pacman -S --noconfirm man-db
+          sed -i "/NoExtract.*man/d" /etc/pacman.conf  # Extract man pages
+          echo "::endgroup::"
+
+          echo "::group::Install ShellSpec"
+          git clone https://aur.archlinux.org/shellspec-bin.git
+          chown -R build:build ./shellspec-bin
+          cd ./shellspec-bin
+          sudo -u build makepkg -si --noconfirm
+          cd -
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          pacman -S --noconfirm fish zsh
+          echo "::endgroup::"
+
+      - name: Checkout mommy
+        uses: actions/checkout@v3
+        with:
+          path: mommy
+      - name: Fix mommy directory ownership
+        run: chown -R build:build ./mommy/
+      - name: Test script
+        working-directory: ./mommy/
+        run: make test
+
+      - name: Install fpm
+        run: |
+          pacman -S --noconfirm ruby
+          gem install --no-document fpm
+          ln -s "$HOME/.local/share/gem/ruby/"*"/bin/fpm" /usr/local/bin/fpm  # Symlink `fpm` to latest version
+      - name: Test fpm package
+        working-directory: ./mommy/
+        run: |
+          echo "::group::Build"
+          make dist/pacman
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          pacman -U --noconfirm ./dist/mommy*.pacman
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          pacman -R --noconfirm mommy
+          echo "::endgroup::"
+
+      - name: Checkout aur-mommy
+        uses: actions/checkout@v3
+        with:
+          repository: FWDekker/aur-mommy
+          path: aur-mommy
+          ref: dev
+      - name: Fix aur-mommy directory ownership
+        run: chown -R build:build ./aur-mommy/
+      - name: Test AUR package
+        working-directory: ./aur-mommy/
+        run: |
+          echo "::group::Patch"
+          sudo -u build ./update.sh dev
+          echo "::endgroup::"
+
+          echo "::group::Build and install"
+          sudo -u build makepkg -si --noconfirm
+          echo "::endgroup::"
+
+          cd ../mommy/
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          pacman -R --noconfirm mommy
+          echo "::endgroup::"
+
 
   test-macos:
     runs-on: macos-latest
     steps:
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install ShellSpec"
+          brew tap shellspec/shellspec
+          brew install shellspec
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          brew install fish
+          echo "::endgroup::"
+
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec
-        run: git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
       - name: Test script
-        run: PATH="$HOME/shellspec:$PATH" ./test.sh
+        run: make test
+
       - name: Install fpm
         run: sudo gem install --no-document fpm
-      - name: Build package
-        run: ./build.sh osxpkg
-      - name: Test package
+      - name: Test fpm package
         run: |
+          echo "::group::Build"
+          make dist/osxpkg
+          echo "::endgroup::"
+
+          echo "::group::Install"
           sudo installer -pkg ./dist/mommy*+osx.pkg -target /
-          MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
-          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz /usr/local/share/fish/vendor_completions.d/mommy.fish /usr/local/share/zsh/site-functions/_mommy
+          echo "::endgroup::"
+
+      - name: Checkout homebrew-mommy
+        uses: actions/checkout@v3
+        with:
+          repository: FWDekker/homebrew-mommy
+          path: homebrew-mommy
+          ref: dev
+      - name: Test Homebrew package
+        run: |
+          echo "::group::Enable Homebrew"
+          mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
+          echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          brew tap local/mommy "$(pwd)/homebrew-mommy"
+          brew install mommy --HEAD
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          brew uninstall mommy
+          brew untap local/mommy
+          echo "::endgroup::"
+
 
   test-freebsd:
     runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
+      - name: Test script and package
         uses: vmactions/freebsd-vm@v0
         with:
           usesh: true
           # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
           # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
           prepare: |
+            echo "::group::Install basic packages"
+            pkg install -y git gmake || exit 1
+            echo "::endgroup::"
+
             echo "::group::Install ShellSpec"
-            pkg install -y git || exit 1
-            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/" || exit 1
+            git clone --depth=1 https://github.com/shellspec/shellspec.git || exit 1
+            gmake -C shellspec install || exit 1
+            echo "::endgroup::"
+
+            echo "::group::Install additional shells"
+            pkg install -y fish zsh || exit 1
             echo "::endgroup::"
 
             # fpm
@@ -82,34 +291,50 @@ jobs:
             set -e
 
             echo "::group::Test script"
-            PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake test
             echo "::endgroup::"
 
             echo "::group::Build package"
-            ./build.sh freebsd
+            gmake dist/freebsd
+            echo "::endgroup::"
+
+            echo "::group::Install package"
+            pkg add ./dist/mommy-*.freebsd
             echo "::endgroup::"
 
             echo "::group::Test package"
-            pkg add ./dist/mommy-*.freebsd
-            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake system=1 test
+            echo "::endgroup::"
+
+            echo "::group::Uninstall package"
             pkg delete -y mommy
             echo "::endgroup::"
+
 
   test-netbsd:
     runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Install fpm && Test script && Build package && Test package
+      - name: Test script and package
         uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
           prepare: |
             set -e
 
+            echo "::group::Install basic packages"
+            pkg_add git gmake
+            echo "::endgroup::"
+
             echo "::group::Install ShellSpec"
-            pkg_add git
-            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            git clone --depth=1 https://github.com/shellspec/shellspec.git
+            gmake -C shellspec install
+            echo "::endgroup::"
+
+            echo "::group::Install additional shells"
+            pkg_add fish zsh
+            touch "$HOME/.zshrc"
             echo "::endgroup::"
 
             echo "::group::Install fpm"
@@ -124,36 +349,53 @@ jobs:
           run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
+            export MOMMY_ZSH_SKIP=1  # Zsh completion capturing totally does not work
 
             echo "::group::Test script"
-            PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake test
             echo "::endgroup::"
 
             echo "::group::Build package"
-            ./build.sh netbsd
+            gmake dist/netbsd
+            echo "::endgroup::"
+
+            echo "::group::Install package"
+            pkg_add ./dist/mommy-*+netbsd.tgz
             echo "::endgroup::"
 
             echo "::group::Test package"
-            pkg_add ./dist/mommy-*+netbsd.tgz
-            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake system=1 test
+            echo "::endgroup::"
+
+            echo "::group::Uninstall package"
             pkg_delete mommy
             echo "::endgroup::"
+
 
   test-openbsd:
     runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install ShellSpec && Test script && Build package && Test package
+      - name: Install dependencies for mommy && Test script && Build package && Test package
         uses: vmactions/openbsd-vm@v0
         with:
           usesh: true
           prepare: |
             set -e
 
+            echo "::group::Install basic packages"
+            pkg_add git gmake
+            echo "::endgroup::"
+
             echo "::group::Install ShellSpec"
-            pkg_add git
-            git clone --depth=1 https://github.com/shellspec/shellspec.git "$HOME/shellspec/"
+            git clone --depth=1 https://github.com/shellspec/shellspec.git
+            gmake -C shellspec install
+            echo "::endgroup::"
+
+            echo "::group::Install additional shells"
+            pkg_add fish zsh
+            touch "$HOME/.zshrc"
             echo "::endgroup::"
 
             echo "::group::Install fpm"
@@ -167,17 +409,24 @@ jobs:
             echo "::endgroup::"
           run: |
             set -e
+            export MOMMY_ZSH_SKIP=1  # `script` does not have the `-q` option in OpenBSD
 
             echo "::group::Test script"
-            PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake test
             echo "::endgroup::"
 
             echo "::group::Build package"
-            ./build.sh openbsd
+            gmake dist/openbsd
+            echo "::endgroup::"
+
+            echo "::group::Install package"
+            pkg_add -D unsigned ./dist/mommy-*+openbsd.tgz
             echo "::endgroup::"
 
             echo "::group::Test package"
-            pkg_add -D unsigned ./dist/mommy-*+openbsd.tgz
-            MOMMY_EXEC=mommy PATH="$HOME/shellspec:$PATH" ./test.sh
+            gmake system=1 test  # Zsh completion tests do not work in OpenBSD
+            echo "::endgroup::"
+
+            echo "::group::Uninstall package"
             pkg_delete mommy
             echo "::endgroup::"

@@ -1,5 +1,46 @@
 # Changelog
 ## [Unreleased]
+### added
+
+### changed
+
+### deprecated
+
+### removed
+
+### fixed
+
+### security
+
+
+## [1.2.2] -- 2023-03-09
+### added
+* mommy has shell completions for fish and zsh~ 🐟  
+  they are enabled by default on most machines.
+  if you installed mommy with brew, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+  ([#43](https://github.com/FWDekker/mommy/issues/43))
+  ([#48](https://github.com/FWDekker/mommy/pull/48))
+
+### changed
+* mommy no longer talks like a robot when unknown options are used~ 🤖
+  ([#47](https://github.com/FWDekker/mommy/pull/47))
+* mommy's build system has been revamped~ ⚗️
+  ([#38](https://github.com/FWDekker/mommy/issues/38))
+  ([#42](https://github.com/FWDekker/mommy/issues/42))
+* mommy has a bunch more emoji in her readme~ ⭐
+  ([#40](https://github.com/FWDekker/mommy/issues/40))
+
+### deprecated
+
+### removed
+
+### fixed
+* mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various
+  operating systems~ 📁
+* mommy better tolerates missing optional dependencies when installing from aur~ 💪
+
+### security
 
 
 ## [1.2.1] -- 2023-02-26

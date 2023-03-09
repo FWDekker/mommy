@@ -1,62 +1,34 @@
-n="
-"
+#!/bin/sh
+## Configuration
+# Temporary file to store mommy's configuration in
+: "${MOMMY_CONFIG_FILE:=$MOMMY_TMP_DIR/config.sh}"
 
-# Settings
-[ -z "$MOMMY_EXEC" ] && export MOMMY_EXEC="../../main/sh/mommy"
-[ -z "$MOMMY_CONFIG_FILE" ] && export MOMMY_CONFIG_FILE="./config"
 
+## Functions
 # Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
 set_config() {
     echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
 }
 
 
-# Tests
+## Run tests
 Describe "mommy"
-    clean_config() { rm -f "$MOMMY_CONFIG_FILE"; }
-    BeforeEach "clean_config"
-    AfterEach "clean_config"
-
     Describe "command-line options"
         It "gives an error for unknown short options"
             When run "$MOMMY_EXEC" -d
-            The error should equal "Illegal option -d"
+            The error should equal "mommy does not know option -d~"
             The status should be failure
         End
 
         It "gives an error for unknown long options"
             When run "$MOMMY_EXEC" --doesnotexist
-            The error should equal "Illegal option --doesnotexist"
+            The error should equal "mommy does not know option --doesnotexist~"
             The status should be failure
         End
 
-        Describe "-h/--help: help information"
-            It "outputs help information using -h"
-                When run "$MOMMY_EXEC" -h
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
+        # -h/--help is tested in `integration_spec.sh`
 
-            It "outputs help information using --help"
-                When run "$MOMMY_EXEC" --help
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-
-            It "outputs help information even when -h is not the first option"
-                When run "$MOMMY_EXEC" -s 432 -h
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-
-            It "outputs help information even when --help is not the first option"
-                When run "$MOMMY_EXEC" -s 221 --help
-                The word 1 of output should equal "mommy(1)"
-                The status should be success
-            End
-        End
-
-        Describe "-v/--help: version information"
+        Describe "-v/--version: version information"
             It "outputs version information using -v"
                 When run "$MOMMY_EXEC" -v
                 The word 1 of output should equal "mommy,"

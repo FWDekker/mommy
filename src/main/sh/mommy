@@ -197,11 +197,9 @@ MOMMY_OPT_EVAL=""
 MOMMY_OPT_STATUS=""
 
 while getopts ":hv1c:e:s:-:" OPTION; do
-    # Workaround for long options: https://stackoverflow.com/a/28466267/
+    # Cheap workaround for long options without arguments
     if [ "$OPTION" = "-" ]; then
-        OPTION="${OPTARG%%=*}"
-        OPTARG="${OPTARG#$OPTION}"
-        OPTARG="${OPTARG#=}"
+        OPTION="$OPTARG"
     fi
 
     # shellcheck disable=SC2214 # Handled by workaround
@@ -212,8 +210,8 @@ while getopts ":hv1c:e:s:-:" OPTION; do
     c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
     e) MOMMY_OPT_EVAL="$OPTARG" ;;
     s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) echo "Illegal option -$OPTARG" >&2; exit 1 ;;
-    *) echo "Illegal option --$OPTION" >&2; exit 1 ;;
+    ?) echo "mommy does not know option -$OPTARG~" >&2; exit 1 ;;
+    *) echo "mommy does not know option --$OPTION~" >&2; exit 1 ;;
     esac
 done
 
@@ -227,15 +225,7 @@ shift "$((OPTIND - 1))"
 
 ## Output
 if [ -n "$MOMMY_OPT_HELP" ]; then
-    local_man_path="$(dirname -- "$0")/../resources/mommy.1"
-
-    if [ -r "$local_man_path" ]; then
-        man "$local_man_path"
-        exit "$?"
-    else
-        man mommy
-        exit "$?"
-    fi
+    man mommy
 elif [ -n "$MOMMY_OPT_VERSION" ]; then
     echo "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0

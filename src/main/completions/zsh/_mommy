@@ -1,0 +1,23 @@
+#compdef mommy
+
+local exit_codes state
+
+exit_codes=(
+    0:"Success"
+    1:"Error"
+)
+
+_arguments \
+    "(- *)"{-h,--help}'[Show manual]' \
+    "(- *)"{-v,--version}'[Show version]' \
+    -1'[Write to stdout]' \
+    -c'[Configuration file]:config:_files' \
+    -e'[Evaluate string]:string' \
+    -s'[Exit code]:code:->status' \
+    '*::command:'
+
+# suggest exit codes for --status
+# $state is required, otherwise it'll always suggest exit codes
+[[ $state == status ]] && _describe -t code "Exit code" exit_codes
+
+# vim: ft=zsh
