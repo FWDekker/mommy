@@ -31,16 +31,10 @@
 * mommy has a bunch more emoji in her readme~ ⭐
   ([#40](https://github.com/FWDekker/mommy/issues/40))
 
-### deprecated
-
-### removed
-
 ### fixed
 * mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various
   operating systems~ 📁
 * mommy better tolerates missing optional dependencies when installing from aur~ 💪
-
-### security
 
 
 ## [1.2.1] -- 2023-02-26

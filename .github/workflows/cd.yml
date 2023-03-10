@@ -183,7 +183,6 @@ jobs:
           body_path: RELEASE_NOTES.md
           files: mommy*
 
-
   release-aur:
     runs-on: ubuntu-latest
     container: archlinux:latest
@@ -209,6 +208,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: mommy
+          token: ${{ secrets.personal_access_token }}
       - name: Extract version number
         run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
 
@@ -227,28 +227,28 @@ jobs:
         working-directory: ./aur-mommy/
         run: |
           echo "::group::Fast-forward main"
-          git checkout dev
-          git checkout master
-          git merge --commit dev
+          sudo -u build git checkout dev
+          sudo -u build git checkout master
+          sudo -u build git merge --commit dev
           echo "::endgroup::"
 
           echo "::group::Update build files"
-          ./update.sh "$MOMMY_VERSION"
+          sudo -u build ./update.sh "$MOMMY_VERSION"
           echo "::endgroup::"
 
           echo "::group::Commit update"
-          git config --global user.name "FWDekkerBot"
-          git config --global user.email "bot@fwdekker.com"
-          git commit -am "mommy updated the build files to mommy $MOMMY_VERSION~"
+          sudo -u build git config --global user.name "FWDekkerBot"
+          sudo -u build git config --global user.email "bot@fwdekker.com"
+          sudo -u build git commit -am "mommy updated the build files to mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
-          git checkout dev
-          git merge --commit master
+          sudo -u build git checkout dev
+          sudo -u build git merge --commit master
           echo "::endgroup::"
 
           echo "::group::Push changes"
-          git push origin master dev
+          sudo -u build git push origin master dev
           echo "::endgroup::"
 
 
@@ -261,6 +261,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: mommy
+          token: ${{ secrets.personal_access_token }}
       - name: Extract version number
         run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
 

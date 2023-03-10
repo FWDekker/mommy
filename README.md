@@ -66,8 +66,8 @@ brew install mommy
 * on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
 * alternatively, on any unix system you can also download and extract the source code `.zip`, and copy
   `src/main/sh/mommy` into the appropriate directory
-  (usually `/usr/local/bin/`)
-  (and optionally also copy `src/main/resources/mommy.1` into `/usr/local/man/man1/`)
+  (usually `/usr/bin/`)
+  (and optionally also copy `src/main/man/man1/mommy.1` into `/usr/share/man/man1/`)
 
 to update mommy, just repeat the installation process~
 
@@ -185,17 +185,17 @@ mommy is installed in slightly different locations on different systems, but you
 installed with `whereis mommy`:
 ```shell
 $ whereis mommy
-mommy: /usr/local/bin/mommy /usr/local/man/man1/mommy.1.gz
+mommy: /usr/bin/mommy /usr/man/man1/mommy.1.gz
 ```
 the exact format may differ depending on your system, but in this case you can see that the program is installed in
-`/usr/local/bin/mommy` and the manual page in `/usr/local/man/man1/mommy.1.gz`.
+`/usr/bin/mommy` and the manual page in `/usr/man/man1/mommy.1.gz`.
 if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
 
 anyway, after finding mommy, you can just symlink using the following commands:
 (if `whereis` gave different paths than seen above, you should adapt these commands accordingly)
 ```shell
-sudo ln -fs /usr/local/bin/mommy /usr/local/bin/daddy
-sudo ln -fs /usr/local/man/man1/mommy.1.gz /usr/local/man/man1/daddy.1.gz
+sudo ln -fs /usr/bin/mommy /usr/bin/daddy
+sudo ln -fs /usr/man/man1/mommy.1.gz /usr/man/man1/daddy.1.gz
 ```
 
 ## shell integration 🐚
@@ -247,7 +247,8 @@ MOMMY_COLOR=""
 MOMMY_PREFIX="%F{005}/%F{006}"
 MOMMY_SUFFIX="~%f"
 ```
-this code randomly changes the output between magenta and cyan~
+this code randomly changes the output between magenta and cyan.
+note the `%f` in the suffix, which resets the color~
 
 <img width="450px" src=".github/img/sample2.png" alt="mommy integrated with the zsh shell" />
 
@@ -258,13 +259,15 @@ contain a message from mommy by setting the `$PS1` variable:
 export PS1="\$(mommy -1 -s \$?)$PS1"
 ```
 to improve the spacing, set `MOMMY_SUFFIX="~ "` in mommy's config file.
-add the above line to the config file for your shell.
-some shells (`dash`, `pdksh`) do not have a default (non-login) config file, so to enable that you should add the
-following to `~/.profile`:
+
+add the above line to the config file for your shell (e.g. `.bashrc` for `bash`).
+some shells (`dash`, `pdksh`) do not have a default (non-login) config file, but you can enable one by adding the
+following line to `~/.profile`:
 ```shell
 export ENV="$HOME/.shrc"
 ```
-after that, add the line that defines `PS1` to `~/.shrc`.
+note that this will apply to all (non-login) posix shells that you open.
+after that, add the above-mentioned line that defines `PS1` to `~/.shrc`.
 log out and back in, and mommy will appear in your shell~
 
 
