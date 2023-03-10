@@ -41,6 +41,17 @@ aura -A mommy
 </details>
 
 <details>
+<summary>red hat/fedora/centos/etc</summary>
+
+install on rpm-based distros from the [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) repository;
+this requires that you have `dnf-plugins-core` installed:
+
+```shell
+dnf copr enable fwdekker/mommy
+```
+</details>
+
+<details>
 <summary>homebrew/linuxbrew</summary>
 
 install with homebrew/linuxbrew from the [mommy tap](https://github.com/FWDekker/homebrew-mommy):
@@ -322,15 +333,40 @@ make apk pacman rpm
 unfortunately, packages for macos, netbsd, and openbsd cannot be built on systems other than themselves~
 
 ### contribution guidelines 🤠
+thank you for considering contributing to mommy!
+below are some guidelines for contributions, but honestly, _any_ contribution is welcome, even if it's broken, because
+surely we'll be able to figure something out together~
+
 * add relevant documentation and tests~
-* ensure that the tests pass~
+* ensure that the tests pass (on your machine, at least)~
 * describe your changes in `CHANGELOG.md`~
 * your pull request should go into `dev`, not into `main`~
 
 ### release 📯
-before a new release, make sure to update `version`, `CHANGELOG.md`, and the acknowledgements in `README.md`.
-when a branch is merged into `main`, a new release is created automatically, and repository distributions are updated
-automatically~
+`main` always contains the latest stable version.
+every merge into `main` automatically build and releases a new version~
+below are checklists
+
+#### before merging into `main` 📰
+* update `version`~
+* update build change log in `pkg/rpm/mommy.spec.rpkg`~
+* update `CHANGELOG.md`~
+  * remove empty sections~
+  * do not leave an empty section for `[Unreleased]`, because that will end up in the `.deb` changelogs~
+* update acknowledgements in `README.md`~
+* update promotional images in `.github/img/`~
+
+#### after merging into `main` 🎉
+* a new github release is created automatically~
+* [aur-mommy](https://github.com/FWDekker/aur-mommy/)
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://github.com/FWDekker/aur-mommy/actions?query=branch%3Amaster)~
+* [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/)
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/builds/)~
+* [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy)
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://github.com/FWDekker/homebrew-mommy/actions?query=branch%3Amain)~
 
 
 ## acknowledgements 💖

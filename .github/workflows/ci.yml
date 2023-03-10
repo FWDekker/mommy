@@ -57,7 +57,7 @@ jobs:
           ref: dev
       - name: Test Linuxbrew package
         run: |
-          echo "::group::Enable Homebrew"
+          echo "::group::Enable Linuxbew"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
           echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"

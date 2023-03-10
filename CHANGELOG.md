@@ -1,6 +1,8 @@
 # Changelog
 ## [Unreleased]
 ### added
+* mommy is now available for fedora, centos, and so on through [copr](https://copr.fedorainfracloud.org/)~ 🎩
+  ([#39](https://github.com/FWDekker/mommy/issues/39))  
 
 ### changed
 
@@ -9,6 +11,8 @@
 ### removed
 
 ### fixed
+* some minor errors in the readme were fixed~ ✏️
+* automatic synchronous updates for homebrew and aur are hopefully fixed~ ♻️
 
 ### security
 
