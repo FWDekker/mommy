@@ -179,6 +179,91 @@ jobs:
           echo "::endgroup::"
 
 
+  test-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Set up basic system
+        run: |
+          echo "::group::Update system"
+          dnf -y update
+          echo "::endgroup::"
+
+          echo "::group::Install basic packages"
+          dnf -y install git make rpm-build
+          echo "::endgroup::"
+
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install man-db"
+          dnf -y install man-db
+          sed -i "/nodocs/d" /etc/dnf/dnf.conf  # Extract man pages
+          echo "::endgroup::"
+
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          dnf -y install fish zsh
+          echo "::endgroup::"
+
+      - name: Checkout mommy
+        uses: actions/checkout@v3
+        with:
+          # Checkout to subdirectory is required for `pkg/rpm/rpkg.conf` to correctly determine `${git_props:root}`
+          path: mommy
+      - name: Test script
+        working-directory: ./mommy/
+        run: make test
+
+      - name: Install fpm
+        run: |
+          dnf -y install rubygems
+          gem install --no-document fpm
+      - name: Test fpm package
+        working-directory: ./mommy/
+        run: |
+          echo "::group::Build"
+          make dist/rpm
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          dnf -y install ./dist/mommy*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          dnf -y remove mommy
+          echo "::endgroup::"
+
+      - name: Install rpkg
+        run: dnf -y install rpkg
+      - name: Test SRPM package
+        working-directory: ./mommy/
+        run: |
+          echo "::group::Build"
+          rpkg -p ./pkg/rpm local  # build srpm
+          rpmbuild --rebuild /tmp/rpkg/mommy-*/*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          dnf -y install "$HOME"/rpmbuild/RPMS/*/*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          dnf -y remove mommy
+          echo "::endgroup::"
+
+
   test-macos:
     runs-on: macos-latest
     steps:

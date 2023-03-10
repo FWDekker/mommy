@@ -15,7 +15,7 @@ much~ ❤️
 
 ## installation 🚚
 mommy works on any unix system.
-mommy is tested on ubuntu, debian, macos, freebsd, netbsd, and openbsd~
+mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, and openbsd~
 
 ### from a repository 🏤
 _don't see your favorite package manager?
@@ -41,13 +41,14 @@ aura -A mommy
 </details>
 
 <details>
-<summary>red hat/fedora/centos/etc</summary>
+<summary>red hat/fedora/etc</summary>
 
-install on rpm-based distros from the [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) repository;
-this requires that you have `dnf-plugins-core` installed:
+install on rpm-based distros from the [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) repository:
+(note that this requires that you have `dnf-plugins-core` installed)
 
 ```shell
-dnf copr enable fwdekker/mommy
+sudo dnf copr enable fwdekker/mommy
+sudo dnf install mommy
 ```
 </details>
 
@@ -349,7 +350,9 @@ below are checklists
 
 #### before merging into `main` 📰
 * update `version`~
-* update build change log in `pkg/rpm/mommy.spec.rpkg`~
+* update `pkg/rpm/mommy.spec.rpkg`~
+  * update version and release~
+  * update change log~
 * update `CHANGELOG.md`~
   * remove empty sections~
   * do not leave an empty section for `[Unreleased]`, because that will end up in the `.deb` changelogs~

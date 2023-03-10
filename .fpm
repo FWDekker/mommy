@@ -4,7 +4,7 @@
 --license unlicense
 --architecture all
 --no-auto-depends
---description "mommy's here to support you~ ❤️"
+--description "mommy's here to support you~"
 --url "https://github.com/FWDekker/mommy"
 --maintainer "Florine W. Dekker"
 --deb-changelog ./CHANGELOG.md
