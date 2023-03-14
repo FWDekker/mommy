@@ -515,3 +515,29 @@ jobs:
             echo "::group::Uninstall package"
             pkg_delete mommy
             echo "::endgroup::"
+
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          pacman -S --noconfirm fish zsh
+          touch "$HOME/.zshrc"
+          echo "::endgroup::"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test script
+        run: make test
+
+      - name: Install mommy
+        run: make install
+      - name: Test installed mommy
+        run: make system=1 test

@@ -4,6 +4,9 @@
 * mommy is now available for fedora, red hat, and other rpm-based systems via
   [copr](https://copr.fedorainfracloud.org/)~ 🎩
   ([#39](https://github.com/FWDekker/mommy/issues/39))
+* mommy is now tested on msys2 for windows~ 🪟
+  ([#54](https://github.com/FWDekker/mommy/issues/54))
+* mommy's makefile now has an `uninstall` option~ 💥
 
 ### changed
 * mommy rewrote the installation instructions~ ✍️

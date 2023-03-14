@@ -15,11 +15,25 @@
 
 ## Run tests
 Describe "integration of mommy with other programs"
+    Describe "uninstalling"
+        is_empty() {
+            test "$(find "$1/" -type f | wc -l)" -eq 0
+        }
+
+        It "uninstalls all files that are installed"
+            make -C ../../../ prefix="$MOMMY_TMP_DIR/" install
+            make -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall
+
+            Assert is_empty "$MOMMY_TMP_DIR/"
+        End
+    End
+
     Describe "-h/--help: help information"
         man_is_skipped_or_not_installed() { test "$MOMMY_MAN_SKIP" = "1" || ! test -x "$(command -v man)"; }
         Skip if "man is skipped or not installed" man_is_skipped_or_not_installed
 
         man_before_each() {
+            unset MANPATH  # Required on Windows
             if [ "$MOMMY_SYSTEM" != "1" ]; then
                 export MANPATH="$(readlink -f "$(pwd)/../../main/man/")"
             fi
