@@ -47,7 +47,7 @@ jobs:
           sudo apt purge -y mommy
           echo "::endgroup::"
 
-      - name: Install Linuxbrew
+      - name: Install Homebrew
         run: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: Checkout homebrew-mommy
         uses: actions/checkout@v3
@@ -55,9 +55,9 @@ jobs:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
           ref: dev
-      - name: Test Linuxbrew package
+      - name: Test Homebrew package
         run: |
-          echo "::group::Enable Linuxbew"
+          echo "::group::Enable Homebrew"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
           echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"

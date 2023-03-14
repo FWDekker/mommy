@@ -17,71 +17,273 @@ much~ ❤️
 mommy works on any unix system.
 mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, and openbsd~
 
-### from a repository 🏤
-_don't see your favorite package manager?
-check the distribution archives below.
-not satisfied?
-[request support for your favorite installation method by opening an issue](https://github.com/FWDekker/mommy/issues)~_
+_missing something?
+need help?
+otherwise not satisfied?
+[please open an issue](https://github.com/FWDekker/mommy/issues)~_
+
+<details>
+<summary>alpine linux</summary>
+
+on alpine linux you can **install from the homebrew tap**, **install from github releases** or **use without
+installing**~
+
+* **install from the homebrew tap** (automatic updates)  
+  installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
+  (requires [brew](https://brew.sh/).)
+  ```shell
+  brew tap fwdekker/mommy
+  brew install mommy
+  ```
+  after installing, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.apk" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo apk add --allow-untrusted ./mommy-*.apk
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path
+  ```
+</details>
 
 <details>
 <summary>arch linux</summary>
 
-install on arch linux from the [aur mommy package](https://aur.archlinux.org/packages/mommy/), probably easiest with
-[an aur helper](https://wiki.archlinux.org/title/AUR_helpers):
+on arch linux you can **install from the repository**, **install from the homebrew tap**, **install from github
+releases**, or **use without installing**~
 
-```shell
-# if you use yay
-yay -S mommy
-# if you use paru
-paru -S mommy
-# if you use aura
-aura -A mommy
-# and so on
-```
+* **install from the repository** (automatic updates)  
+  installs from the [arch user repository](https://aur.archlinux.org/packages/mommy), allowing for automatic updates.
+  you should probably use [an aur helper](https://wiki.archlinux.org/title/AUR_helpers) to do this:
+  ```shell
+  # if you use yay
+  yay -S mommy
+  # if you use paru
+  paru -S mommy
+  # if you use aura
+  aura -A mommy
+  # and so on
+  ```
+* **install from the homebrew tap** (automatic updates)  
+  installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
+  (requires [brew](https://brew.sh/).)
+  ```shell
+  brew tap fwdekker/mommy
+  brew install mommy
+  ```
+  after installing, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.pacman" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo pacman -U ./mommy-*.pacman
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path
+  ```
 </details>
 
 <details>
-<summary>red hat/fedora/etc</summary>
+<summary>debian/ubuntu/apt-based</summary>
 
-install on rpm-based distros from the [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) repository:
-(note that this requires that you have `dnf-plugins-core` installed)
+on any apt-based system you can **install from the homebrew tap**, **install from github releases**, or **use without
+installing**.
+subscribing to a repository (with automatic updates) [is planned](https://github.com/FWDekker/mommy/issues/53)~
 
-```shell
-sudo dnf copr enable fwdekker/mommy
-sudo dnf install mommy
-```
+* **install from the homebrew tap** (automatic updates)  
+  installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
+  (requires [brew](https://brew.sh/).)
+  ```shell
+  brew tap fwdekker/mommy
+  brew install mommy
+  ```
+  after installing, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.deb" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo apt install ./mommy*.deb
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path
+  ```
 </details>
 
 <details>
-<summary>homebrew/linuxbrew</summary>
+<summary>freebsd</summary>
 
-install with homebrew/linuxbrew from the [mommy tap](https://github.com/FWDekker/homebrew-mommy):
+on freebsd you can either **install from github releases** or **use without installing**~
 
-after installing, check the
-[brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-
-```shell
-brew tap fwdekker/mommy
-brew install mommy
-```
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.freebsd" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo pkg add ./mommy-*.freebsd
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path (suggested: `/usr/local/bin`)
+  ```
 </details>
 
-### distribution archives 📦
-[download the latest release](https://github.com/FWDekker/mommy/releases/latest) for your platform and install as usual:
-* on debian/ubuntu/etc, run `sudo apt install ./mommy-*.deb`,
-* on red hat/fedora/etc, run `sudo dnf install ./mommy-*.rpm`,
-* on archlinux, run `sudo pacman -U ./mommy-*.pacman`,
-* on alpine linux, run `sudo apk add --allow-untrusted ./mommy-*.apk`,
-* on macos, run `sudo installer -pkg ./mommy*+osx.pkg -target /`,
-* on freebsd, run `pkg add ./mommy-*.freebsd`,
-* on netbsd, run `pkg_add ./mommy-*+netbsd.tgz`,
-* on openbsd, run `pkg_add -D unsigned ./mommy-*+openbsd.tgz`,
-* alternatively, on any unix system you can also download and extract the source code `.zip`, and copy
-  `src/main/sh/mommy` into the appropriate directory
-  (usually `/usr/bin/`)
-  (and optionally also copy `src/main/man/man1/mommy.1` into `/usr/share/man/man1/`)
+<details>
+<summary>macos</summary>
 
-to update mommy, just repeat the installation process~
+on macos you can **install from the homebrew tap**, **install from github releases**, or **use without installing**~
+
+* **install from the homebrew tap** (automatic updates)  
+  installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
+  (requires [brew](https://brew.sh/).)
+  ```shell
+  brew tap fwdekker/mommy
+  brew install mommy
+  ```
+  after installing, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*osx\.pkg" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo installer -pkg ./mommy*+osx.pkg -target /
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path (suggested: `/usr/local/bin`)
+  ```
+</details>
+
+<details>
+<summary>netbsd</summary>
+
+on netbsd you can either **install from github releases** or **use without installing**
+
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*netbsd\.tgz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo pkg_add ./mommy-*+netbsd.tgz
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path (suggested: `/usr/pkg/bin`)
+  ```
+</details>
+
+<details>
+<summary>openbsd</summary>
+
+on openbsd you can either **install from github releases** or **use without installing**
+
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*openbsd\.tgz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo pkg_add -D unsigned ./mommy-*+openbsd.tgz
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path (suggested: `/usr/local/bin`)
+  ```
+</details>
+
+<details>
+<summary>red hat/fedora/rpm-based</summary>
+
+on any rpm-based system you can **install from the repository**, **install from the homebrew tap**, **install from
+github releases**, or **use without installing**.
+since mommy is just a shell script this also works fine on systems like opensuse~
+
+* **install from the repository** (automatic updates)  
+  installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/), allowing for automatic
+  updates.
+  (requires the `dnf-plugins-core` package.)
+  ```shell
+  sudo dnf copr enable fwdekker/mommy
+  sudo dnf install mommy
+  ```
+* **install from the homebrew tap** (automatic updates)  
+  installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
+  (requires [brew](https://brew.sh/).)
+  ```shell
+  brew tap fwdekker/mommy
+  brew install mommy
+  ```
+  after installing, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+* **install from github releases** (manual updates)
+  ```shell
+  # download latest package from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.rpm" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # install package
+  sudo dnf install ./mommy-*.rpm
+  ```
+* **use without installing** (manual updates)
+  ```shell
+  # download latest archive from github release
+  curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*generic\.tar\.gz" | cut -d ":" -f 2,3 | tr -d \" | wget -qi -
+  # extract archive to `mommy`
+  tar -C ./ -xzf mommy-*.tar.gz
+  # invoke mommy
+  ./mommy/usr/bin/mommy
+  # you will have to manually move mommy to a directory on your path
+  ```
+</details>
 
 ### what's next? 🔮
 check out [how to use mommy](#usage-), read all about [ways you can configure mommy](#configuration-), and

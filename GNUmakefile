@@ -91,6 +91,16 @@ endif
 		"build/completions/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
 		"build/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
 
+# Build generic extractable package
+.PHONY: dist/generic
+dist/generic: build
+	@rm -rf build/generic/
+
+	@$(MAKE) prefix="./build/generic/mommy/usr/" install
+
+	@mkdir -p dist/
+	@tar -C build/generic/ -czf "dist/mommy-$(version)+generic.tar.gz" ./
+
 # Build Debian package with fpm
 .PHONY: dist/deb
 dist/deb:
