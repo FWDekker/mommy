@@ -15,8 +15,8 @@ BuildRequires: make
 mommy's here to support you! mommy will compliment you if things go well, and
 will encourage you if things are not going so well~
 
-mommy is fully customizable, integrates with any shell, works on any unix
-system, and most importantly, loves you very much~ ❤️
+mommy is fully customizable, integrates with any shell, works on any system, and
+most importantly, loves you very much~ ❤️
 
 %prep
 {{{ git_repo_setup_macro }}}
@@ -39,5 +39,5 @@ PATH="$(pwd)/shellspec:$PATH" MOMMY_EXEC="%{buildroot}/%{_prefix}/bin/mommy" mak
 
 %changelog
 # Changelog lists changes to the packaging, not to the software.
-* Fri Mar 10 2023 Florine W. Dekker 1.2.3-1
+* Tue Mar 14 2023 Florine W. Dekker 1.2.3-1
 - Initial release with rpkg

@@ -514,7 +514,7 @@ this section explains how to build mommy from source, in case you want to help w
 ### 🎬 run
 you can actually just directly run the script in `src/main/sh/mommy`.
 the only difference will be that the `-h` and `-v` options may not work correctly.
-if that annoys you, run `make build`, and use `build/bin/mommy` instead~
+if that annoys you, run `make build` after each change, and use `build/bin/mommy` instead~
 
 ### 🧪 tests
 1. **requirements**  
@@ -538,7 +538,7 @@ if that annoys you, run `make build`, and use `build/bin/mommy` instead~
    ```
 4. **configuration**  
    except for `system=1`, test behaviour is configured with environment variables.
-   check the various files in `src/test/` to find 'em all~
+   check the various files in [`src/test/`](https://github.com/FWDekker/mommy/tree/main/src/test) to find 'em all~
 
 ### 🏬 distribution
 mommy is distributed in three ways:
@@ -617,11 +617,13 @@ every merge into `main` automatically build and releases a new version~
 * **before merging into `main`**
   * update `version`~
   * update `pkg/rpm/mommy.spec.rpkg`~
-      * update version and release~
+      * update release number~
       * update change log~
   * update `CHANGELOG.md`~
-      * remove empty sections~
-      * do not leave an empty section for `[Unreleased]`, because that will end up in the `.deb` changelogs~
+      * do not leave a placeholder section for `[Unreleased]`, because that will end up in the `.deb` changelogs~
+      * remove empty subsections for the new release~
+      * ensure no line breaks are used as whitespace;
+        github release notes use them as actual line breaks~
   * update acknowledgements in `README.md`~
   * update promotional images in `.github/img/`~
 
