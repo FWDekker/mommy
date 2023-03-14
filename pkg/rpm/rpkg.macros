@@ -1,0 +1,3 @@
+function my_git_version {
+    head -n 1 "$(git rev-parse --show-toplevel)/version"
+}

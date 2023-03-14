@@ -16,7 +16,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install additional shells"
-          sudo apt install fish zsh
+          sudo apt-get install fish zsh
           touch "$HOME/.zshrc"
           echo "::endgroup::"
 
@@ -27,7 +27,7 @@ jobs:
 
       - name: Install fpm and build dependencies
         run: |
-          sudo apt install -y rubygems libarchive-tools rpm zstd
+          sudo apt-get install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
       - name: Test fpm package
         run: |
@@ -36,7 +36,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install"
-          sudo apt install -y ./dist/mommy-*.deb
+          sudo apt-get install -y ./dist/mommy-*.deb
           echo "::endgroup::"
 
           echo "::group::Test"
@@ -44,10 +44,10 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Uninstall"
-          sudo apt purge -y mommy
+          sudo apt-get purge -y mommy
           echo "::endgroup::"
 
-      - name: Install Linuxbrew
+      - name: Install Homebrew
         run: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: Checkout homebrew-mommy
         uses: actions/checkout@v3
@@ -55,7 +55,7 @@ jobs:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
           ref: dev
-      - name: Test Linuxbrew package
+      - name: Test Homebrew package
         run: |
           echo "::group::Enable Homebrew"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -176,6 +176,91 @@ jobs:
 
           echo "::group::Uninstall"
           pacman -R --noconfirm mommy
+          echo "::endgroup::"
+
+
+  test-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Set up basic system
+        run: |
+          echo "::group::Update system"
+          dnf -y update
+          echo "::endgroup::"
+
+          echo "::group::Install basic packages"
+          dnf -y install git make rpm-build
+          echo "::endgroup::"
+
+      - name: Install dependencies for mommy
+        run: |
+          echo "::group::Install man-db"
+          dnf -y install man-db
+          sed -i "/nodocs/d" /etc/dnf/dnf.conf  # Extract man pages
+          echo "::endgroup::"
+
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Install additional shells"
+          dnf -y install fish zsh
+          echo "::endgroup::"
+
+      - name: Checkout mommy
+        uses: actions/checkout@v3
+        with:
+          # Checkout to subdirectory is required for `pkg/rpm/rpkg.conf` to correctly determine `${git_props:root}`
+          path: mommy
+      - name: Test script
+        working-directory: ./mommy/
+        run: make test
+
+      - name: Install fpm
+        run: |
+          dnf -y install rubygems
+          gem install --no-document fpm
+      - name: Test fpm package
+        working-directory: ./mommy/
+        run: |
+          echo "::group::Build"
+          make dist/rpm
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          dnf -y install ./dist/mommy*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          dnf -y remove mommy
+          echo "::endgroup::"
+
+      - name: Install rpkg
+        run: dnf -y install rpkg
+      - name: Test SRPM package
+        working-directory: ./mommy/
+        run: |
+          echo "::group::Build"
+          rpkg -p ./pkg/rpm local  # build srpm
+          rpmbuild --rebuild /tmp/rpkg/mommy-*/*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Install"
+          dnf -y install "$HOME"/rpmbuild/RPMS/*/*.rpm
+          echo "::endgroup::"
+
+          echo "::group::Test"
+          make system=1 test
+          echo "::endgroup::"
+
+          echo "::group::Uninstall"
+          dnf -y remove mommy
           echo "::endgroup::"
 
 
@@ -430,3 +515,39 @@ jobs:
             echo "::group::Uninstall package"
             pkg_delete mommy
             echo "::endgroup::"
+
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Set up msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          # Install basic package && Install additional shells
+          install: git make fish zsh
+
+      - name: Install dependencies for mommy
+        shell: msys2 {0}
+        run: |
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Post-install additional shells"
+          touch "$HOME/.zshrc"
+          echo "::endgroup::"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test script
+        shell: msys2 {0}
+        run: make test
+
+      - name: Install mommy
+        shell: msys2 {0}
+        run: make install
+      - name: Test installed mommy
+        shell: msys2 {0}
+        run: make system=1 test

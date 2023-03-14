@@ -1,46 +1,35 @@
 # Changelog
-## [Unreleased]
+## [1.2.3] -- 2023-03-14
 ### added
+* 🎩 mommy is now available for fedora, red hat, and other rpm-based systems via [copr](https://copr.fedorainfracloud.org/)~ ([#39](https://github.com/FWDekker/mommy/issues/39))
+* 🪟 mommy is now tested on msys2 for windows~ ([#54](https://github.com/FWDekker/mommy/issues/54))
+* 💥 mommy's makefile now has an `uninstall` option~
 
 ### changed
-
-### deprecated
-
-### removed
+* ✍️ mommy rewrote the installation instructions~ ([#51](https://github.com/FWDekker/mommy/issues/51))
+* 🐙 mommy links to github if `man` doesn't work~ ([#55](https://github.com/FWDekker/mommy/issues/55)) 
 
 ### fixed
-
-### security
+* ✏️ mommy fixed some minor errors in the readme~
+* ♻️ mommy hopefully fixed automatic synchronous releases for homebrew and aur~
 
 
 ## [1.2.2] -- 2023-03-09
 ### added
-* mommy has shell completions for fish and zsh~ 🐟  
-  they are enabled by default on most machines.
-  if you installed mommy with brew, check the
-  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-  ([#43](https://github.com/FWDekker/mommy/issues/43))
-  ([#48](https://github.com/FWDekker/mommy/pull/48))
+* 🐟 mommy has shell completions for fish and zsh~  
+  they are enabled by default on most machines. if you installed mommy with brew, check the [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~ ([#43](https://github.com/FWDekker/mommy/issues/43)) ([#48](https://github.com/FWDekker/mommy/pull/48))
 
 ### changed
-* mommy no longer talks like a robot when unknown options are used~ 🤖
+* 🤖 mommy no longer talks like a robot when unknown options are used~
   ([#47](https://github.com/FWDekker/mommy/pull/47))
-* mommy's build system has been revamped~ ⚗️
-  ([#38](https://github.com/FWDekker/mommy/issues/38))
-  ([#42](https://github.com/FWDekker/mommy/issues/42))
-* mommy has a bunch more emoji in her readme~ ⭐
+* ⚗️ mommy's build system has been revamped~
+  ([#38](https://github.com/FWDekker/mommy/issues/38)) ([#42](https://github.com/FWDekker/mommy/issues/42))
+* ⭐ mommy has a bunch more emoji in her readme~
   ([#40](https://github.com/FWDekker/mommy/issues/40))
 
-### deprecated
-
-### removed
-
 ### fixed
-* mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various
-  operating systems~ 📁
-* mommy better tolerates missing optional dependencies when installing from aur~ 💪
-
-### security
+* 📁 mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various operating systems~
+* 💪 mommy better tolerates missing optional dependencies when installing from aur~
 
 
 ## [1.2.1] -- 2023-02-26

@@ -15,11 +15,11 @@ man_prefix_default = $(prefix)/share/man/
 fish_prefix_default = $(prefix)/share/fish/vendor_completions.d/
 zsh_prefix_default = $(prefix)/share/zsh/site-functions/
 
-install fpm: prefix ?= $(prefix_default)
-install fpm: bin_prefix ?= $(bin_prefix_default)
-install fpm: man_prefix ?= $(man_prefix_default)
-install fpm: fish_prefix ?= $(fish_prefix_default)
-install fpm: zsh_prefix ?= $(zsh_prefix_default)
+install uninstall fpm: prefix ?= $(prefix_default)
+install uninstall fpm: bin_prefix ?= $(bin_prefix_default)
+install uninstall fpm: man_prefix ?= $(man_prefix_default)
+install uninstall fpm: fish_prefix ?= $(fish_prefix_default)
+install uninstall fpm: zsh_prefix ?= $(zsh_prefix_default)
 
 
 # Output list of targets
@@ -41,7 +41,7 @@ test: test/unit test/integration
 .PHONY: test/%
 test/%: system ?= 0
 test/%:
-	@MOMMY_SYSTEM=$(system) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
+	@MOMMY_SYSTEM=$(system) MOMMY_MAKE=$(MAKE) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
 ## Compilation
@@ -69,10 +69,17 @@ install: build
 	@install -m 755 -d "$(bin_prefix)" "$(man_prefix)/man1/" "$(fish_prefix)" "$(zsh_prefix)"
 
 	@# Copy files
-	@install -m 755 build/bin/* "$(bin_prefix)"
-	@install -m 644 build/man/man1/* "$(man_prefix)/man1/"
-	@install -m 644 build/completions/fish/* "$(fish_prefix)"
-	@install -m 644 build/completions/zsh/* "$(zsh_prefix)"
+	@install -m 755 build/bin/mommy "$(bin_prefix)"
+	@install -m 644 build/man/man1/mommy.1.gz "$(man_prefix)/man1/"
+	@install -m 644 build/completions/fish/mommy.fish "$(fish_prefix)"
+	@install -m 644 build/completions/zsh/_mommy "$(zsh_prefix)"
+
+.PHONY: uninstall
+uninstall:
+	@rm "$(bin_prefix)/mommy"
+	@rm "$(man_prefix)/man1/mommy.1.gz"
+	@rm "$(fish_prefix)/mommy.fish"
+	@rm "$(zsh_prefix)/_mommy"
 
 # Invoke fpm on built files to create `fpm_target` type output
 # For valid `fpm_target`s, see https://fpm.readthedocs.io/en/latest/packaging-types.html
@@ -90,6 +97,16 @@ endif
 		"build/man/man1/mommy.1.gz=$(man_prefix)/man1/mommy.1.gz" \
 		"build/completions/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
 		"build/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
+
+# Build generic extractable package
+.PHONY: dist/generic
+dist/generic: build
+	@rm -rf build/generic/
+
+	@$(MAKE) prefix="./build/generic/mommy/usr/" install
+
+	@mkdir -p dist/
+	@tar -C build/generic/ -czf "dist/mommy-$(version)+generic.tar.gz" ./
 
 # Build Debian package with fpm
 .PHONY: dist/deb
