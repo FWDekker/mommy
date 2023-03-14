@@ -4,6 +4,8 @@
 [![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
 [![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
 
+<!-- In the future, add a badge from https://repology.org/ -->
+
 mommy's here to support you!
 mommy will compliment you if things go well, and will encourage you if things are not going
 so well~
@@ -18,7 +20,7 @@ much~ ❤️
 mommy works on any system.
 mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, openbsd, and windows~
 
-_missing something?
+_don't see your favourite distro or package manager listed?
 need help?
 otherwise not satisfied?
 [please open an issue](https://github.com/FWDekker/mommy/issues)~_
@@ -27,7 +29,7 @@ otherwise not satisfied?
 <details>
 <summary>alpine linux</summary>
 
-* **install from the homebrew tap** (automatic updates)  
+* **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
   ```shell
@@ -36,7 +38,7 @@ otherwise not satisfied?
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-* **install from github releases** (manual updates)
+* **apk (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.apk" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -48,7 +50,7 @@ otherwise not satisfied?
 <details>
 <summary>arch linux</summary>
 
-* **install from the repository** (automatic updates)  
+* **arch user repository** (automatic updates)  
   installs from the [arch user repository](https://aur.archlinux.org/packages/mommy), allowing for automatic updates.
   you should probably use [an aur helper](https://wiki.archlinux.org/title/AUR_helpers) to do this:
   ```shell
@@ -60,7 +62,7 @@ otherwise not satisfied?
   aura -A mommy
   # and so on
   ```
-* **install from the homebrew tap** (automatic updates)  
+* **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
   ```shell
@@ -69,7 +71,7 @@ otherwise not satisfied?
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-* **install from github releases** (manual updates)
+* **pacman (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.pacman" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -83,7 +85,7 @@ otherwise not satisfied?
 
 subscribing to a repository (with automatic updates) [is planned](https://github.com/FWDekker/mommy/issues/53)~
 
-* **install from the homebrew tap** (automatic updates)  
+* **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
   ```shell
@@ -92,7 +94,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-* **install from github releases** (manual updates)
+* **apt (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.deb" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -104,7 +106,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 <details>
 <summary>freebsd</summary>
 
-* **install from github releases** (manual updates)
+* **pkg (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.freebsd" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -116,7 +118,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 <details>
 <summary>macos</summary>
 
-* **install from the homebrew tap** (automatic updates)  
+* **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
   ```shell
@@ -125,7 +127,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-* **install from github releases** (manual updates)
+* **pkg (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*osx\.pkg" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -137,7 +139,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 <details>
 <summary>netbsd</summary>
 
-* **install from github releases** (manual updates)
+* **pkg_add (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*netbsd\.tgz" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -149,7 +151,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 <details>
 <summary>openbsd</summary>
 
-* **install from github releases** (manual updates)
+* **pkg_add (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*openbsd\.tgz" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -163,7 +165,7 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 
 since mommy is just a shell script these methods also work fine on opensuse~
 
-* **install from the repository** (automatic updates)  
+* **dnf (copr)** (automatic updates)  
   installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/), allowing for automatic
   updates.
   (requires the `dnf-plugins-core` package.)
@@ -171,7 +173,7 @@ since mommy is just a shell script these methods also work fine on opensuse~
   sudo dnf copr enable fwdekker/mommy
   sudo dnf install mommy
   ```
-* **install from the homebrew tap** (automatic updates)  
+* **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
   ```shell
@@ -180,7 +182,7 @@ since mommy is just a shell script these methods also work fine on opensuse~
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
-* **install from github releases** (manual updates)
+* **dnf (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*\.rpm" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
@@ -193,10 +195,11 @@ since mommy is just a shell script these methods also work fine on opensuse~
 <summary>windows</summary>
 
 * **wsl** (automatic or manual updates)  
-  follow any of the mommy installation instructions for the installed linux subsystem (default is ubuntu)~
+  follow any of the mommy installation instructions for your installed linux subsystem (default is ubuntu) or
+  [build mommy from source](#-without-a-package-manager)~
 * **msys2** (automatic or manual updates)  
-  follow any of the mommy installation instructions for arch linux, except **do not use the arch user repository
-  method**~
+  follow any of the mommy installation instructions for _arch linux_ (except **do not use the arch user repository
+  method**) or [build mommy from source](#-without-a-package-manager)~
 * **cygwin** (manual updates)  
   there is no mommy package for cygwin.
   instead, you can [build mommy from source](#-without-a-package-manager)
@@ -218,13 +221,14 @@ if you want to customise where and how mommy installs, you can just compile her 
    cd mommy
    ```
 3. **install**  
-   this step builds mommy's file and copies them to the right locations on your system.
-   the paths below correspond to the recommended paths for each system, but you can override those yourself if you
-   want.
-   the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) lists the prefixes that are used by the
-   installation method~
+   this step builds mommy's files and copies them into your system.
+   the exact paths differ per system, so find the instructions that are right for your system.
 
-   if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
+   > ℹ️ if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
+
+   > ℹ️ check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
+   > you can override~
+   
     * _debian/ubuntu/apt-based_
       ```shell
       sudo make zsh_prefix='$(prefix)/share/zsh/vendor-completions/' install
@@ -401,17 +405,17 @@ mommy is installed in slightly different locations on different systems, but you
 installed with `whereis mommy`:
 ```shell
 $ whereis mommy
-mommy: /usr/bin/mommy /usr/man/man1/mommy.1.gz
+mommy: /usr/bin/mommy /usr/share/man/man1/mommy.1.gz
 ```
 the exact format may differ depending on your system, but in this case you can see that the program is installed in
-`/usr/bin/mommy` and the manual page in `/usr/man/man1/mommy.1.gz`.
+`/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
 if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
 
 anyway, after finding mommy, you can just symlink using the following commands:
 (if `whereis` gave different paths than seen above, you should adapt these commands accordingly)
 ```shell
 sudo ln -fs /usr/bin/mommy /usr/bin/daddy
-sudo ln -fs /usr/man/man1/mommy.1.gz /usr/man/man1/daddy.1.gz
+sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 ```
 
 
@@ -664,3 +668,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [making mommy talk less like a robot](https://github.com/FWDekker/mommy/pull/47)~
 * mommy thanks [natawie](https://github.com/natawie) for
   [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
+* mommy thanks [wei he](https://github.com/wei/socialify) for creating [socialify](https://github.com/wei/socialify),
+  which mommy uses for her github social preview~
