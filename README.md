@@ -173,6 +173,8 @@ since mommy is just a shell script these methods also work fine on opensuse~
   sudo dnf copr enable fwdekker/mommy
   sudo dnf install mommy
   ```
+  packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
+  `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
 * **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
