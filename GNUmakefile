@@ -41,7 +41,7 @@ test: test/unit test/integration
 .PHONY: test/%
 test/%: system ?= 0
 test/%:
-	@MOMMY_SYSTEM=$(system) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
+	@MOMMY_SYSTEM=$(system) MOMMY_MAKE=$(MAKE) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
 ## Compilation

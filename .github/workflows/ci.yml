@@ -517,19 +517,24 @@ jobs:
             echo "::endgroup::"
 
 
-  test-windows:
+  test-windows-wsl2:
     runs-on: windows-latest
     steps:
       - name: Install dependencies for mommy
         run: |
+          echo "::group::Install basic packages"
+          apt install -y git make
+          echo "::endgroup::"
+
           echo "::group::Install ShellSpec"
           git clone --depth=1 https://github.com/shellspec/shellspec.git
           make -C shellspec install
           echo "::endgroup::"
 
           echo "::group::Install additional shells"
-          pacman -S --noconfirm fish zsh
+          apt install -y fish zsh
           touch "$HOME/.zshrc"
+          fish -v
           echo "::endgroup::"
 
       - name: Checkout
@@ -540,4 +545,39 @@ jobs:
       - name: Install mommy
         run: make install
       - name: Test installed mommy
+        run: make system=1 test
+
+  test-windows-msys2:
+    runs-on: windows-latest
+    steps:
+      - name: Set up msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          # Install basic package && Install additional shells
+          install: git make fish zsh
+
+      - name: Install dependencies for mommy
+        shell: msys2 {0}
+        run: |
+          echo "::group::Install ShellSpec"
+          git clone --depth=1 https://github.com/shellspec/shellspec.git
+          make -C shellspec install
+          echo "::endgroup::"
+
+          echo "::group::Post-install additional shells"
+          touch "$HOME/.zshrc"
+          echo "::endgroup::"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test script
+        shell: msys2 {0}
+        run: make test
+
+      - name: Install mommy
+        shell: msys2 {0}
+        run: make install
+      - name: Test installed mommy
+        shell: msys2 {0}
         run: make system=1 test

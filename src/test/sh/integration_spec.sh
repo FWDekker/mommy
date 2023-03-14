@@ -1,5 +1,8 @@
 #!/bin/sh
 ## Configuration
+# Make
+: "${MOMMY_MAKE:=make}"  # Path to GNU make to invoke
+
 # Man
 : "${MOMMY_MAN_SKIP:=0}"  # "1" to run man-related tests, "0" to skip them
 
@@ -21,8 +24,8 @@ Describe "integration of mommy with other programs"
         }
 
         It "uninstalls all files that are installed"
-            make -C ../../../ prefix="$MOMMY_TMP_DIR/" install
-            make -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
 
             Assert is_empty "$MOMMY_TMP_DIR/"
         End
