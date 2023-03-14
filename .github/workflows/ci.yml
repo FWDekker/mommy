@@ -16,7 +16,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install additional shells"
-          sudo apt install fish zsh
+          sudo apt-get install fish zsh
           touch "$HOME/.zshrc"
           echo "::endgroup::"
 
@@ -27,7 +27,7 @@ jobs:
 
       - name: Install fpm and build dependencies
         run: |
-          sudo apt install -y rubygems libarchive-tools rpm zstd
+          sudo apt-get install -y rubygems libarchive-tools rpm zstd
           sudo gem install --no-document fpm
       - name: Test fpm package
         run: |
@@ -36,7 +36,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install"
-          sudo apt install -y ./dist/mommy-*.deb
+          sudo apt-get install -y ./dist/mommy-*.deb
           echo "::endgroup::"
 
           echo "::group::Test"
@@ -44,7 +44,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Uninstall"
-          sudo apt purge -y mommy
+          sudo apt-get purge -y mommy
           echo "::endgroup::"
 
       - name: Install Homebrew
@@ -517,37 +517,7 @@ jobs:
             echo "::endgroup::"
 
 
-  test-windows-wsl2:
-    runs-on: windows-latest
-    steps:
-      - name: Install dependencies for mommy
-        run: |
-          echo "::group::Install basic packages"
-          apt install -y git make
-          echo "::endgroup::"
-
-          echo "::group::Install ShellSpec"
-          git clone --depth=1 https://github.com/shellspec/shellspec.git
-          make -C shellspec install
-          echo "::endgroup::"
-
-          echo "::group::Install additional shells"
-          apt install -y fish zsh
-          touch "$HOME/.zshrc"
-          fish -v
-          echo "::endgroup::"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Test script
-        run: make test
-
-      - name: Install mommy
-        run: make install
-      - name: Test installed mommy
-        run: make system=1 test
-
-  test-windows-msys2:
+  test-windows:
     runs-on: windows-latest
     steps:
       - name: Set up msys2
