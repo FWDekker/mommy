@@ -67,6 +67,15 @@ Describe "integration of mommy with other programs"
             The word 1 of output should equal "mommy(1)"
             The status should be success
         End
+
+        It "outputs a link to github if the manual page could not be found when using -h"
+            export MANPATH="/invalid-path"
+
+            When run "$MOMMY_EXEC" -h
+            The output should equal ""
+            The error should include "github.com"
+            The status should be failure
+        End
     End
 
     Describe "fish shell autocompletion"

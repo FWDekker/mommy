@@ -226,6 +226,17 @@ shift "$((OPTIND - 1))"
 ## Output
 if [ -n "$MOMMY_OPT_HELP" ]; then
     man mommy
+
+    status="$?"
+    if [ "$status" -ne 0 ]; then
+        printf "%s" \
+            "oops! " \
+            "mommy couldn't find the help page. " \
+            "but you can visit https://github.com/FWDekker/mommy/blob/%%VERSION_NUMBER%%/README.md for more " \
+            "information~" \
+            "$n" >&2
+    fi
+    exit "$status"
 elif [ -n "$MOMMY_OPT_VERSION" ]; then
     echo "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0
