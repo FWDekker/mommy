@@ -5,21 +5,11 @@ date := $(shell tail -n 1 version)
 comment := $(shell grep -- "--description" .fpm | tr -d "\"" | cut -d " " -f 2-)
 maintainer := $(shell grep -- "--maintainer" .fpm | tr -d "\"" | cut -d " " -f 2-)
 
-# Define default output directories
-# Separating these variables into a `*_prefix` and `*_prefix_default` allows, for example, the `fpm` target to specify
-# certain defaults, while also allowing the `deb` target to override that default when invoking `fpm`, and then also
-# allows the user to override that default when running `make osxpkg`.
-prefix_default = /usr/
-bin_prefix_default = $(prefix)/bin/
-man_prefix_default = $(prefix)/share/man/
-fish_prefix_default = $(prefix)/share/fish/vendor_completions.d/
-zsh_prefix_default = $(prefix)/share/zsh/site-functions/
-
-install uninstall fpm: prefix ?= $(prefix_default)
-install uninstall fpm: bin_prefix ?= $(bin_prefix_default)
-install uninstall fpm: man_prefix ?= $(man_prefix_default)
-install uninstall fpm: fish_prefix ?= $(fish_prefix_default)
-install uninstall fpm: zsh_prefix ?= $(zsh_prefix_default)
+install uninstall fpm: prefix ?= /usr/
+install uninstall fpm: bin_prefix ?= $(prefix)/bin/
+install uninstall fpm: man_prefix ?= $(prefix)/share/man/
+install uninstall fpm: fish_prefix ?= $(prefix)/share/fish/vendor_completions.d/
+install uninstall fpm: zsh_prefix ?= $(prefix)/share/zsh/site-functions/
 
 
 # Output list of targets
