@@ -192,7 +192,7 @@ fill_template() {
 MOMMY_OPT_HELP=""
 MOMMY_OPT_VERSION=""
 MOMMY_OPT_TARGET="2"
-MOMMY_OPT_CONFIG_FILE="$HOME/.config/mommy/config.sh"
+MOMMY_OPT_CONFIG_FILE="${MOMMY_OPT_CONFIG_FILE:-"${XDG_CONFIG_HOME:-"$HOME/.config"}/mommy/config.sh"}"
 MOMMY_OPT_EVAL=""
 MOMMY_OPT_STATUS=""
 
