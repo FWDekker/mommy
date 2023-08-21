@@ -409,7 +409,7 @@ jobs:
             set -e
 
             echo "::group::Install basic packages"
-            pkg_add git gmake
+            pkg_add git gmake mozilla-rootcerts-openssl
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
@@ -424,7 +424,7 @@ jobs:
 
             echo "::group::Install fpm"
             pkg_add ruby
-            /usr/pkg/bin/gem* install --no-document fpm
+            /usr/pkg/bin/gem install --no-document fpm
             pkg_add pkg_install  # This is necessary to make `fpm` work with `pkgin` format for some reason
             echo "::endgroup::"
 
