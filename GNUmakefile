@@ -1,3 +1,10 @@
+# Target locations
+prefix := /usr/
+bin_prefix := $(prefix)/bin/
+man_prefix := $(prefix)/share/man/
+fish_prefix := $(prefix)/share/fish/vendor_completions.d/
+zsh_prefix := $(prefix)/share/zsh/site-functions/
+
 # Extracted values
 version := $(shell head -n 1 version)
 date := $(shell tail -n 1 version)
@@ -5,18 +12,16 @@ date := $(shell tail -n 1 version)
 comment := $(shell grep -- "--description" .fpm | tr -d "\"" | cut -d " " -f 2-)
 maintainer := $(shell grep -- "--maintainer" .fpm | tr -d "\"" | cut -d " " -f 2-)
 
-install uninstall fpm: prefix ?= /usr/
-install uninstall fpm: bin_prefix ?= $(prefix)/bin/
-install uninstall fpm: man_prefix ?= $(prefix)/share/man/
-install uninstall fpm: fish_prefix ?= $(prefix)/share/fish/vendor_completions.d/
-install uninstall fpm: zsh_prefix ?= $(prefix)/share/zsh/site-functions/
 
-
+## Meta
 # Output list of targets
 .PHONY: list
 list:
 	@# Taken from https://stackoverflow.com/a/26339924/
-	@LC_ALL=C $(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/(^|\n)# Files(\n|$$)/,/(^|\n)# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
+	@LC_ALL=C $(MAKE) -pRrq -f "$(lastword $(MAKEFILE_LIST))" : 2>/dev/null | \
+		awk -v RS= -F: '/(^|\n)# Files(\n|$$)/,/(^|\n)# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | \
+		sort | \
+		egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 # Clean up previous builds
 .PHONY: clean
@@ -24,18 +29,17 @@ clean:
 	@rm -rf build/ dist/
 
 
-# Run tests
+## Tests
 .PHONY: test
 test: test/unit test/integration
 
 .PHONY: test/%
 test/%: system ?= 0
 test/%:
-	@MOMMY_SYSTEM=$(system) MOMMY_MAKE=$(MAKE) shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
+	@MOMMY_SYSTEM="$(system)" MOMMY_MAKE="$(MAKE)" shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
-## Compilation
-# "Compile" files into `build/`
+## "Compile" files into `build/`
 .PHONY: build
 build:
 	@# Copy relevant files
@@ -45,13 +49,16 @@ build:
 	@mkdir -p build/completions/zsh/; cp src/main/completions/zsh/_mommy build/completions/zsh/
 
 	@# Insert version information
-	@sed -i".bak" "s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" build/bin/mommy build/man/man1/mommy.1
+	@sed -i".bak" "s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" \
+		build/bin/mommy \
+		build/man/man1/mommy.1
 	@rm -f build/bin/mommy.bak build/man/man1/mommy.1.bak
 
 	@# Compress
 	@gzip -f build/man/man1/mommy.1
 
 
+## Installation
 # Copy built files into appropriate directories
 .PHONY: install
 install: build
@@ -64,12 +71,27 @@ install: build
 	@install -m 644 build/completions/fish/mommy.fish "$(fish_prefix)"
 	@install -m 644 build/completions/zsh/_mommy "$(zsh_prefix)"
 
+# Install with preset overrides, as specified later
+.PHONY: install/%
+install/%: install
+	@#
+
+# Remove installed files
 .PHONY: uninstall
 uninstall:
 	@rm "$(bin_prefix)/mommy"
 	@rm "$(man_prefix)/man1/mommy.1.gz"
 	@rm "$(fish_prefix)/mommy.fish"
 	@rm "$(zsh_prefix)/_mommy"
+
+# Uninstall with preset overrides, as specified later
+.PHONY: uninstall/%
+uninstall/%: uninstall
+	@#
+
+
+## Build packages
+.PHONY: dist/%
 
 # Invoke fpm on built files to create `fpm_target` type output
 # For valid `fpm_target`s, see https://fpm.readthedocs.io/en/latest/packaging-types.html
@@ -89,42 +111,42 @@ endif
 		"build/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
 
 # Build generic extractable package
-.PHONY: dist/generic
-dist/generic: build
+dist/generic: prefix := ./build/generic/mommy/usr/
+dist/generic:
 	@rm -rf build/generic/
 
-	@$(MAKE) prefix="./build/generic/mommy/usr/" install
+	@$(MAKE) prefix="$(prefix)" install
 
 	@mkdir -p dist/
 	@tar -C build/generic/ -czf "dist/mommy-$(version)+generic.tar.gz" ./
 
 # Build Debian package with fpm
-.PHONY: dist/deb
+dist/deb: zsh_prefix := $(prefix)/share/zsh/vendor-completions/
 dist/deb:
-	@$(MAKE) fpm_target="deb" zsh_prefix='$$(prefix)/share/zsh/vendor-completions/' fpm
+	@$(MAKE) fpm_target=deb zsh_prefix="$(zsh_prefix)" fpm
 
 # Build AlpineLinux / Debian / ArchLinux / RedHat package with fpm
-.PHONY: dist/apk dist/pacman dist/rpm
 dist/apk dist/pacman dist/rpm:
 	@$(MAKE) fpm_target="$(@:dist/%=%)" fpm
 
 # Build macOS package with fpm
-.PHONE: dist/osxpkg
+%/osxpkg: prefix := /usr/local/
 dist/osxpkg:
-	@$(MAKE) fpm_target="osxpkg" prefix="/usr/local/" fpm
+	@$(MAKE) fpm_target=osxpkg prefix="$(prefix)" fpm
 
 	@# `installer` program requires `pkg` extension
 	@mv dist/*.osxpkg "dist/mommy-$(version)+osx.pkg"
 
 # Build FreeBSD package with fpm
-.PHONY: dist/freebsd
+%/freebsd: prefix := /usr/local/
 dist/freebsd:
-	@$(MAKE) fpm_target="freebsd" prefix="/usr/local/" fpm
+	@$(MAKE) fpm_target=freebsd prefix="$(prefix)" fpm
 
 # Build NetBSD package manually
-.PHONY: dist/netbsd
+%/netbsd: prefix := build/netbsd/usr/pkg/
+%/netbsd: man_prefix := $(prefix)/man/
 dist/netbsd:
-	@$(MAKE) prefix='build/netbsd/usr/pkg/' man_prefix='$$(prefix)/man/' install
+	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
 
 	@cd build/netbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 
@@ -154,9 +176,10 @@ dist/netbsd:
 	@mv build/netbsd/mommy*.tgz dist/
 
 # Build OpenBSD package manually
-.PHONY: dist/openbsd
+%/openbsd: prefix := build/openbsd/usr/local/
+%/openbsd: man_prefix := $(prefix)/man/
 dist/openbsd:
-	@$(MAKE) prefix='build/openbsd/usr/local/' man_prefix='$$(prefix)/man/' install
+	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
 
 	@cd build/openbsd; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 

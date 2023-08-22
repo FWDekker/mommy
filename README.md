@@ -230,26 +230,34 @@ if you want to customise where and how mommy installs, you can just compile her 
 
    > ℹ️ check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
    > you can override~
-   
+
     * _debian/ubuntu/apt-based_
       ```shell
-      sudo make zsh_prefix='$(prefix)/share/zsh/vendor-completions/' install
+      sudo make install/deb
       ```
-    * _all other linux / windows_
+    * _freebsd_
       ```shell
-      sudo make install
+      sudo gmake install/freebsd
       ```
-    * _macos/freebsd_
+    * _macos_
       ```shell
-      sudo gmake prefix='/usr/local/' install
+      sudo gmake install/osxpkg
       ```
     * _netbsd_
       ```shell
-      sudo gmake prefix='/usr/pkg/' man_prefix='$(prefix)/man/'
+      sudo gmake install/netbsd
       ```
     * _openbsd_
       ```shell
-      sudo gmake prefix='/usr/local/' man_prefix='$(prefix)/man/'
+      sudo gmake install/openbsd
+      ```
+    * _windows_
+      ```shell
+      sudo make install
+      ```
+    * _all other unix systems_
+      ```shell
+      sudo make install
       ```
 4. **test** (optional)  
    if you want to make sure installation was successful, you can run tests using
@@ -257,13 +265,12 @@ if you want to customise where and how mommy installs, you can just compile her 
    run the following from inside the cloned mommy repository
    ```shell
    git clone https://github.com/shellspec/shellspec.git
-   PATH="$(pwd)/shellspec/:$PATH" make test
+   PATH="$(pwd)/shellspec/:$PATH" make system=1 test
    ```
    some tests will be skipped, depending on which other programs you have installed~
 5. **uninstall** (optional)  
    if you want to uninstall after running `make install`, just run the same command as in step 3, except you replace
    `install` with `uninstall`.
-   so on debian, you'd run `sudo make zsh_prefix='$(prefix)/share/zsh/vendor-completions/' uninstall`~
 
    uninstall might not work completely if you installed a different version than the one you're uninstalling.
    for the best results, run `mommy -v`, check the version number, run `git checkout <the version>`, and then perform
@@ -275,7 +282,7 @@ if you want to customise where and how mommy installs, you can just compile her 
 
 if you don't want to use a package manager but also don't want to bother with `make`ing mommy, you can download a
 universal build of mommy, and play around with that.
-this will not install any files into your system.
+this will not install any files onto your system.
 if you're here because you want to install mommy only for a specific user, the "build from source and install" option
 is probably a better approach, though~
 
@@ -403,6 +410,9 @@ outputs `your mommy loves you`~
 
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
+
+> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to write `mommy` in the first place~
+
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
 ```shell
@@ -419,6 +429,8 @@ anyway, after finding mommy, you can just symlink using the following commands:
 sudo ln -fs /usr/bin/mommy /usr/bin/daddy
 sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 ```
+
+> ℹ️ uninstalling mommy will not remove the manually created symlinks~
 
 
 ## 🐚 shell integration
