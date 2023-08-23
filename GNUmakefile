@@ -111,7 +111,7 @@ endif
 		"build/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
 
 # Build generic extractable package
-dist/generic: prefix := ./build/generic/mommy/usr/
+dist/generic: prefix = ./build/generic/mommy/usr/
 dist/generic:
 	@rm -rf build/generic/
 
@@ -121,7 +121,7 @@ dist/generic:
 	@tar -C build/generic/ -czf "dist/mommy-$(version)+generic.tar.gz" ./
 
 # Build Debian package with fpm
-dist/deb: zsh_prefix := $(prefix)/share/zsh/vendor-completions/
+dist/deb: zsh_prefix = $(prefix)/share/zsh/vendor-completions/
 dist/deb:
 	@$(MAKE) fpm_target=deb zsh_prefix="$(zsh_prefix)" fpm
 
@@ -130,7 +130,7 @@ dist/apk dist/pacman dist/rpm:
 	@$(MAKE) fpm_target="$(@:dist/%=%)" fpm
 
 # Build macOS package with fpm
-%/osxpkg: prefix := /usr/local/
+%/osxpkg: prefix = /usr/local/
 dist/osxpkg:
 	@$(MAKE) fpm_target=osxpkg prefix="$(prefix)" fpm
 
@@ -138,13 +138,13 @@ dist/osxpkg:
 	@mv dist/*.osxpkg "dist/mommy-$(version)+osx.pkg"
 
 # Build FreeBSD package with fpm
-%/freebsd: prefix := /usr/local/
+%/freebsd: prefix = /usr/local/
 dist/freebsd:
 	@$(MAKE) fpm_target=freebsd prefix="$(prefix)" fpm
 
 # Build NetBSD package manually
-%/netbsd: prefix := build/netbsd/usr/pkg/
-%/netbsd: man_prefix := $(prefix)/man/
+%/netbsd: prefix = build/netbsd/usr/pkg/
+%/netbsd: man_prefix = $(prefix)/man/
 dist/netbsd:
 	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
 
@@ -176,8 +176,8 @@ dist/netbsd:
 	@mv build/netbsd/mommy*.tgz dist/
 
 # Build OpenBSD package manually
-%/openbsd: prefix := build/openbsd/usr/local/
-%/openbsd: man_prefix := $(prefix)/man/
+%/openbsd: prefix = build/openbsd/usr/local/
+%/openbsd: man_prefix = $(prefix)/man/
 dist/openbsd:
 	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
 
