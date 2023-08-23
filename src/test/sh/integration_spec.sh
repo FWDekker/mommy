@@ -24,8 +24,8 @@ Describe "integration of mommy with other programs"
         }
 
         It "uninstalls all files that are installed"
-            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
-            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
+            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
+            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
 
             Assert is_empty "$MOMMY_TMP_DIR/"
         End
@@ -122,7 +122,7 @@ Describe "integration of mommy with other programs"
         BeforeEach "zsh_before_each"
 
         zsh_complete() {
-            #  `script` emulates an interactive terminal during GitHub actions
+            # `script` emulates an interactive terminal during GitHub actions
             if script -q -c true /dev/null 1>/dev/null 2>/dev/null; then
                 # Linux
                 script -q -c "$MOMMY_ZSH_EXEC -i -u -c \"source '$MOMMY_ZSH_PREAMBLE_FILE'; compget '$1'\"" /dev/null
