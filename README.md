@@ -194,6 +194,50 @@ since mommy is just a shell script these methods also work fine on opensuse~
 </details>
 
 <details>
+<summary>nixpkgs/nixos</summary>
+
+mommy has arrived in nixpkgs, and supports customization directly through nixpkgs~
+
+* you can temporarily install mommy with **nix-shell**~
+
+```
+$ nix-shell -p mommy
+[nix-shell:~]$ mommy
+who's my good girl~
+```
+
+* or you can let mommy live in your NixOS or home-manager system by adding mommy to your nix expression:
+<table>
+    <tr>
+      <th>NixOS (default: <code>/etc/nixos/configuration.nix</code>)</th>
+      <th>home-manager</th>
+    </tr>
+    <tr>
+      <td><pre lang="nix">environment.systemPackages = with pkgs; [
+  mommy
+];</pre></td>
+      <td><pre lang="nix">home.packages = with pkgs; [
+  mommy
+];</pre></td>
+    </tr>
+</table>
+
+ * mommy can be configured like this using home-manager or the nix CLIs too~
+   ``` nix
+   environment.systemPackages = with pkgs; [
+     (mommy.override {
+       mommySettings = {
+         sweetie = "catgirl";
+         # all of mommy's other settings work here too!
+         # please scroll down to find out what they are~
+       };
+     })
+   ];
+   ```
+   
+</details>
+
+<details>
 <summary>windows</summary>
 
 * **wsl** (automatic or manual updates)  
