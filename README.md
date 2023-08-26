@@ -18,7 +18,7 @@ much~ ❤️
 
 ## 🚚 installation
 mommy works on any system.
-mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, openbsd, and windows~
+mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, openbsd, nixpkgs, and windows~
 
 _don't see your favourite distro or package manager listed?
 need help?

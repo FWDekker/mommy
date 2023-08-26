@@ -551,3 +551,12 @@ jobs:
       - name: Test installed mommy
         shell: msys2 {0}
         run: make system=1 test
+
+  test-nixpkgs:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: |
+          nix build --impure --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; ${if prev.version == "1.2.3" then "patches" else null} = []; })'
