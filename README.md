@@ -18,7 +18,7 @@ much~ ❤️
 
 ## 🚚 installation
 mommy works on any system.
-mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, openbsd, and windows~
+mommy is tested on ubuntu, debian, archlinux, fedora, nixpkgs, macos, freebsd, netbsd, openbsd, and windows~
 
 _don't see your favourite distro or package manager listed?
 need help?
@@ -149,6 +149,56 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 </details>
 
 <details>
+<summary>nixpkgs/nixos</summary>
+
+* **nix-shell** (temporary)  
+  if you're curious but not ready for commitments, use `nix-shell` to temporarily install mommy:
+  ```shell
+  nix-shell -p mommy
+  ```
+* **home-manager** (persistent)  
+  if you use home manager, install mommy by adding the following to your home manager configuration:
+  ```nix
+  home.packages = with pkgs; [
+    mommy
+  ];
+  ```
+  you can configure mommy as follows:
+  ```nix
+  home.packages = with pkgs; [
+    (mommy.override {
+      mommySettings = {
+        sweetie = "catgirl";
+      }
+    })
+  ];
+  ```
+  check [the full list of configuration options](#-configuration).
+  note that your nix configuration should use lowercase variable names~
+* **nixos** (persistent)  
+  install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`): 
+  ```nix
+  environment.systemPackages = with pkgs; [
+    mommy
+  ];
+  ```
+
+  you can configure mommy as follows:
+  ```nix
+  environment.systemPackages = with pkgs; [
+    (mommy.override {
+      mommySettings = {
+        sweetie = "catgirl";
+      }
+    })
+  ];
+  ```
+  check [the full list of configuration options](#-configuration).
+  note that your nix configuration should use lowercase variable names~
+
+</details>
+
+<details>
 <summary>openbsd</summary>
 
 * **pkg_add (github release)** (manual updates)
@@ -173,6 +223,8 @@ since mommy is just a shell script these methods also work fine on opensuse~
   sudo dnf copr enable fwdekker/mommy
   sudo dnf install mommy
   ```
+  packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
+  `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
 * **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
@@ -228,26 +280,34 @@ if you want to customise where and how mommy installs, you can just compile her 
 
    > ℹ️ check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
    > you can override~
-   
+
     * _debian/ubuntu/apt-based_
       ```shell
-      sudo make zsh_prefix='$(prefix)/share/zsh/vendor-completions/' install
+      sudo make install/deb
       ```
-    * _all other linux / windows_
+    * _freebsd_
       ```shell
-      sudo make install
+      sudo gmake install/freebsd
       ```
-    * _macos/freebsd_
+    * _macos_
       ```shell
-      sudo gmake prefix='/usr/local/' install
+      sudo gmake install/osxpkg
       ```
     * _netbsd_
       ```shell
-      sudo gmake prefix='/usr/pkg/' man_prefix='$(prefix)/man/'
+      sudo gmake install/netbsd
       ```
     * _openbsd_
       ```shell
-      sudo gmake prefix='/usr/local/' man_prefix='$(prefix)/man/'
+      sudo gmake install/openbsd
+      ```
+    * _windows_
+      ```shell
+      sudo make install
+      ```
+    * _all other unix systems_
+      ```shell
+      sudo make install
       ```
 4. **test** (optional)  
    if you want to make sure installation was successful, you can run tests using
@@ -255,13 +315,12 @@ if you want to customise where and how mommy installs, you can just compile her 
    run the following from inside the cloned mommy repository
    ```shell
    git clone https://github.com/shellspec/shellspec.git
-   PATH="$(pwd)/shellspec/:$PATH" make test
+   PATH="$(pwd)/shellspec/:$PATH" make system=1 test
    ```
    some tests will be skipped, depending on which other programs you have installed~
 5. **uninstall** (optional)  
    if you want to uninstall after running `make install`, just run the same command as in step 3, except you replace
    `install` with `uninstall`.
-   so on debian, you'd run `sudo make zsh_prefix='$(prefix)/share/zsh/vendor-completions/' uninstall`~
 
    uninstall might not work completely if you installed a different version than the one you're uninstalling.
    for the best results, run `mommy -v`, check the version number, run `git checkout <the version>`, and then perform
@@ -273,7 +332,7 @@ if you want to customise where and how mommy installs, you can just compile her 
 
 if you don't want to use a package manager but also don't want to bother with `make`ing mommy, you can download a
 universal build of mommy, and play around with that.
-this will not install any files into your system.
+this will not install any files onto your system.
 if you're here because you want to install mommy only for a specific user, the "build from source and install" option
 is probably a better approach, though~
 
@@ -320,7 +379,12 @@ use `mommy -v` to see which version of mommy you're using~
 
 ## 🙋 configuration
 mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
-or specify a different config file with `mommy -c ./my_config.sh [other options]`~
+
+> ℹ️ mommy is used to instructions being scribbled down in unusual places, and will check inside `XDG_CONFIG_HOME`
+> instead of `~/.config/` if the former is set~
+
+you can specify a different config file by pointing the environment variable `MOMMY_OPT_CONFIG_FILE` to that file, or by
+running mommy as `mommy -c ./my_config.sh [other options]`~
 
 ### 🗃️ config file format
 mommy executes the config file as a shell script and keeps the environment variables.
@@ -371,7 +435,8 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   ```shell
   MOMMY_PRONOUNS="she her her/they them their"
   ```
-  then mommy may choose between `mommy knows she loves her girl` and `mommy knows they love their girl`~
+  then mommy may choose between `mommy knows she loves her girl` and `mommy knows they love their girl` (but not
+  `mommy knows they love her girl`)~
 * if you set
   ```shell
   MOMMY_FORBIDDEN_WORDS="cat/dog"
@@ -379,8 +444,9 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
 
 ### 🧬 custom templates
-you can add your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but there is a slight
-difference:
+you can add a [list](#-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but
+there is a slight difference:
+
 * if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`, but
 * if you want your own compliments and _not_ the default compliments, add your own compliments to `MOMMY_COMPLIMENTS`~
 
@@ -401,14 +467,17 @@ outputs `your mommy loves you`~
 
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
+
+> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to prefix `daddy` in the first place~
+
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
 ```shell
 $ whereis mommy
 mommy: /usr/bin/mommy /usr/share/man/man1/mommy.1.gz
 ```
-the exact format may differ depending on your system, but in this case you can see that the program is installed in
-`/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
+the exact output of `whereis` differs depending on your system, but in this case you can see that the program is
+installed in `/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
 if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
 
 anyway, after finding mommy, you can just symlink using the following commands:
@@ -418,10 +487,12 @@ sudo ln -fs /usr/bin/mommy /usr/bin/daddy
 sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 ```
 
+> ℹ️ uninstalling mommy will not remove the manually created symlinks~
+
 
 ## 🐚 shell integration
-instead of calling mommy for each command, you can also fully integrate mommy with your shell to get mommy's output each
-time you run any command.
+instead of calling mommy for each command, you can fully integrate mommy with your shell to get mommy's output each time
+you run any command.
 here are some examples on how you can do that in various shells.
 recall that you can add `MOMMY_COMPLIMENTS_ENABLED=0` to your mommy config file to disable compliments while keeping
 encouragements~
@@ -616,7 +687,7 @@ every merge into `main` automatically build and releases a new version~
 
 * **before merging into `main`**
   * update `version`~
-  * update `pkg/rpm/mommy.spec.rpkg`~
+  * update `pkg/rpm/mommy.spec.rpkg` if changes were made to the packaging~
       * update release number~
       * update change log~
   * update `CHANGELOG.md`~
@@ -647,6 +718,7 @@ below are some guidelines for contributions, but honestly, _any_ contribution is
 surely we'll be able to figure something out together~
 
 * add relevant documentation and tests~
+* add relevant emojis in your commit messages~
 * ensure that the tests pass (on your machine, at least)~
 * describe your changes in `CHANGELOG.md`~
 * your pull request should go into `dev`, not into `main`~
@@ -672,3 +744,6 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
 * mommy thanks [wei he](https://github.com/wei/socialify) for creating [socialify](https://github.com/wei/socialify),
   which mommy uses for her github social preview~
+* mommy thanks [ckie](https://github.com/ckiee) for
+  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and 
+  [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~

@@ -252,7 +252,7 @@ jobs:
           echo "::group::Commit update"
           sudo -u build git config --global user.name "FWDekkerBot"
           sudo -u build git config --global user.email "bot@fwdekker.com"
-          sudo -u build git commit -am "mommy updated the build files to mommy $MOMMY_VERSION~"
+          sudo -u build git commit -am "🔖 mommy updated the build files to mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
@@ -303,7 +303,7 @@ jobs:
           echo "::group::Commit update"
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
-          git commit -am "mommy updated the formula to mommy $MOMMY_VERSION~"
+          git commit -am "🔖 mommy updated the formula to mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
