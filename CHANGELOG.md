@@ -1,27 +1,42 @@
 # Changelog
 ## [Unreleased]
 ### added
+* ❄️ mommy is now available on nixpkgs, thanks to [ckie](https://github.com/ckiee)~
+  ([NixOS/nixpkgs#250034](https://github.com/NixOS/nixpkgs/pull/250034))
+* ☝️ mommy now mentions the fingerprint of her copr signing key in the readme~
+  ([c8cde91](https://github.com/FWDekker/mommy/commit/c8cde91d162c9000e0133fdec8d65796ee17bfbf))
 
 ### changed
+* 🗂️ mommy looks in `XDG_CONFIG_HOME` instead of `$HOME/.config` if the former is configured~
+  ([#61](https://github.com/FWDekker/mommy/pull/61))
+* 🎨 mommy cleaned up her makefile~
+  ([#63](https://github.com/FWDekker/mommy/pull/63))
 
 ### deprecated
 
 ### removed
 
 ### fixed
+* 💿 mommy fixed a small issue with tests for netbsd~
+  ([#62](https://github.com/FWDekker/mommy/pull/62))
 
 ### security
 
 
 ## [1.2.3] -- 2023-03-14
 ### added
-* 🎩 mommy is now available for fedora, red hat, and other rpm-based systems via [copr](https://copr.fedorainfracloud.org/)~ ([#39](https://github.com/FWDekker/mommy/issues/39))
-* 🪟 mommy is now tested on msys2 for windows~ ([#54](https://github.com/FWDekker/mommy/issues/54))
+* 🎩 mommy is now available for fedora, red hat, and other rpm-based systems via
+  [copr](https://copr.fedorainfracloud.org/)~
+  ([#39](https://github.com/FWDekker/mommy/issues/39))
+* 🪟 mommy is now tested on msys2 for windows~
+  ([#54](https://github.com/FWDekker/mommy/issues/54))
 * 💥 mommy's makefile now has an `uninstall` option~
 
 ### changed
-* ✍️ mommy rewrote the installation instructions~ ([#51](https://github.com/FWDekker/mommy/issues/51))
-* 🐙 mommy links to github if `man` doesn't work~ ([#55](https://github.com/FWDekker/mommy/issues/55)) 
+* ✍️ mommy rewrote the installation instructions~
+  ([#51](https://github.com/FWDekker/mommy/issues/51))
+* 🐙 mommy links to github if `man` doesn't work~
+  ([#55](https://github.com/FWDekker/mommy/issues/55)) 
 
 ### fixed
 * ✏️ mommy fixed some minor errors in the readme~
@@ -31,18 +46,23 @@
 ## [1.2.2] -- 2023-03-09
 ### added
 * 🐟 mommy has shell completions for fish and zsh~  
-  they are enabled by default on most machines. if you installed mommy with brew, check the [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~ ([#43](https://github.com/FWDekker/mommy/issues/43)) ([#48](https://github.com/FWDekker/mommy/pull/48))
+  they are enabled by default on most machines. if you installed mommy with brew, check the
+  [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+  ([#43](https://github.com/FWDekker/mommy/issues/43))
+  ([#48](https://github.com/FWDekker/mommy/pull/48))
 
 ### changed
 * 🤖 mommy no longer talks like a robot when unknown options are used~
   ([#47](https://github.com/FWDekker/mommy/pull/47))
 * ⚗️ mommy's build system has been revamped~
-  ([#38](https://github.com/FWDekker/mommy/issues/38)) ([#42](https://github.com/FWDekker/mommy/issues/42))
+  ([#38](https://github.com/FWDekker/mommy/issues/38))
+  ([#42](https://github.com/FWDekker/mommy/issues/42))
 * ⭐ mommy has a bunch more emoji in her readme~
   ([#40](https://github.com/FWDekker/mommy/issues/40))
 
 ### fixed
-* 📁 mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various operating systems~
+* 📁 mommy installs herself into `/usr/bin` instead of `/usr/local/bin` on linux, to comply with the standards of various
+  operating systems~
 * 💪 mommy better tolerates missing optional dependencies when installing from aur~
 
 
@@ -60,7 +80,8 @@
 
 ## [1.1.0] -- 2023-02-24
 * _breaking_: mommy supports different pronoun forms.  
-  instead of `MOMMY_THEIR="her"` and using variable `%%THEIR%%`, you should now write `MOMMY_PRONOUN="she her her"` and use variables `%%THEY%%`, `%%THEM%%`, and `%%THEIR`~
+  instead of `MOMMY_THEIR="her"` and using variable `%%THEIR%%`, you should now write `MOMMY_PRONOUN="she her her"` and
+  use variables `%%THEY%%`, `%%THEM%%`, and `%%THEIR`~
 
 
 ## [1.0.0] -- 2023-02-23
@@ -81,17 +102,21 @@
 
 
 ## [0.0.5] -- 2023-02-11
-* _breaking_: config variables have been renamed, like from `%%PRONOUN%%` to `%%THEIR%%`, so you can actually read your templates without using too much of your precious brain capacity~
-* mommy's output is now vibrant! check the readme to see how to integrate with [lolcat](https://github.com/busyloop/lolcat) for rainbow colors~
+* _breaking_: config variables have been renamed, like from `%%PRONOUN%%` to `%%THEIR%%`, so you can actually read your
+  templates without using too much of your precious brain capacity~
+* mommy's output is now vibrant! check the readme to see how to integrate with
+  [lolcat](https://github.com/busyloop/lolcat) for rainbow colors~
 * mommy's library of compliments is much larger now~
 * the readme now explains how to integrate mommy into your shell, so you two will never have to be apart again~
-* you can add comments in between your templates so you don't forget what they mean. just start a line with `#` inside a template~
+* you can add comments in between your templates so you don't forget what they mean. just start a line with `#` inside a
+  template~
 
 
 ## [0.0.4] -- 2023-02-07
 * mommy supports reading exit codes with `mommy -s <status>`, as in `mommy -s $?` or `mommy -s 0`~
 * mommy avoids saying the words listed in `MOMMY_FORBIDDEN_WORDS`~
-* mommy's compliments can be disabled with `MOMMY_COMPLIMENTS_ENABLED=0` and mommy's encouragements can be disabled with `MOMMY_ENCOURAGEMENTS_ENABLED=1`~
+* mommy's compliments can be disabled with `MOMMY_COMPLIMENTS_ENABLED=0` and mommy's encouragements can be disabled with
+  `MOMMY_ENCOURAGEMENTS_ENABLED=1`~
 * mommy trims leading and trailing newlines in compliments and encouragements~
 * mommy behaves consistently when options are empty~
 

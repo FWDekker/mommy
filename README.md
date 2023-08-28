@@ -18,7 +18,7 @@ much~ ❤️
 
 ## 🚚 installation
 mommy works on any system.
-mommy is tested on ubuntu, debian, archlinux, fedora, macos, freebsd, netbsd, openbsd, nixpkgs, and windows~
+mommy is tested on ubuntu, debian, archlinux, fedora, nixpkgs, macos, freebsd, netbsd, openbsd, and windows~
 
 _don't see your favourite distro or package manager listed?
 need help?
@@ -149,6 +149,56 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 </details>
 
 <details>
+<summary>nixpkgs/nixos</summary>
+
+* **nix-shell** (temporary)  
+  if you're curious but not ready for commitments, use `nix-shell` to temporarily install mommy:
+  ```shell
+  nix-shell -p mommy
+  ```
+* **home-manager** (persistent)  
+  if you use home manager, install mommy by adding the following to your home manager configuration:
+  ```nix
+  home.packages = with pkgs; [
+    mommy
+  ];
+  ```
+  you can configure mommy as follows:
+  ```nix
+  home.packages = with pkgs; [
+    (mommy.override {
+      mommySettings = {
+        sweetie = "catgirl";
+      }
+    })
+  ];
+  ```
+  check [the full list of configuration options](#-configuration).
+  note that your nix configuration should use lowercase variable names~
+* **nixos** (persistent)  
+  install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`): 
+  ```nix
+  environment.systemPackages = with pkgs; [
+    mommy
+  ];
+  ```
+
+  you can configure mommy as follows:
+  ```nix
+  environment.systemPackages = with pkgs; [
+    (mommy.override {
+      mommySettings = {
+        sweetie = "catgirl";
+      }
+    })
+  ];
+  ```
+  check [the full list of configuration options](#-configuration).
+  note that your nix configuration should use lowercase variable names~
+
+</details>
+
+<details>
 <summary>openbsd</summary>
 
 * **pkg_add (github release)** (manual updates)
@@ -191,50 +241,6 @@ since mommy is just a shell script these methods also work fine on opensuse~
   # install package
   sudo dnf install ./mommy-*.rpm
   ```
-</details>
-
-<details>
-<summary>nixpkgs/nixos</summary>
-
-mommy has arrived in nixpkgs, and supports customization directly through nixpkgs~
-
-* you can temporarily install mommy with **nix-shell**~
-
-```
-$ nix-shell -p mommy
-[nix-shell:~]$ mommy
-who's my good girl~
-```
-
-* or you can let mommy live in your NixOS or home-manager system by adding mommy to your nix expression:
-<table>
-    <tr>
-      <th>NixOS (default: <code>/etc/nixos/configuration.nix</code>)</th>
-      <th>home-manager</th>
-    </tr>
-    <tr>
-      <td><pre lang="nix">environment.systemPackages = with pkgs; [
-  mommy
-];</pre></td>
-      <td><pre lang="nix">home.packages = with pkgs; [
-  mommy
-];</pre></td>
-    </tr>
-</table>
-
- * mommy can be configured like this using home-manager or the nix CLIs too~
-   ``` nix
-   environment.systemPackages = with pkgs; [
-     (mommy.override {
-       mommySettings = {
-         sweetie = "catgirl";
-         # all of mommy's other settings work here too!
-         # please scroll down to find out what they are~
-       };
-     })
-   ];
-   ```
-   
 </details>
 
 <details>
@@ -373,7 +379,10 @@ use `mommy -v` to see which version of mommy you're using~
 
 ## 🙋 configuration
 mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
-or specify a different config file with `mommy -c ./my_config.sh [other options]`~
+(if `XDG_CONFIG_HOME` is set, mommy will look there instead of `~/.config/`)~
+
+you can specify a different config file by pointing the environment variable `MOMMY_OPT_CONFIG_FILE` to that file, or by
+running mommy as `mommy -c ./my_config.sh [other options]`~
 
 ### 🗃️ config file format
 mommy executes the config file as a shell script and keeps the environment variables.
@@ -424,7 +433,8 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   ```shell
   MOMMY_PRONOUNS="she her her/they them their"
   ```
-  then mommy may choose between `mommy knows she loves her girl` and `mommy knows they love their girl`~
+  then mommy may choose between `mommy knows she loves her girl` and `mommy knows they love their girl` (but not
+  `mommy knows they love her girl`)~
 * if you set
   ```shell
   MOMMY_FORBIDDEN_WORDS="cat/dog"
@@ -432,8 +442,9 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
 
 ### 🧬 custom templates
-you can add your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but there is a slight
-difference:
+you can add a [list](#-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but
+there is a slight difference:
+
 * if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`, but
 * if you want your own compliments and _not_ the default compliments, add your own compliments to `MOMMY_COMPLIMENTS`~
 
@@ -463,8 +474,8 @@ installed with `whereis mommy`:
 $ whereis mommy
 mommy: /usr/bin/mommy /usr/share/man/man1/mommy.1.gz
 ```
-the exact format may differ depending on your system, but in this case you can see that the program is installed in
-`/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
+the exact output of `whereis` differs depending on your system, but in this case you can see that the program is
+installed in `/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
 if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
 
 anyway, after finding mommy, you can just symlink using the following commands:
@@ -478,8 +489,8 @@ sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 
 
 ## 🐚 shell integration
-instead of calling mommy for each command, you can also fully integrate mommy with your shell to get mommy's output each
-time you run any command.
+instead of calling mommy for each command, you can fully integrate mommy with your shell to get mommy's output each time
+you run any command.
 here are some examples on how you can do that in various shells.
 recall that you can add `MOMMY_COMPLIMENTS_ENABLED=0` to your mommy config file to disable compliments while keeping
 encouragements~
@@ -730,3 +741,6 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
 * mommy thanks [wei he](https://github.com/wei/socialify) for creating [socialify](https://github.com/wei/socialify),
   which mommy uses for her github social preview~
+* mommy thanks [ckie](https://github.com/ckiee) for
+  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and 
+  [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~
