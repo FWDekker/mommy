@@ -379,7 +379,9 @@ use `mommy -v` to see which version of mommy you're using~
 
 ## 🙋 configuration
 mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
-(if `XDG_CONFIG_HOME` is set, mommy will look there instead of `~/.config/`)~
+
+> ℹ️ mommy is used to instructions being scribbled down in unusual places, and will check inside `XDG_CONFIG_HOME`
+> instead of `~/.config/` if the former is set~
 
 you can specify a different config file by pointing the environment variable `MOMMY_OPT_CONFIG_FILE` to that file, or by
 running mommy as `mommy -c ./my_config.sh [other options]`~
@@ -466,7 +468,7 @@ outputs `your mommy loves you`~
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
 
-> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to write `mommy` in the first place~
+> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to prefix `daddy` in the first place~
 
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
@@ -685,7 +687,7 @@ every merge into `main` automatically build and releases a new version~
 
 * **before merging into `main`**
   * update `version`~
-  * update `pkg/rpm/mommy.spec.rpkg`~
+  * update `pkg/rpm/mommy.spec.rpkg` if changes were made to the packaging~
       * update release number~
       * update change log~
   * update `CHANGELOG.md`~
@@ -716,6 +718,7 @@ below are some guidelines for contributions, but honestly, _any_ contribution is
 surely we'll be able to figure something out together~
 
 * add relevant documentation and tests~
+* add relevant emojis in your commit messages~
 * ensure that the tests pass (on your machine, at least)~
 * describe your changes in `CHANGELOG.md`~
 * your pull request should go into `dev`, not into `main`~
