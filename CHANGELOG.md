@@ -1,4 +1,9 @@
 # Changelog
+## [Unreleased]
+### added
+* 📈 mommy now explains how to integrate with nushell, thanks to [aemogie.](https://github.com/aemogie)~ ([#65](https://github.com/FWDekker/mommy/issues/65))~
+
+
 ## [1.2.4] -- 2023-08-28
 ### added
 * ❄️ mommy is now available on nixpkgs, thanks to [ckie](https://github.com/ckiee)~ ([NixOS/nixpkgs#250034](https://github.com/NixOS/nixpkgs/pull/250034))

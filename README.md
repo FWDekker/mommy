@@ -513,6 +513,16 @@ PROMPT_COMMAND="mommy -1 -s \$?; $PROMPT_COMMAND"
 </details>
 
 <details>
+<summary>📈 nushell</summary>
+
+in nushell you can have mommy output a message on the right side of your prompt by adding the following line to your
+`~/.config/nushell/config.nu` file:
+```shell
+$env.PROMPT_COMMAND_RIGHT = {|| mommy -1 -s $env.LAST_EXIT_CODE }
+```
+</details>
+
+<details>
 <summary>🐟 fish</summary>
 
 in fish you can have mommy output a message on the right side of your prompt by creating
@@ -747,3 +757,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
 * mommy thanks [ckie](https://github.com/ckiee) for
   [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and 
   [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~
+* mommy thanks [aemogie.](https://github.com/aemogie) for
+  [telling her how to integrate with nushell](https://github.com/FWDekker/mommy/issues/65)~
