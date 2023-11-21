@@ -407,6 +407,7 @@ jobs:
           usesh: true
           prepare: |
             set -e
+            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
 
             echo "::group::Install basic packages"
             pkg_add git gmake mozilla-rootcerts-openssl
