@@ -332,17 +332,17 @@ jobs:
 
 
   test-freebsd:
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Test script and package
-        uses: vmactions/freebsd-vm@v0
+        uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
-          # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
           prepare: |
+            set -e
+
             echo "::group::Install basic packages"
             pkg install -y git gmake || exit 1
             echo "::endgroup::"
@@ -397,7 +397,7 @@ jobs:
 
 
   test-netbsd:
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -407,6 +407,7 @@ jobs:
           usesh: true
           prepare: |
             set -e
+            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
 
             echo "::group::Install basic packages"
             pkg_add git gmake mozilla-rootcerts-openssl
@@ -458,12 +459,12 @@ jobs:
 
 
   test-openbsd:
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install dependencies for mommy && Test script && Build package && Test package
-        uses: vmactions/openbsd-vm@v0
+        uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
           prepare: |
@@ -559,4 +560,6 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |
-          nix build --impure --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; ${if prev.version == "1.2.3" then "patches" else null} = []; })'
+          nix build \
+            --impure \
+            --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; })'

@@ -1,7 +1,10 @@
 # Changelog
 ## [Unreleased]
 ### added
-* 📈 mommy now explains how to integrate with nushell, thanks to [aemogie.](https://github.com/aemogie)~ ([#65](https://github.com/FWDekker/mommy/issues/65))~
+* 📈 mommy now explains how to integrate with nushell, thanks to [aemogie.](https://github.com/aemogie)~ ([#65](https://github.com/FWDekker/mommy/issues/65))
+
+### changed
+* 💨 mommy is now much faster at doing her exams~ ([#69](https://github.com/FWDekker/mommy/pull/69))
 
 
 ## [1.2.4] -- 2023-08-28
