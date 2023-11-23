@@ -21,7 +21,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         run: make test
 
@@ -50,7 +50,7 @@ jobs:
       - name: Install Homebrew
         run: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: Checkout homebrew-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
@@ -116,7 +116,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: mommy
       - name: Fix mommy directory ownership
@@ -150,7 +150,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout aur-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/aur-mommy
           path: aur-mommy
@@ -210,7 +210,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Checkout to subdirectory is required for `pkg/rpm/rpkg.conf` to correctly determine `${git_props:root}`
           path: mommy
@@ -279,7 +279,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         run: make test
 
@@ -304,7 +304,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout homebrew-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
@@ -335,7 +335,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script and package
         uses: vmactions/freebsd-vm@v1
         with:
@@ -400,7 +400,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script and package
         uses: vmactions/netbsd-vm@v0
         with:
@@ -462,7 +462,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install dependencies for mommy && Test script && Build package && Test package
         uses: vmactions/openbsd-vm@v1
         with:
@@ -541,7 +541,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         shell: msys2 {0}
         run: make test
@@ -556,7 +556,7 @@ jobs:
   test-nixpkgs:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |

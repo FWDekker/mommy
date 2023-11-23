@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install fpm and build dependencies
         run: |
           sudo apt install -y rubygems libarchive-tools rpm zstd
@@ -42,7 +42,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install fpm
         run: sudo gem install --no-document fpm
       - name: Build package
@@ -58,7 +58,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install fpm && Build package
         uses: vmactions/freebsd-vm@v0
         with:
@@ -99,7 +99,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install fpm && Build package
         uses: vmactions/netbsd-vm@v0
         with:
@@ -136,7 +136,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install fpm && Build package
         uses: vmactions/openbsd-vm@v0
         with:
@@ -175,7 +175,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download built packages
         uses: actions/download-artifact@v3
         with:
@@ -218,7 +218,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: mommy
           token: ${{ secrets.personal_access_token }}
@@ -226,7 +226,7 @@ jobs:
         run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
 
       - name: Checkout aur-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/aur-mommy
           path: aur-mommy
@@ -271,7 +271,7 @@ jobs:
 
     steps:
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: mommy
           token: ${{ secrets.personal_access_token }}
@@ -279,7 +279,7 @@ jobs:
         run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
 
       - name: Checkout homebrew-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
