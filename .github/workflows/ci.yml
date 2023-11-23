@@ -397,12 +397,12 @@ jobs:
 
 
   test-netbsd:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Test script and package
-        uses: vmactions/netbsd-vm@v1
+        uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
           prepare: |
@@ -560,4 +560,6 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |
-          nix build --impure --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; ${if prev.version == "1.2.3" then "patches" else null} = []; })'
+          nix build \
+            --impure \
+            --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; })'
