@@ -2,8 +2,7 @@ name: CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +11,7 @@ permissions:
 
 jobs:
   check-release-needed:
-    # Note that `workflow_dispatch` is never skipped
+    # Note that 'workflow_dispatch' is never skipped
     if: "!(contains(github.event.head_commit.message, '[cd skip]') || contains(github.event.head_commit.message, '[skip cd]'))"
     runs-on: ubuntu-latest
     steps:
@@ -55,34 +54,36 @@ jobs:
 
   build-freebsd:
     needs: [ check-release-needed ]
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install fpm && Build package
-        uses: vmactions/freebsd-vm@v0
+        uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
           prepare: |
+            set -e
+
             echo "::group::Install basic packages"
-            pkg install -y git gmake || exit 1
+            pkg install -y git gmake
             echo "::endgroup::"
 
             # fpm
               echo "::group::Install fpm: Actually install fpm"
-              pkg install -y devel/ruby-gems || exit 1
-              gem install --no-document fpm || exit 1
+              pkg install -y devel/ruby-gems
+              gem install --no-document fpm
               echo "::endgroup::"
 
               echo "::group::Install fpm: Install gtar (workaround for https://github.com/jordansissel/fpm/pull/1922)"
-              pkg install -y gtar || exit 1
-              mv /usr/bin/tar /usr/bin/bsdtar || exit 1
-              mv /usr/local/bin/gtar /usr/bin/tar || exit 1
+              pkg install -y gtar
+              mv /usr/bin/tar /usr/bin/bsdtar
+              mv /usr/local/bin/gtar /usr/bin/tar
               echo "::endgroup::"
             # /fpm
 
             echo "::group::Ignore ownership issues"
-            git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
           run: |
             set -e
@@ -106,15 +107,16 @@ jobs:
           usesh: true
           prepare: |
             set -e
+            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
 
             echo "::group::Install basic packages"
-            pkg_add git gmake mozilla-rootcerts-openssl || exit 1
+            pkg_add git gmake mozilla-rootcerts-openssl
             echo "::endgroup::"
 
             echo "::group::Install fpm"
             pkg_add ruby
             /usr/pkg/bin/gem install --no-document fpm
-            pkg_add pkg_install  # This is necessary to make `fpm` work with `pkgin` format for some reason
+            pkg_add pkg_install  # This is necessary to make 'fpm' work with 'pkgin' format for some reason
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
@@ -122,7 +124,7 @@ jobs:
             echo "::endgroup::"
           run: |
             set -e
-            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
+            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
 
             gmake dist/netbsd
       - name: Upload built package
@@ -133,12 +135,12 @@ jobs:
 
   build-openbsd:
     needs: [ check-release-needed ]
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install fpm && Build package
-        uses: vmactions/openbsd-vm@v0
+        uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
           prepare: |
@@ -151,7 +153,7 @@ jobs:
             echo "::group::Install fpm"
             pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
             /usr/local/bin/gem* install --no-document fpm
-            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink `fpm` to latest version
+            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink 'fpm' to latest version
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"

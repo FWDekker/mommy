@@ -9,6 +9,9 @@ man_prefix := $(prefix)/share/man/
 fish_prefix := $(prefix)/share/fish/vendor_completions.d/
 zsh_prefix := $(prefix)/share/zsh/site-functions/
 
+# Other locations
+shellspec_bin := shellspec
+
 # Extracted values
 version := $(shell head -n 1 version)
 date := $(shell tail -n 1 version)
@@ -40,7 +43,7 @@ test: test/unit test/integration
 .PHONY: test/%
 test/%: system ?= 0
 test/%:
-	@MOMMY_SYSTEM="$(system)" MOMMY_MAKE="$(MAKE)" shellspec "src/test/sh/$(@:test/%=%)_spec.sh"
+	@MOMMY_SYSTEM="$(system)" MOMMY_MAKE="$(MAKE)" "$(shellspec_bin)" "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
 ## "Compile" source files into '$(build_dir)' along a simple prefix layout
