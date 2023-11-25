@@ -1,18 +1,30 @@
+## Locations
 # Build file locations
 build_dir := build/
 dist_dir := dist/
 
 # Install locations
 prefix := /usr/
-bin_prefix := $(prefix)/bin/
-man_prefix := $(prefix)/share/man/
-fish_prefix := $(prefix)/share/fish/vendor_completions.d/
-zsh_prefix := $(prefix)/share/zsh/site-functions/
+bin_prefix = $(prefix)/bin/
+man_prefix = $(prefix)/share/man/
+fish_prefix = $(prefix)/share/fish/vendor_completions.d/
+zsh_prefix = $(prefix)/share/zsh/site-functions/
 
-# Other locations
+# Build dependency locations
 shellspec_bin := shellspec
 
-# Extracted values
+# Set target-specific locations
+%/deb: zsh_prefix = $(prefix)/share/zsh/vendor-completions/
+%/freebsd: prefix = /usr/local/
+%/generic: prefix = $(build_dir)/generic/mommy-$(version)/usr/
+%/netbsd: prefix = $(build_dir)/netbsd/usr/pkg/
+%/netbsd: man_prefix = $(prefix)/man/
+%/openbsd: prefix = $(build_dir)/openbsd/usr/local/
+%/openbsd: man_prefix = $(prefix)/man/
+%/osxpkg: prefix = /usr/local/
+
+
+## Extracted values
 version := $(shell head -n 1 version)
 date := $(shell tail -n 1 version)
 
@@ -46,17 +58,26 @@ test/%:
 	@MOMMY_SYSTEM="$(system)" MOMMY_MAKE="$(MAKE)" "$(shellspec_bin)" "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
-## "Compile" source files into '$(build_dir)' along a simple prefix layout
+## Build
+# "Compile" source files into '$(build_dir)' along a simple prefix-based directory layout
 .PHONY: build
 build:
 	@# Copy relevant files
-	@mkdir -p "$(build_dir)/bin/"; cp src/main/sh/mommy "$(build_dir)/bin/"
-	@mkdir -p "$(build_dir)/man/man1/"; cp src/main/man/man1/mommy.1 "$(build_dir)/man/man1/"
-	@mkdir -p "$(build_dir)/completions/fish/"; cp src/main/completions/fish/mommy.fish "$(build_dir)/completions/fish/"
-	@mkdir -p "$(build_dir)/completions/zsh/"; cp src/main/completions/zsh/_mommy "$(build_dir)/completions/zsh/"
+	@mkdir -p "$(build_dir)/bin/"
+	@cp src/main/sh/mommy "$(build_dir)/bin/"
+
+	@mkdir -p "$(build_dir)/man/man1/"
+	@cp src/main/man/man1/mommy.1 "$(build_dir)/man/man1/"
+
+	@mkdir -p "$(build_dir)/completions/fish/"
+	@cp src/main/completions/fish/mommy.fish "$(build_dir)/completions/fish/"
+
+	@mkdir -p "$(build_dir)/completions/zsh/"
+	@cp src/main/completions/zsh/_mommy "$(build_dir)/completions/zsh/"
 
 	@# Insert version information
-	@sed -i".bak" "s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" \
+	@sed -i".bak" \
+		"s/%%VERSION_NUMBER%%/$(version)/g;s/%%VERSION_DATE%%/$(date)/g" \
 		"$(build_dir)/bin/mommy" \
 		"$(build_dir)/man/man1/mommy.1"
 	@rm -f "$(build_dir)/bin/mommy.bak" "$(build_dir)/man/man1/mommy.1.bak"
@@ -80,9 +101,10 @@ install: build
 
 # Install with preset overrides, as specified later
 .PHONY: install/%
-install/%: install
-	@#
+install/%: install ;
 
+
+## Uninstallation
 # Remove installed files
 .PHONY: uninstall
 uninstall:
@@ -91,70 +113,31 @@ uninstall:
 	@rm "$(fish_prefix)/mommy.fish"
 	@rm "$(zsh_prefix)/_mommy"
 
-# Uninstall with preset overrides, as specified later
+# Uninstall, after loading OS-specific overrides
 .PHONY: uninstall/%
-uninstall/%: uninstall
-	@#
+uninstall/%: uninstall ;
 
 
-## Build packages
+## Build distributable packages
 .PHONY: dist/%
 
-# Invoke fpm on built files to create `fpm_target` type output
-# For valid `fpm_target`s, see https://fpm.readthedocs.io/en/latest/packaging-types.html
-.PHONY: fpm
-fpm: build
-ifndef fpm_target
-	$(error fpm_target is undefined)
-endif
-	@mkdir -p "$(dist_dir)"
-	@fpm -t "$(fpm_target)" \
-		-p "$(dist_dir)/mommy-$(version).$(fpm_target)" \
-		--version "$(version)" \
-		\
-		"$(build_dir)/bin/mommy=$(bin_prefix)/mommy" \
-		"$(build_dir)/man/man1/mommy.1.gz=$(man_prefix)/man1/mommy.1.gz" \
-		"$(build_dir)/completions/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
-		"$(build_dir)/completions/zsh/_mommy=$(zsh_prefix)/_mommy"
-
 # Build generic extractable package
-dist/generic: prefix = $(build_dir)/generic/mommy-$(version)/usr/
-dist/generic:
-	@rm -rf "$(build_dir)/generic/"
-
-	@$(MAKE) prefix="$(prefix)" install
-
+dist/generic: install
 	@mkdir -p "$(dist_dir)"
 	@tar -C "$(build_dir)/generic/" -czf "$(dist_dir)/mommy-$(version)+generic.tar.gz" ./
 
-# Build Debian package with fpm
-dist/deb: zsh_prefix = $(prefix)/share/zsh/vendor-completions/
-dist/deb:
-	@$(MAKE) fpm_target=deb zsh_prefix="$(zsh_prefix)" fpm
-
-# Build AlpineLinux / Debian / ArchLinux / RedHat package with fpm
-dist/apk dist/pacman dist/rpm:
-	@$(MAKE) fpm_target="$(@:dist/%=%)" fpm
-
-# Build macOS package with fpm
-%/osxpkg: prefix = /usr/local/
-dist/osxpkg:
-	@$(MAKE) fpm_target=osxpkg prefix="$(prefix)" fpm
-
-	@# `installer` program requires `pkg` extension
+# Build packages with fpm
+dist/apk: fpm/apk
+dist/deb: fpm/deb
+dist/freebsd: fpm/freebsd
+dist/osxpkg: fpm/osxpkg
+	@# 'installer' program requires 'pkg' extension
 	@mv "$(dist_dir)/"*".osxpkg" "$(dist_dir)/mommy-$(version)+osx.pkg"
-
-# Build FreeBSD package with fpm
-%/freebsd: prefix = /usr/local/
-dist/freebsd:
-	@$(MAKE) fpm_target=freebsd prefix="$(prefix)" fpm
+dist/pacman: fpm/pacman
+dist/rpm: fpm/rpm
 
 # Build NetBSD package manually
-%/netbsd: prefix = $(build_dir)/netbsd/usr/pkg/
-%/netbsd: man_prefix = $(prefix)/man/
-dist/netbsd:
-	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
-
+dist/netbsd: install
 	@cd "$(build_dir)/netbsd"; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 
 	@echo "$(comment)" > "$(build_dir)/netbsd/+COMMENT"
@@ -183,11 +166,7 @@ dist/netbsd:
 	@mv "$(build_dir)/netbsd/mommy-$(version)+netbsd.tgz" "$(dist_dir)"
 
 # Build OpenBSD package manually
-%/openbsd: prefix = $(build_dir)/openbsd/usr/local/
-%/openbsd: man_prefix = $(prefix)/man/
-dist/openbsd:
-	@$(MAKE) prefix="$(prefix)" man_prefix="$(man_prefix)" install
-
+dist/openbsd: install
 	@cd "$(build_dir)/openbsd"; find . -type f | sed -e "s/^/.\//" > +CONTENTS
 
 	@echo "$(comment)" > "$(build_dir)/openbsd/+COMMENT"
@@ -208,3 +187,17 @@ dist/openbsd:
 
 	@mkdir -p "$(dist_dir)"
 	@mv "$(build_dir)/openbsd/mommy-$(version)+openbsd.tgz" "$(dist_dir)"
+
+# Invoke 'fpm/<target>' on built files to create an output of type '<target>'
+# For valid '<target>'s, see https://fpm.readthedocs.io/en/latest/packaging-types.html
+.PHONY: fpm/%
+fpm/%: build
+	@mkdir -p "$(dist_dir)"
+	@fpm -t "$(@:fpm/%=%)" \
+		-p "$(dist_dir)/mommy-$(version).$(@:fpm/%=%)" \
+		--version "$(version)" \
+		\
+		"$(build_dir)/bin/mommy=$(bin_prefix)/mommy" \
+		"$(build_dir)/man/man1/mommy.1.gz=$(man_prefix)/man1/mommy.1.gz" \
+		"$(build_dir)/completions/fish/mommy.fish=$(fish_prefix)/mommy.fish" \
+		"$(build_dir)/completions/zsh/_mommy=$(zsh_prefix)/_mommy"

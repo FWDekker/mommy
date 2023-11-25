@@ -212,7 +212,7 @@ jobs:
       - name: Checkout mommy
         uses: actions/checkout@v4
         with:
-          # Checkout to subdirectory is required for 'pkg/rpm/rpkg.conf' to correctly determine '${git_props:root}'
+          # Checkout to subdirectory is required for 'pkg/fpm/rpkg.conf' to correctly determine '${git_props:root}'
           path: mommy
       - name: Test script
         working-directory: ./mommy/
@@ -247,7 +247,7 @@ jobs:
         working-directory: ./mommy/
         run: |
           echo "::group::Build"
-          rpkg -p ./pkg/rpm local  # build srpm
+          rpkg -p ./pkg/fpm local  # build srpm
           rpmbuild --rebuild /tmp/rpkg/mommy-*/*.rpm
           echo "::endgroup::"
 
@@ -348,8 +348,8 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
-            git clone --depth=1 https://github.com/shellspec/shellspec.git
-            gmake -C shellspec install
+            git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+            gmake -C /tmp/shellspec install
             echo "::endgroup::"
 
             echo "::group::Install additional shells"

@@ -18,3 +18,6 @@ indent_size = 2
 
 [GNUmakefile]
 indent_style = tab
+
+[debian.rules]
+indent_style = tab

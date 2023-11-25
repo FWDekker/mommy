@@ -672,7 +672,7 @@ unfortunately, packages for macos, netbsd, and openbsd cannot be built on system
 a service builds mommy on-demand on each release, and makes the created packages available for all users.
 currently, this happens only for fedora/epel at [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
 the relevant build files are hosted in
-[mommy's `pkg/rpm/` directory](https://github.com/FWDekker/mommy/tree/main/pkg/rpm/)~
+[mommy's `pkg/fpm/` directory](https://github.com/FWDekker/mommy/tree/main/pkg/fpm/)~
 </details>
 
 <details>
@@ -697,7 +697,7 @@ every merge into `main` automatically build and releases a new version~
 
 * **before merging into `main`**
   * update `version`~
-  * update `pkg/rpm/mommy.spec.rpkg` if changes were made to the packaging~
+  * update `pkg/fpm/mommy.spec.rpkg` if changes were made to the packaging~
       * update release number~
       * update change log~
   * update `CHANGELOG.md`~
