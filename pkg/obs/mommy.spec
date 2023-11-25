@@ -1,15 +1,14 @@
-Name:          {{{ git_repo_name }}}
-Version:       {{{ my_git_version }}}
-Release:       1
+Name:          mommy
+Version:       placeholder
+Release:       placeholder
 Summary:       mommy's here to support you, in any shell~ ❤️
 License:       Unlicense
 URL:           https://github.com/FWDekker/mommy
-VCS:           {{{ git_repo_vcs }}}
-Source:        {{{ git_repo_pack }}}
-BuildRequires: git
+VCS:           git+https://github.com/fwdekker/mommy.git
+Source:        mommy-%{version}.tar.gz
+BuildArch:     noarch
 BuildRequires: make
-
-%global debug_package %{nil}
+BuildRequires: glibc-langpack-en
 
 %description
 mommy's here to support you! mommy will compliment you if things go well, and
@@ -19,17 +18,16 @@ mommy is fully customizable, integrates with any shell, works on any system, and
 most importantly, loves you very much~ ❤️
 
 %prep
-{{{ git_repo_setup_macro }}}
-git clone --depth=1 https://github.com/shellspec/shellspec.git
+%setup -q
+
+%clean
+rm -rf "%{buildroot}"
 
 %build
 make build
 
 %install
 make prefix="%{buildroot}/%{_prefix}/" install
-
-%check
-PATH="$(pwd)/shellspec:$PATH" MOMMY_EXEC="%{buildroot}/%{_prefix}/bin/mommy" make test/unit
 
 %files
 %{_bindir}/mommy
@@ -39,5 +37,8 @@ PATH="$(pwd)/shellspec:$PATH" MOMMY_EXEC="%{buildroot}/%{_prefix}/bin/mommy" mak
 
 %changelog
 # Changelog lists changes to the packaging, not to the software.
+* Sat Nov 25 2023 Florine W. Dekker 1.2.5-1
+- Rewrite script for OpenBuildService.
+
 * Tue Mar 14 2023 Florine W. Dekker 1.2.3-1
-- Initial release with rpkg
+- Initial release with rpkg.

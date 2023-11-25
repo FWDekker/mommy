@@ -1,0 +1,5 @@
+mommy (1.2.5-1) stable; urgency=low
+
+  * Initial release using OpenBuildService.
+
+ -- Florine W. Dekker <florine@fwdekker.com>  Sat, 25 Nov 2023 13:01:09 +0000

@@ -338,7 +338,7 @@ is probably a better approach, though~
 
 the script below downloads the latest stable release and extracts it for you.
 if you don't want to use curl, just [check the latest release](https://github.com/FWDekker/mommy/releases/latest) in
-your browser and download the `+generic.tar.gz` file manually~
+your browser and download the file ending in `+generic.tar.gz` manually~
 
 ```shell
 # download latest archive from github release
@@ -416,7 +416,7 @@ make sure you do not put spaces around the `=`~
 ### 🪣 lists
 some of these settings support lists.
 mommy chooses a random element from each list each time she is called by you.
-(except for `MOMMY_FORBIDDEN_WORDS` and `MOMMY_SUPPRESS_EXIT`, where all elements of the list are always considered.)
+(except for `MOMMY_FORBIDDEN_WORDS` and `MOMMY_SUPPRESS_EXIT`, where mommy always considers all elements of the list.)
 in a list, elements are separated by a newline or by a `/`.
 elements that contain whitespace only, and elements that start with a `#` are ignored~
 
@@ -466,9 +466,9 @@ outputs `your mommy loves you`~
 | `%%SWEETIE%%`   | what mommy calls you                              |
 
 ### ✍️ renaming the mommy executable
-if you want to write `daddy npm test` instead of `mommy npm test`, you can just create a symlink.
+if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~
 
-> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to prefix `daddy` in the first place~
+> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to write `daddy` in the first place~
 
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
@@ -613,7 +613,7 @@ if that annoys you, run `make build` after each change, and use `build/bin/mommy
       ```shell
       make test/integration
       ```
-3. **test installation**
+3. **test installed code**
    ```shell
    make system=1 test
    ```
@@ -637,7 +637,7 @@ the binary packages attached to the github release are built with the
 run `make list` to see a list of build targets;
 you're looking for the ones starting with `dist/`~
 
-to build the packages, you need at least gnu make, ruby, and fpm.
+to build the packages, you need at least gnu make, ruby, and [fpm](https://github.com/jordansissel/fpm).
 (actually, you don't need fpm for netbsd and openbsd.)
 on debian-based systems, you already have gnu make, so you only need
 ```shell
@@ -646,22 +646,23 @@ sudo gem install fpm
 ```
 
 after that, just run `make dist/deb` (or better: `mommy make dist/deb`), and a `.deb` package will be built in `dist/`.
-run `make` or `make list` for a list of valid building targets.
+run `make` or `make list` for a list of valid build targets.
 a special target is `install`, which directly copies the files into the specified directories on your system.
 these directories can be changed by setting `prefix` variables, as in `make prefix=/usr/ install`.
 i recommend running `make --dry-run prefix=/usr/ install` first so you can verify that all directories are calculated
 correctly.
-check the `GNUmakefile` for more details~
+check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for more details~
 
-all systems can build packages for themselves without additional dependencies.
+all systems can build packages for themselves without dependencies beyond those noted above.
 if you want to compile for a different system, you may need additional dependencies.
-for example, if you want to build packages for alpinelinux, archlinux, and rpm from a debian-like system, you will need
+for example, if you want to build packages for alpinelinux, archlinux, and rpm from a debian-like system, you will
+respectively need
 ```shell
 sudo apt install libarchive-tools rpm zstd
 ```
 and then you can run
 ```shell
-make apk pacman rpm
+make dist/apk dist/pacman dist/rpm
 ```
 unfortunately, packages for macos, netbsd, and openbsd cannot be built on systems other than themselves~
 </details>
@@ -669,10 +670,16 @@ unfortunately, packages for macos, netbsd, and openbsd cannot be built on system
 <details>
 <summary>🏗️ external build servers</summary>
 
-a service builds mommy on-demand on each release, and makes the created packages available for all users.
-currently, this happens only for fedora/epel at [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
-the relevant build files are hosted in
-[mommy's `pkg/fpm/` directory](https://github.com/FWDekker/mommy/tree/main/pkg/fpm/)~
+build servers build mommy distributions on-demand for each release, and make the created packages available for all
+users.
+how sweet~
+
+* [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) builds packages for fedora and epel~
+* [openbuildservice](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy) builds packages for all
+  deb-based and rpm-based systems~
+
+see [pkg/README.md](https://github.com/FWDekker/mommy/blob/main/pkg/README.md) for more information on the build
+process~
 </details>
 
 <details>
@@ -697,29 +704,32 @@ every merge into `main` automatically build and releases a new version~
 
 * **before merging into `main`**
   * update `version`~
-  * update `pkg/fpm/mommy.spec.rpkg` if changes were made to the packaging~
-      * update release number~
-      * update change log~
-  * update `CHANGELOG.md`~
+  * update all changelogs~
+    * update `CHANGELOG.md`~
       * do not leave a placeholder section for `[Unreleased]`, because that will end up in the `.deb` changelogs~
       * remove empty subsections for the new release~
       * ensure no line breaks are used as whitespace;
         github release notes use them as actual line breaks~
+    * update `pkg/obs/debian.changelog` if changes were made to obs's debian packaging process~
+    * update `pkg/obs/mommy.spec` if changes were made to obs's rpm packaging process~
+    * update `pkg/rpkg/mommy.spec.rpkg` if changes were made to copr's rpkg packaging process~
   * update acknowledgements in `README.md`~
   * update promotional images in `.github/img/`~
 
 * **after merging into `main`**
   * a new github release is created automatically~
   * [aur-mommy](https://github.com/FWDekker/aur-mommy/)
-      * updated automatically when `mommy` updates
-      * always [manually check deployment status](https://github.com/FWDekker/aur-mommy/actions?query=branch%3Amaster)~
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://github.com/FWDekker/aur-mommy/actions?query=branch%3Amaster)~
   * [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/)
-      * updated automatically when `mommy` updates
-      * always [manually check deployment status](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/builds/)~
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/builds/)~
   * [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy)
-      * updated automatically when `mommy` updates
-      * always
-        [manually check deployment status](https://github.com/FWDekker/homebrew-mommy/actions?query=branch%3Amain)~
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://github.com/FWDekker/homebrew-mommy/actions?query=branch%3Amain)~
+  * [openbuildservice](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy)
+    * updated automatically when `mommy` updates
+    * always [manually check deployment status](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy)~
 </details>
 
 ### 🤠 contribution guidelines
