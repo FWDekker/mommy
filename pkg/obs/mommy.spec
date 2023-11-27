@@ -8,7 +8,6 @@ VCS:           git+https://github.com/fwdekker/mommy.git
 Source:        mommy-%{version}.tar.gz
 BuildArch:     noarch
 BuildRequires: make
-BuildRequires: glibc-langpack-en
 
 %description
 mommy's here to support you! mommy will compliment you if things go well, and

@@ -18,6 +18,16 @@ there are two entry points:
 the whole architecture here was heavily inspired (which means: basically copied) from
 [mpz](https://build.opensuse.org/package/show/home:oleg_antonyan/mpz)~
 
+### setup notes
+a few notes for future reference in how obs was set up~
+
+1. to allow obs to find its own packages during installation, configure each of the project's repositories to include
+   `openSUSE:Tools` on its repository path~
+2. to resolve the error
+   `have choice for (glibc-langpack-en or glibc-all-langpacks) needed by obs-service-obs_scm-common: glibc-all-langpacks glibc-langpack-en`,
+   add the line `Prefer: glibc-langpack-en` to the project's configuration ("prjconf")~
+   
+
 ## rpkg
 rpkg is for [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/), which works by downloading this repo,
 `cd`ing into `pkg/rpkg`, and then running [rpkg](https://pagure.io/rpkg-util)~
