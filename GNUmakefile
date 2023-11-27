@@ -53,9 +53,8 @@ clean:
 test: test/unit test/integration
 
 .PHONY: test/%
-test/%: system ?= 0
 test/%:
-	@MOMMY_SYSTEM="$(system)" MOMMY_MAKE="$(MAKE)" "$(shellspec_bin)" "src/test/sh/$(@:test/%=%)_spec.sh"
+	@MOMMY_MAKE="$(MAKE)" "$(shellspec_bin)" "src/test/sh/$(@:test/%=%)_spec.sh"
 
 
 ## Build
