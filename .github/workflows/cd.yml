@@ -18,6 +18,7 @@ jobs:
       - name: nop
         run: true
 
+
   build-linux:
     needs: [ check-release-needed ]
     runs-on: ubuntu-latest
@@ -198,6 +199,55 @@ jobs:
           body_path: RELEASE_NOTES.md
           files: mommy*
 
+  release-apt:
+    needs: [ release-mommy ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download built packages
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Checkout mommy
+        uses: actions/checkout@v4
+      - name: Checkout apt-mommy
+        uses: actions/checkout@v4
+        with:
+          repository: fwdekker/apt-mommy
+          token: ${{ secrets.personal_access_token }}
+      - name: Extract version number
+        run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
+      - name: Import GPG key
+        run: echo "$apt_gpg_private_key" | gpg --import
+        env:
+          apt_gpg_private_key: ${{ secrets.apt_gpg_private_key }}
+      - name: Update apt repository
+        run: |
+          echo "::group::Copy .deb into apt-mommy"
+          cp *.deb apt-mommy/deb/
+          echo "::endgroup::"
+
+          echo "::group::Update repo"
+          cd apt-mommy/
+          ./update.sh
+          cd ../
+          echo "::endgroup::"
+
+          echo "::group::Commit update"
+          cd apt-mommy/
+          git add --all
+          git config --global user.name "FWDekkerBot"
+          git config --global user.email "bot@fwdekker.com"
+          git commit -am "🔖 mommy added package mommy $MOMMY_VERSION~"
+          cd ../
+          echo "::endgroup::"
+
+          echo "::group::Push changes"
+          cd apt-mommy/
+          git push origin
+          cd ../
+          echo "::endgroup::"
+
   release-aur:
     needs: [ release-mommy ]
     runs-on: ubuntu-latest
@@ -265,7 +315,6 @@ jobs:
           echo "::group::Push changes"
           sudo -u build git push origin master dev
           echo "::endgroup::"
-
 
   release-homebrew:
     needs: [ release-mommy ]

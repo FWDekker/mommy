@@ -83,8 +83,33 @@ otherwise not satisfied?
 <details>
 <summary>debian/ubuntu/apt-based</summary>
 
-subscribing to a repository (with automatic updates) [is planned](https://github.com/FWDekker/mommy/issues/53)~
+* **apt** (automatic updates)  
+  installs from the [mommy apt repository](https://github.com/FWDekker/apt-mommy).
+  the repository supports all architectures and suites~
+  1. register the repository in apt:
+     ([more info](https://stackoverflow.com/a/71384057/))
+     ```shell
+     sudo mkdir -p /etc/apt/keyrings/
+     
+     wget -O- https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/Release.key | \
+       gpg --dearmor | \
+       sudo tee /etc/apt/keyrings/mommy.gpg > /dev/null
 
+     echo "deb [signed-by=/etc/apt/keyrings/mommy.gpg] https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/ ./" | \
+       sudo tee /etc/apt/sources.list.d/mommy.list > /dev/null
+     ```
+  2. (optional)
+     tell apt not to install any other packages from the mommy repo:
+     ([more info](https://wiki.debian.org/DebianRepository/UseThirdParty#Standard_pinning))
+     ```shell
+     echo -e "Package: *\nPin: origin o=mommy\nPin-Priority: 100" | \
+       sudo tee /etc/apt/preferences.d/pin-fwdekker-mommy > /dev/null
+     ```
+  3. install mommy:
+     ```shell
+     sudo apt update
+     sudo apt install mommy
+     ```
 * **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
@@ -211,17 +236,25 @@ subscribing to a repository (with automatic updates) [is planned](https://github
 </details>
 
 <details>
-<summary>red hat/fedora/rpm-based</summary>
+<summary>red hat/fedora/opensuse/rpm-based</summary>
 
 since mommy is just a shell script these methods also work fine on opensuse~
 
 * **dnf (copr)** (automatic updates)  
-  installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/), allowing for automatic
-  updates.
+  installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
   (requires the `dnf-plugins-core` package.)
   ```shell
   sudo dnf copr enable fwdekker/mommy
   sudo dnf install mommy
+  ```
+  packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
+  `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
+* **yum (copr)** (automatic updates)  
+  installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
+  (requires the `yum-plugin-core` package.)
+  ```shell
+  sudo yum copr enable fwdekker/mommy
+  sudo yum install mommy
   ```
   packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
   `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
@@ -624,7 +657,7 @@ if that annoys you, run `make build` after each change, and use `build/bin/mommy
 ### 🏬 distribution
 mommy is distributed in three ways:
 * attached as **binary packages** to each github release,
-* built on **external build servers**,
+* built on **build servers**,
 * and available as **source builds** ("ports", basically) on a few servers.
 
 let's go into them in more detail~
@@ -668,18 +701,15 @@ unfortunately, packages for macos, netbsd, and openbsd cannot be built on system
 </details>
 
 <details>
-<summary>🏗️ external build servers</summary>
+<summary>🏗️ build servers</summary>
 
 build servers build mommy distributions on-demand for each release, and make the created packages available for all
 users.
 how sweet~
 
+* [apt-mommy](https://github.com/FWDekker/apt-mommy) is a github-based apt repository that hosts mommy's `.deb` packages
+  after they have been built in [mommy's cd pipeline](https://github.com/FWDekker/mommy/actions/workflows/cd.yml)~
 * [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) builds packages for fedora and epel~
-* [openbuildservice](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy) builds packages for all
-  deb-based and rpm-based systems~
-
-see [pkg/README.md](https://github.com/FWDekker/mommy/blob/main/pkg/README.md) for more information on the build
-process~
 </details>
 
 <details>
@@ -696,7 +726,7 @@ users connect to the server, get the latest instructions, and their system build
 </details>
 
 ### 📯 release
-`main` always contains the latest stable version.
+[`main`](https://github.com/FWDekker/mommy/tree/main) always contains the latest stable version.
 every merge into `main` automatically build and releases a new version~
 
 <details>
@@ -710,8 +740,6 @@ every merge into `main` automatically build and releases a new version~
       * remove empty subsections for the new release~
       * ensure no line breaks are used as whitespace;
         github release notes use them as actual line breaks~
-    * update `pkg/obs/debian.changelog` if changes were made to obs's debian packaging process~
-    * update `pkg/obs/mommy.spec` if changes were made to obs's rpm packaging process~
     * update `pkg/rpkg/mommy.spec.rpkg` if changes were made to copr's rpkg packaging process~
   * update acknowledgements in `README.md`~
   * update promotional images in `.github/img/`~
@@ -724,12 +752,12 @@ every merge into `main` automatically build and releases a new version~
   * [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/)
     * updated automatically when `mommy` updates
     * always [manually check deployment status](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/builds/)~
+  * [apt-mommy](https://github.com/FWDekker/apt-mommy/)
+      * updated automatically when `mommy` updates
+      * always [manually check deployment status](https://github.com/FWDekker/apt-mommy/commits/main)~
   * [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy)
     * updated automatically when `mommy` updates
     * always [manually check deployment status](https://github.com/FWDekker/homebrew-mommy/actions?query=branch%3Amain)~
-  * [openbuildservice](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy)
-    * updated automatically when `mommy` updates
-    * always [manually check deployment status](https://build.opensuse.org/package/show/home:fwdekker:mommy/mommy)~
 </details>
 
 ### 🤠 contribution guidelines
@@ -769,3 +797,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~
 * mommy thanks [aemogie.](https://github.com/aemogie) for
   [telling her how to integrate with nushell](https://github.com/FWDekker/mommy/issues/65)~
+* mommy thanks [maximilian downey twiss](https://github.com/Zopolis4) for
+  [bumping mommy's actions to their latest versions](https://github.com/FWDekker/mommy/pull/68)~
