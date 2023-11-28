@@ -26,6 +26,8 @@ otherwise not satisfied?
 [please open an issue](https://github.com/FWDekker/mommy/issues)~_
 
 ### 👩‍💼 with a package manager
+find your operating system and package manager for the right instructions~
+
 <details>
 <summary>alpine linux</summary>
 
@@ -99,7 +101,7 @@ otherwise not satisfied?
        sudo tee /etc/apt/sources.list.d/mommy.list > /dev/null
      ```
   2. (optional)
-     tell apt not to install any other packages from the mommy repo:
+     set mommy's repository priority lower than the distro's official repositories:
      ([more info](https://wiki.debian.org/DebianRepository/UseThirdParty#Standard_pinning))
      ```shell
      echo -e "Package: *\nPin: origin o=mommy\nPin-Priority: 100" | \
@@ -237,8 +239,6 @@ otherwise not satisfied?
 
 <details>
 <summary>red hat/fedora/opensuse/rpm-based</summary>
-
-since mommy is just a shell script these methods also work fine on opensuse~
 
 * **dnf (copr)** (automatic updates)  
   installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
@@ -686,9 +686,9 @@ i recommend running `make --dry-run prefix=/usr/ install` first so you can verif
 correctly.
 check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for more details~
 
-all systems can build packages for themselves without dependencies beyond those noted above.
+all systems can build packages for themselves without additional dependencies beyond those noted above.
 if you want to compile for a different system, you may need additional dependencies.
-for example, if you want to build packages for alpinelinux, archlinux, and rpm from a debian-like system, you will
+for example, if you want to build packages for alpine linux, archlinux, and rpm from a debian-like system, you will
 respectively need
 ```shell
 sudo apt install libarchive-tools rpm zstd
