@@ -1,5 +1,5 @@
 # Changelog
-## [Unreleased]
+## [1.2.5] -- 2023-11-28
 ### added
 * 📈 mommy now explains how to integrate with nushell, thanks to [aemogie.](https://github.com/aemogie)~ ([#65](https://github.com/FWDekker/mommy/issues/65))
 
@@ -7,6 +7,7 @@
 * 🍳 mommy uses newer github actions, thanks to [zopolis4](https://github.com/Zopolis4)~ ([#68](https://github.com/FWDekker/mommy/pull/68))
 * 💨 mommy became much faster at doing her exams~ ([#69](https://github.com/FWDekker/mommy/pull/69))
 * 📂 mommy supports specifying a custom directory during `make`~ ([#70](https://github.com/FWDekker/mommy/pull/70))
+* 👭 mommy now has an apt repository, see [mommy's readme](https://github.com/FWDekker/mommy/blob/v1.2.5/README.md#-with-a-package-manager) for installation instructions~ ([#71](https://github.com/FWDekker/mommy/pull/71))
 
 
 ## [1.2.4] -- 2023-08-28

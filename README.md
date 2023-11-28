@@ -4,7 +4,11 @@
 [![github ci status](https://img.shields.io/github/actions/workflow/status/FWDekker/mommy/ci.yml?style=for-the-badge)](https://github.com/FWDekker/mommy/actions/workflows/ci.yml?query=branch%3Amain)
 [![mommy is licensed under unlicense](https://img.shields.io/github/license/FWDekker/mommy?style=for-the-badge)](https://github.com/FWDekker/mommy/blob/main/LICENSE)
 
-<!-- In the future, add a badge from https://repology.org/ -->
+---
+
+🚚 [**installation**](#-installation) | 📖 [**usage**](#-usage) | 🙋 [**configuration**](#-configuration) | 🐚 [**shell integration**](#-shell-integration) | ⚗️ [**development**](#%EF%B8%8F-development) | 💖 [**acknowledgements**](#-acknowledgements)
+
+---
 
 mommy's here to support you!
 mommy will compliment you if things go well, and will encourage you if things are not going
@@ -203,7 +207,7 @@ find your operating system and package manager for the right instructions~
   check [the full list of configuration options](#-configuration).
   note that your nix configuration should use lowercase variable names~
 * **nixos** (persistent)  
-  install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`): 
+  install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`):
   ```nix
   environment.systemPackages = with pkgs; [
     mommy
@@ -782,18 +786,17 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
 * mommy thanks [austin burk](https://github.com/sudofox) for creating
   [shell-mommy](https://github.com/sudofox/shell-mommy) and contributing to the mommy-sphere;
   mommy did not know about shell-mommy before embarking on her journey, but loves her very much~
-* mommy thanks [natawie](https://github.com/FWDekker/mommy/issues/39) for
-  [suggesting publishing mommy on copr](https://github.com/FWDekker/mommy/issues/39)~
+* mommy thanks [natawie](https://github.com/natawie) for
+  [suggesting publishing mommy on copr](https://github.com/FWDekker/mommy/issues/39) and
+  [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
 * mommy thanks [amber sprenkels](https://github.com/dsprenkels) for
   [reporting a bug](https://github.com/FWDekker/mommy/issues/45),
   [sharing great ideas](https://github.com/FWDekker/mommy/issues/46), and
   [making mommy talk less like a robot](https://github.com/FWDekker/mommy/pull/47)~
-* mommy thanks [natawie](https://github.com/natawie) for
-  [writing the zsh completions](https://github.com/FWDekker/mommy/pull/48)~
-* mommy thanks [wei he](https://github.com/wei/socialify) for creating [socialify](https://github.com/wei/socialify),
+* mommy thanks [wei he](https://github.com/wei) for creating [socialify](https://github.com/wei/socialify),
   which mommy uses for her github social preview~
 * mommy thanks [ckie](https://github.com/ckiee) for
-  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and 
+  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and
   [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~
 * mommy thanks [aemogie.](https://github.com/aemogie) for
   [telling her how to integrate with nushell](https://github.com/FWDekker/mommy/issues/65)~
