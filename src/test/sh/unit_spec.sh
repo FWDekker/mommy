@@ -358,6 +358,15 @@ Describe "mommy"
                 The status should be success
             End
 
+            It "replaces %%N%%"
+                set_config "MOMMY_COMPLIMENTS='>bottom%%N%%stimky<'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ">bottom
+stimky<"
+                The status should be success
+            End
+
             It "prepends the prefix"
                 set_config "MOMMY_COMPLIMENTS='<';MOMMY_PREFIX='woolen'"
 

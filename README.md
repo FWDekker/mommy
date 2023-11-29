@@ -501,6 +501,7 @@ outputs `your mommy loves you`~
 | `%%THEM%%`      | mommy's object pronoun (e.g. him, her, them)      |
 | `%%THEIR%%`     | mommy's possessive pronoun (e.g. his, her, their) |
 | `%%SWEETIE%%`   | what mommy calls you                              |
+| `%%N%%`         | a newline                                         |
 
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~
