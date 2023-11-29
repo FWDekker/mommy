@@ -1,8 +1,6 @@
 name: CI
 
-on:
-  push:
-  pull_request:
+on: [ push, pull_request ]
 
 jobs:
   test-linux:
@@ -11,8 +9,9 @@ jobs:
       - name: Install dependencies for mommy
         run: |
           echo "::group::Install ShellSpec"
-          git clone --depth=1 https://github.com/shellspec/shellspec.git
-          sudo make -C shellspec install
+          git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+          sudo make -C /tmp/shellspec/ install
+          rm -rf /tmp/shellspec
           echo "::endgroup::"
 
           echo "::group::Install additional shells"
@@ -21,7 +20,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         run: make test
 
@@ -40,7 +39,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -48,9 +47,11 @@ jobs:
           echo "::endgroup::"
 
       - name: Install Homebrew
-        run: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        run: |
+          NONINTERACTIVE=1 \
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - name: Checkout homebrew-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
@@ -69,7 +70,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -104,10 +105,11 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install ShellSpec"
-          git clone https://aur.archlinux.org/shellspec-bin.git
-          chown -R build:build ./shellspec-bin
-          cd ./shellspec-bin
+          git clone https://aur.archlinux.org/shellspec-bin.git /tmp/shellspec-bin
+          chown -R build:build /tmp/shellspec-bin
+          cd /tmp/shellspec-bin
           sudo -u build makepkg -si --noconfirm
+          rm -rf /tmp/shellspec-bin
           cd -
           echo "::endgroup::"
 
@@ -116,7 +118,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: mommy
       - name: Fix mommy directory ownership
@@ -129,7 +131,7 @@ jobs:
         run: |
           pacman -S --noconfirm ruby
           gem install --no-document fpm
-          ln -s "$HOME/.local/share/gem/ruby/"*"/bin/fpm" /usr/local/bin/fpm  # Symlink `fpm` to latest version
+          ln -s "$HOME/.local/share/gem/ruby/"*"/bin/fpm" /usr/local/bin/fpm  # Symlink 'fpm' to latest version
       - name: Test fpm package
         working-directory: ./mommy/
         run: |
@@ -142,7 +144,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -150,7 +152,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout aur-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/aur-mommy
           path: aur-mommy
@@ -171,7 +173,7 @@ jobs:
           cd ../mommy/
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -201,8 +203,9 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install ShellSpec"
-          git clone --depth=1 https://github.com/shellspec/shellspec.git
-          make -C shellspec install
+          git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+          make -C /tmp/shellspec install
+          rm -rf /tmp/shellspec
           echo "::endgroup::"
 
           echo "::group::Install additional shells"
@@ -210,9 +213,9 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          # Checkout to subdirectory is required for `pkg/rpm/rpkg.conf` to correctly determine `${git_props:root}`
+          # Checkout to subdirectory is required for 'pkg/rpkg/rpkg.conf' to correctly determine '${git_props:root}'
           path: mommy
       - name: Test script
         working-directory: ./mommy/
@@ -234,7 +237,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -247,7 +250,7 @@ jobs:
         working-directory: ./mommy/
         run: |
           echo "::group::Build"
-          rpkg -p ./pkg/rpm local  # build srpm
+          rpkg -p ./pkg/rpkg local  # build srpm
           rpmbuild --rebuild /tmp/rpkg/mommy-*/*.rpm
           echo "::endgroup::"
 
@@ -256,7 +259,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -279,7 +282,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         run: make test
 
@@ -296,15 +299,15 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
-          sudo rm -f /usr/local/bin/mommy /usr/local/share/man/man1/mommy.1.gz /usr/local/share/fish/vendor_completions.d/mommy.fish /usr/local/share/zsh/site-functions/_mommy
+          sudo make uninstall/osxpkg
           echo "::endgroup::"
 
       - name: Checkout homebrew-mommy
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
@@ -322,7 +325,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Test"
-          make system=1 test
+          MOMMY_SYSTEM=1 make test
           echo "::endgroup::"
 
           echo "::group::Uninstall"
@@ -332,45 +335,46 @@ jobs:
 
 
   test-freebsd:
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script and package
-        uses: vmactions/freebsd-vm@v0
+        uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
-          # TODO: Use `set -e` in `prepare` once https://github.com/vmactions/freebsd-vm/issues/66 is deployed
-          # Probably once the latest release at https://github.com/vmactions/freebsd-vm/releases is newer than v0.3.0
           prepare: |
+            set -e
+
             echo "::group::Install basic packages"
-            pkg install -y git gmake || exit 1
+            pkg install -y git gmake
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
-            git clone --depth=1 https://github.com/shellspec/shellspec.git || exit 1
-            gmake -C shellspec install || exit 1
+            git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+            gmake -C /tmp/shellspec install
+            rm -rf /tmp/shellspec
             echo "::endgroup::"
 
             echo "::group::Install additional shells"
-            pkg install -y fish zsh || exit 1
+            pkg install -y fish zsh
             echo "::endgroup::"
 
             # fpm
               echo "::group::Install fpm: Actually install fpm"
-              pkg install -y devel/ruby-gems || exit 1
-              gem install --no-document fpm || exit 1
+              pkg install -y devel/ruby-gems
+              gem install --no-document fpm
               echo "::endgroup::"
 
               echo "::group::Install fpm: Install gtar (workaround for https://github.com/jordansissel/fpm/pull/1922)"
-              pkg install -y gtar || exit 1
-              mv /usr/bin/tar /usr/bin/bsdtar || exit 1
-              mv /usr/local/bin/gtar /usr/bin/tar || exit 1
+              pkg install -y gtar
+              mv /usr/bin/tar /usr/bin/bsdtar
+              mv /usr/local/bin/gtar /usr/bin/tar
               echo "::endgroup::"
             # /fpm
 
             echo "::group::Ignore ownership issues"
-            git config --global --add safe.directory "$GITHUB_WORKSPACE" || exit 1
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
           run: |
             set -e
@@ -388,7 +392,7 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Test package"
-            gmake system=1 test
+            MOMMY_SYSTEM=1 gmake test
             echo "::endgroup::"
 
             echo "::group::Uninstall package"
@@ -397,24 +401,26 @@ jobs:
 
 
   test-netbsd:
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script and package
         uses: vmactions/netbsd-vm@v0
         with:
           usesh: true
           prepare: |
             set -e
+            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
 
             echo "::group::Install basic packages"
             pkg_add git gmake mozilla-rootcerts-openssl
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
-            git clone --depth=1 https://github.com/shellspec/shellspec.git
-            gmake -C shellspec install
+            git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec/
+            gmake -C /tmp/shellspec/ install
+            rm -rf /tmp/shellspec
             echo "::endgroup::"
 
             echo "::group::Install additional shells"
@@ -425,7 +431,7 @@ jobs:
             echo "::group::Install fpm"
             pkg_add ruby
             /usr/pkg/bin/gem install --no-document fpm
-            pkg_add pkg_install  # This is necessary to make `fpm` work with `pkgin` format for some reason
+            pkg_add pkg_install  # This is necessary to make 'fpm' work with 'pkgin' format for some reason
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
@@ -433,7 +439,7 @@ jobs:
             echo "::endgroup::"
           run: |
             set -e
-            export PATH="/usr/sbin:$PATH"  # Add `pkg_*` commands to path
+            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
             export MOMMY_ZSH_SKIP=1  # Zsh completion capturing totally does not work
 
             echo "::group::Test script"
@@ -449,7 +455,7 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Test package"
-            gmake system=1 test
+            MOMMY_SYSTEM=1 gmake test
             echo "::endgroup::"
 
             echo "::group::Uninstall package"
@@ -458,12 +464,12 @@ jobs:
 
 
   test-openbsd:
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install dependencies for mommy && Test script && Build package && Test package
-        uses: vmactions/openbsd-vm@v0
+        uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
           prepare: |
@@ -474,8 +480,9 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
-            git clone --depth=1 https://github.com/shellspec/shellspec.git
-            gmake -C shellspec install
+            git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+            gmake -C /tmp/shellspec install
+            rm -rf /tmp/shellspec
             echo "::endgroup::"
 
             echo "::group::Install additional shells"
@@ -486,7 +493,7 @@ jobs:
             echo "::group::Install fpm"
             pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
             /usr/local/bin/gem* install --no-document fpm
-            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink `fpm` to latest version
+            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink 'fpm' to latest version
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
@@ -494,7 +501,7 @@ jobs:
             echo "::endgroup::"
           run: |
             set -e
-            export MOMMY_ZSH_SKIP=1  # `script` does not have the `-q` option in OpenBSD
+            export MOMMY_ZSH_SKIP=1  # 'script' does not have the '-q' option in OpenBSD
 
             echo "::group::Test script"
             gmake test
@@ -509,7 +516,7 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Test package"
-            gmake system=1 test  # Zsh completion tests do not work in OpenBSD
+            MOMMY_SYSTEM=1 gmake test  # Zsh completion tests do not work in OpenBSD
             echo "::endgroup::"
 
             echo "::group::Uninstall package"
@@ -531,8 +538,9 @@ jobs:
         shell: msys2 {0}
         run: |
           echo "::group::Install ShellSpec"
-          git clone --depth=1 https://github.com/shellspec/shellspec.git
-          make -C shellspec install
+          git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec
+          make -C /tmp/shellspec install
+          rm -rf /tmp/shellspec
           echo "::endgroup::"
 
           echo "::group::Post-install additional shells"
@@ -540,7 +548,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test script
         shell: msys2 {0}
         run: make test
@@ -550,13 +558,19 @@ jobs:
         run: make install
       - name: Test installed mommy
         shell: msys2 {0}
-        run: make system=1 test
+        run: MOMMY_SYSTEM=1 make test
 
   test-nixpkgs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: |
-          nix build --impure --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; ${if prev.version == "1.2.3" then "patches" else null} = []; })'
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Enable nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - name: Enable cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Build
+        run: |
+          nix build \
+            --impure \
+            --expr '(import <nixpkgs> {}).mommy.overrideAttrs (prev: { src = ./.; })'
