@@ -1,5 +1,10 @@
 # Changelog
-## [1.2.5] -- 2023-11-28
+## [1.2.6] -- 2023-11-29
+### fixed
+* 🚒 mommy fixes her apt repository release script~ ([#73](https://github.com/FWDekker/mommy/issues/73))
+
+
+## [1.2.5] -- 2023-11-29
 ### added
 * 📈 mommy now explains how to integrate with nushell, thanks to [aemogie.](https://github.com/aemogie)~ ([#65](https://github.com/FWDekker/mommy/issues/65))
 

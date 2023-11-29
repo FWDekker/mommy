@@ -1,8 +1,10 @@
 name: CD
 
 on:
+  # 'push' creates a real release
   push:
     branches: [ main ]
+  # 'workflow_dispatch' does a dry run of the workflow
   workflow_dispatch:
 
 permissions:
@@ -11,7 +13,6 @@ permissions:
 
 jobs:
   check-release-needed:
-    # Note that 'workflow_dispatch' is never skipped
     if: "!(contains(github.event.head_commit.message, '[cd skip]') || contains(github.event.head_commit.message, '[skip cd]'))"
     runs-on: ubuntu-latest
     steps:
@@ -174,7 +175,6 @@ jobs:
   release-mommy:
     needs: [ build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -190,63 +190,75 @@ jobs:
         uses: ffurrer2/extract-release-notes@v1
         with:
           release_notes_file: RELEASE_NOTES.md
+      - name: Prepend release notes
+        run: |
+          echo -e "mommy can also be installed using a package manager. [check the readme for more info](https://github.com/FWDekker/mommy/tree/${MOMMY_VERSION}#-installation)~\n" | cat - RELEASE_NOTES.md | tee RELEASE_NOTES.md
       - name: Checkout release
         uses: softprops/action-gh-release@v1
+        if: github.event_name != 'workflow_dispatch'
         with:
           draft: false
           prerelease: false
           tag_name: ${{ env.MOMMY_VERSION }}
           body_path: RELEASE_NOTES.md
           files: mommy*
+          discussion_category_name: announcements
 
   release-apt:
     needs: [ release-mommy ]
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download built packages
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
       - name: Checkout mommy
         uses: actions/checkout@v4
+        with:
+          path: src-mommy
+      - name: Extract version number
+        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
+
       - name: Checkout apt-mommy
         uses: actions/checkout@v4
         with:
           repository: fwdekker/apt-mommy
+          path: apt-mommy
+          ref: main
+          fetch-depth: 0
+          # Required to push '.deb' to repository
           token: ${{ secrets.personal_access_token }}
-      - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
+      - name: Download built packages
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist-mommy
+      - name: Move .deb into apt-mommy
+        run: cp dist-mommy/*.deb apt-mommy/deb/
+
       - name: Import GPG key
         run: echo "$apt_gpg_private_key" | gpg --import
         env:
           apt_gpg_private_key: ${{ secrets.apt_gpg_private_key }}
-      - name: Update apt repository
+      - name: Update apt-mommy
+        working-directory: apt-mommy
         run: |
-          echo "::group::Copy .deb into apt-mommy"
-          cp *.deb apt-mommy/deb/
-          echo "::endgroup::"
-
-          echo "::group::Update repo"
-          cd apt-mommy/
+          echo "::group::Run update script"
           ./update.sh
-          cd ../
           echo "::endgroup::"
 
-          echo "::group::Commit update"
-          cd apt-mommy/
+          echo "::group::Commit changes"
           git add --all
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
           git commit -am "🔖 mommy added package mommy $MOMMY_VERSION~"
-          cd ../
           echo "::endgroup::"
 
-          echo "::group::Push changes"
-          cd apt-mommy/
-          git push origin
-          cd ../
-          echo "::endgroup::"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "::group::Push changes"
+            git push origin
+            echo "::endgroup::"
+          else
+            echo "::group::Not pushing changes"
+            echo "::endgroup::"
+          fi;
 
   release-aur:
     needs: [ release-mommy ]
@@ -272,10 +284,9 @@ jobs:
       - name: Checkout mommy
         uses: actions/checkout@v4
         with:
-          path: mommy
-          token: ${{ secrets.personal_access_token }}
+          path: src-mommy
       - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
+        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
 
       - name: Checkout aur-mommy
         uses: actions/checkout@v4
@@ -289,7 +300,7 @@ jobs:
       - name: Fix aur-mommy directory ownership
         run: chown -R build:build ./aur-mommy/
       - name: Update build files
-        working-directory: ./aur-mommy/
+        working-directory: aur-mommy
         run: |
           echo "::group::Fast-forward main"
           sudo -u build git checkout dev
@@ -312,9 +323,14 @@ jobs:
           sudo -u build git merge --commit master
           echo "::endgroup::"
 
-          echo "::group::Push changes"
-          sudo -u build git push origin master dev
-          echo "::endgroup::"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "::group::Push changes"
+            sudo -u build git push origin master dev
+            echo "::endgroup::"
+          else
+            echo "::group::Not pushing changes"
+            echo "::endgroup::"
+          fi;
 
   release-homebrew:
     needs: [ release-mommy ]
@@ -324,10 +340,9 @@ jobs:
       - name: Checkout mommy
         uses: actions/checkout@v4
         with:
-          path: mommy
-          token: ${{ secrets.personal_access_token }}
+          path: src-mommy
       - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./mommy/version)" >> $GITHUB_ENV
+        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
 
       - name: Checkout homebrew-mommy
         uses: actions/checkout@v4
@@ -339,7 +354,7 @@ jobs:
           # Required to trigger CI action when pushed
           token: ${{ secrets.personal_access_token }}
       - name: Update formula
-        working-directory: ./homebrew-mommy/
+        working-directory: homebrew-mommy
         run: |
           echo "::group::Fast-forward main"
           git checkout dev
@@ -362,6 +377,11 @@ jobs:
           git merge --commit main
           echo "::endgroup::"
 
-          echo "::group::Push changes"
-          git push origin main dev
-          echo "::endgroup::"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "::group::Push changes"
+            git push origin main dev
+            echo "::endgroup::"
+          else
+            echo "::group::Not pushing changes"
+            echo "::endgroup::"
+          fi;
