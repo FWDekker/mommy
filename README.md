@@ -6,7 +6,7 @@
 
 ---
 
-🚚 [**installation**](#-installation) | 📖 [**usage**](#-usage) | 🙋 [**configuration**](#-configuration) | 🐚 [**shell integration**](#-shell-integration) | ⚗️ [**development**](#%EF%B8%8F-development) | 💖 [**acknowledgements**](#-acknowledgements)
+🚚&nbsp;[**installation**](#-installation) | 📖&nbsp;[**usage**](#-usage) | 🙋&nbsp;[**configuration**](#-configuration) | 🐚&nbsp;[**shell integration**](#-shell-integration) | ⚗️&nbsp;[**development**](#%EF%B8%8F-development) | 💖&nbsp;[**acknowledgements**](#-acknowledgements)
 
 ---
 
@@ -501,6 +501,7 @@ outputs `your mommy loves you`~
 | `%%THEM%%`      | mommy's object pronoun (e.g. him, her, them)      |
 | `%%THEIR%%`     | mommy's possessive pronoun (e.g. his, her, their) |
 | `%%SWEETIE%%`   | what mommy calls you                              |
+| `%%N%%`         | a newline                                         |
 
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~

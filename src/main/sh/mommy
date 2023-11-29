@@ -181,7 +181,8 @@ fill_template() {
                           -e "s/%%THEY%%/$they/g" \
                           -e "s/%%THEM%%/$them/g" \
                           -e "s/%%THEIR%%/$their/g" \
-                          -e "s/%%CAREGIVER%%/$caregiver/g")"
+                          -e "s/%%CAREGIVER%%/$caregiver/g" \
+                          -e "s/%%N%%/\\$n/g")"
 
     capitalize "$prefix$template$suffix" "$6"
     return 0

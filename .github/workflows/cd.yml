@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  discussions: write
   packages: read
 
 jobs:
@@ -197,11 +198,13 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: github.event_name != 'workflow_dispatch'
         with:
-          draft: false
-          prerelease: false
+          target_commitish: main
           tag_name: ${{ env.MOMMY_VERSION }}
           body_path: RELEASE_NOTES.md
           files: mommy*
+          draft: false
+          prerelease: false
+          discussion_category_name: announcements
 
   release-apt:
     needs: [ release-mommy ]
@@ -244,7 +247,6 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Commit changes"
-          git add --all
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
           git commit -am "🔖 mommy added package mommy $MOMMY_VERSION~"
