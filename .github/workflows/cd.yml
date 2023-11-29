@@ -202,7 +202,6 @@ jobs:
           tag_name: ${{ env.MOMMY_VERSION }}
           body_path: RELEASE_NOTES.md
           files: mommy*
-          discussion_category_name: announcements
 
   release-apt:
     needs: [ release-mommy ]
