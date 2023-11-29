@@ -6,7 +6,7 @@
 
 ---
 
-🚚 [**installation**](#-installation) | 📖 [**usage**](#-usage) | 🙋 [**configuration**](#-configuration) | 🐚 [**shell integration**](#-shell-integration) | ⚗️ [**development**](#%EF%B8%8F-development) | 💖 [**acknowledgements**](#-acknowledgements)
+🚚&nbsp;[**installation**](#-installation) | 📖&nbsp;[**usage**](#-usage) | 🙋&nbsp;[**configuration**](#-configuration) | 🐚&nbsp;[**shell integration**](#-shell-integration) | ⚗️&nbsp;[**development**](#%EF%B8%8F-development) | 💖&nbsp;[**acknowledgements**](#-acknowledgements)
 
 ---
 
