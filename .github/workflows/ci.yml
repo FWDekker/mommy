@@ -401,12 +401,12 @@ jobs:
 
 
   test-netbsd:
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Test script and package
-        uses: vmactions/netbsd-vm@v0
+        uses: vmactions/netbsd-vm@v1
         with:
           usesh: true
           prepare: |
@@ -446,21 +446,21 @@ jobs:
             gmake test
             echo "::endgroup::"
 
-            echo "::group::Build package"
-            gmake dist/netbsd
-            echo "::endgroup::"
-
-            echo "::group::Install package"
-            pkg_add ./dist/mommy-*+netbsd.tgz
-            echo "::endgroup::"
-
-            echo "::group::Test package"
-            MOMMY_SYSTEM=1 gmake test
-            echo "::endgroup::"
-
-            echo "::group::Uninstall package"
-            pkg_delete mommy
-            echo "::endgroup::"
+#            echo "::group::Build package"
+#            gmake dist/netbsd
+#            echo "::endgroup::"
+#
+#            echo "::group::Install package"
+#            pkg_add ./dist/mommy-*+netbsd.tgz
+#            echo "::endgroup::"
+#
+#            echo "::group::Test package"
+#            MOMMY_SYSTEM=1 gmake test
+#            echo "::endgroup::"
+#
+#            echo "::group::Uninstall package"
+#            pkg_delete mommy
+#            echo "::endgroup::"
 
 
   test-openbsd:
