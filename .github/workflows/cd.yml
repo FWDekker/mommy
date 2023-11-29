@@ -247,7 +247,6 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Commit changes"
-          git add --all
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
           git commit -am "🔖 mommy added package mommy $MOMMY_VERSION~"

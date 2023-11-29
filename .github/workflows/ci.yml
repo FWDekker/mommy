@@ -56,6 +56,14 @@ jobs:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
           ref: dev
+      - name: Patch homebrew-mommy
+        working-directory: homebrew-mommy
+        env:
+          RELEVANT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # Point the formula to the commit that is being tested in this workflow
+          sed -i -e "s|head \(.*\), branch: .*|head \1, revision: \"$RELEVANT_SHA\"|g" mommy.rb
+          git -c user.name="ignore" -c user.email="ignore" commit -am "ignore"
       - name: Test Homebrew package
         run: |
           echo "::group::Enable Homebrew"
@@ -161,9 +169,11 @@ jobs:
         run: chown -R build:build ./aur-mommy/
       - name: Test AUR package
         working-directory: ./aur-mommy/
+        env:
+          RELEVANT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           echo "::group::Patch"
-          sudo -u build ./update.sh dev
+          sudo -u build ./update.sh "$RELEVANT_SHA"
           echo "::endgroup::"
 
           echo "::group::Build and install"
@@ -312,6 +322,14 @@ jobs:
           repository: FWDekker/homebrew-mommy
           path: homebrew-mommy
           ref: dev
+      - name: Patch homebrew-mommy
+        working-directory: homebrew-mommy
+        env:
+          RELEVANT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # Point the formula to the commit that is being tested in this workflow
+          sed -i -e "s|head \(.*\), branch: .*|head \1, revision: \"$RELEVANT_SHA\"|g" mommy.rb
+          git -c user.name="ignore" -c user.email="ignore" commit -am "ignore"
       - name: Test Homebrew package
         run: |
           echo "::group::Enable Homebrew"
