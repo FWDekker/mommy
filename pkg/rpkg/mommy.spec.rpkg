@@ -42,6 +42,7 @@ rm -rf "%{_tmppath}/shellspec/"
 %{_datarootdir}/zsh/site-functions/_mommy
 
 %changelog
-# Changelog lists changes to the packaging, not to the software.
-* Tue Mar 14 2023 Florine W. Dekker 1.2.3-1
-- Initial release with rpkg
+# This changelog is only for packages built using rpkg on copr.
+
+* Tue Mar 14 2023 Florine W. Dekker - 1.2.3-1
+- initial release with rpkg~

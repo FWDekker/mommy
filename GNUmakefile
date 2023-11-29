@@ -82,7 +82,7 @@ build:
 	@rm -f "$(build_dir)/bin/mommy.bak" "$(build_dir)/man/man1/mommy.1.bak"
 
 	@# Compress
-	@gzip -f "$(build_dir)/man/man1/mommy.1"
+	@gzip -9nf "$(build_dir)/man/man1/mommy.1"
 
 
 ## Installation

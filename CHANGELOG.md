@@ -5,6 +5,7 @@
 
 ### fixed
 * 🚒 mommy fixes the description url in her manual page~ ([#81](https://github.com/FWDekker/mommy/issues/81)) ([#82](https://github.com/FWDekker/mommy/issues/82))
+* 🕰️ mommy uses the correct types of changelogs in the right places ([#83](https://github.com/FWDekker/mommy/issues/83))
 
 
 ## [1.2.6] -- 2023-11-29

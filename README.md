@@ -746,6 +746,8 @@ every merge into `main` automatically build and releases a new version~
       * ensure no line breaks are used as whitespace;
         github release notes use them as actual line breaks~
     * update `pkg/rpkg/mommy.spec.rpkg` if changes were made to copr's rpkg packaging process~
+    * update `pkg/fpm/deb.changelog` if changes were made to fpm's debian packaging process~
+    * update `pkg/fpm/rpm.changelog` if changes were made to fpm's rpm packaging process~
   * update acknowledgements in `README.md`~
   * update promotional images in `.github/img/`~
 
