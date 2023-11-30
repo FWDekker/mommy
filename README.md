@@ -89,33 +89,43 @@ find your operating system and package manager for the right instructions~
 <details>
 <summary>debian/ubuntu/apt-based</summary>
 
-* **apt** (automatic updates)  
+
+* **apt ≥2.2.4** (automatic updates)  
+  this method requires apt v2.2.4 or newer.
+  check your version of apt with `apt -v`~
+
   installs from the [mommy apt repository](https://github.com/FWDekker/apt-mommy).
   the repository supports all architectures and suites~
-  1. register the repository in apt:
-     ([more info](https://stackoverflow.com/a/71384057/))
-     ```shell
-     sudo mkdir -p /etc/apt/keyrings/
-     
-     wget -O- https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/Release.key | \
-       gpg --dearmor | \
-       sudo tee /etc/apt/keyrings/mommy.gpg > /dev/null
 
-     echo "deb [signed-by=/etc/apt/keyrings/mommy.gpg] https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/ ./" | \
-       sudo tee /etc/apt/sources.list.d/mommy.list > /dev/null
-     ```
-  2. (optional)
-     set mommy's repository priority lower than the distro's official repositories:
-     ([more info](https://wiki.debian.org/DebianRepository/UseThirdParty#Standard_pinning))
-     ```shell
-     echo -e "Package: *\nPin: origin o=mommy\nPin-Priority: 100" | \
-       sudo tee /etc/apt/preferences.d/pin-fwdekker-mommy > /dev/null
-     ```
-  3. install mommy:
-     ```shell
-     sudo apt update
-     sudo apt install mommy
-     ```
+   ```shell
+   sudo curl -fsSo /etc/apt/sources.list.d/mommy.sources https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/mommy.sources
+   sudo chmod 644 /etc/apt/sources.list.d/mommy.sources
+
+   sudo apt update
+   sudo apt install mommy
+   ```
+* **apt <2.2.4** (automatic updates)  
+  this method works on all versions of apt~
+
+  installs from the [mommy apt repository](https://github.com/FWDekker/apt-mommy).
+  the repository supports all architectures and suites~
+
+  [check this page for details on what this code does](https://stackoverflow.com/a/71384057/)~
+   ```shell
+   sudo mkdir -m 0755 -p /etc/apt/keyrings/
+
+   wget -O- https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/Release.key | \
+     gpg --dearmor | \
+     sudo tee /etc/apt/keyrings/mommy.gpg > /dev/null;
+     sudo chmod 644 /etc/apt/keyrings/EXAMPLE.gpg
+
+   echo "deb [signed-by=/etc/apt/keyrings/mommy.gpg] https://raw.githubusercontent.com/FWDekker/apt-mommy/main/deb/ ./" | \
+     sudo tee /etc/apt/sources.list.d/mommy.list > /dev/null;
+     sudo chmod 644 /etc/apt/sources.list.d/EXAMPLE.list
+
+   sudo apt update
+   sudo apt install mommy
+   ```
 * **homebrew** (automatic updates)  
   installs from the [mommy tap](https://github.com/FWDekker/homebrew-mommy).
   (requires [brew](https://brew.sh/).)
