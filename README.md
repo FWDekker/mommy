@@ -491,10 +491,10 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
 
 ### 🧬 custom templates
-you can add a [list](#-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`, but
-there is a slight difference:
+you can add a [list](#-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`.
+there is a slight difference between the two lists:
 
-* if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`, but
+* if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`~
 * if you want your own compliments and _not_ the default compliments, add your own compliments to `MOMMY_COMPLIMENTS`~
 
 and similarly so for encouragements~

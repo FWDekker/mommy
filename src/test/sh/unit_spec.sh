@@ -342,6 +342,14 @@ Describe "mommy"
         End
 
         Describe "template variables"
+            It "escapes sed-specific characters"
+                set_config "MOMMY_COMPLIMENTS='>%%SWEETIE%%<';MOMMY_SWEETIE='&\\'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ">&\\<"
+                The status should be success
+            End
+
             It "replaces %%SWEETIE%%"
                 set_config "MOMMY_COMPLIMENTS='>%%SWEETIE%%<';MOMMY_SWEETIE='attempt'"
 
