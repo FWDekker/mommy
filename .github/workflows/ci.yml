@@ -4,10 +4,12 @@ on:
   push:
     paths-ignore:
       - 'README.md'
+      - 'SECURITY.md'
       - '.github/img/**'
   pull_request:
     paths-ignore:
       - 'README.md'
+      - 'SECURITY.md'
       - '.github/img/**'
 
 jobs:
