@@ -249,7 +249,8 @@ jobs:
           echo "::group::Commit changes"
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
-          git commit -am "🔖 mommy added package mommy $MOMMY_VERSION~"
+          git add --all
+          git commit -m "🔖 mommy added package mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
@@ -316,7 +317,8 @@ jobs:
           echo "::group::Commit update"
           sudo -u build git config --global user.name "FWDekkerBot"
           sudo -u build git config --global user.email "bot@fwdekker.com"
-          sudo -u build git commit -am "🔖 mommy updated the build files to mommy $MOMMY_VERSION~"
+          sudo -u build git add --all
+          sudo -u build git commit -m "🔖 mommy updated the build files to mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
@@ -370,7 +372,8 @@ jobs:
           echo "::group::Commit update"
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
-          git commit -am "🔖 mommy updated the formula to mommy $MOMMY_VERSION~"
+          git add --all
+          git commit -m "🔖 mommy updated the formula to mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
