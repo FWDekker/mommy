@@ -90,7 +90,7 @@ list_contains_any() {
 # Takes the list in stdin and (1) removes all lines starting with `#`, (2) replaces each `/` with a newline, (3) removes
 # all blank lines, and (4) removes all entries that contain any of the entries in the sanitized list `$1` as a
 # substring.
-list_sanitize() {
+list_normalize() {
     cat |
         grep -v "^#" |
         tr "/" "$n" |
@@ -112,6 +112,13 @@ else
         echo "$lines" | sed "${idx}q;d"
     }
 fi
+
+# Escapes stdin to be used as a replacement string in sed.
+#
+# Only the characters `\` and `&` need replacement, since we assume that `/` does not occur.
+escape_sed_replacement() {
+    cat | sed -e 's/\\/\\\\/g' -e 's/&/\\\&/g'
+}
 
 
 ## Functions
@@ -170,18 +177,19 @@ split_pronouns() {
 # 4. prepends `$4` and appends `$5`; and
 # 5. writes to stdout.
 fill_template() {
-    sweetie="$(echo "$1" | list_sanitize | list_choose)"
-    split_pronouns "$(echo "$2" | list_sanitize | list_choose)"
-    caregiver="$(echo "$3" | list_sanitize | list_choose)"
+    sweetie="$(echo "$1" | list_normalize | list_choose | escape_sed_replacement)"
+    split_pronouns "$(echo "$2" | list_normalize | list_choose | escape_sed_replacement)"
+    caregiver="$(echo "$3" | list_normalize | list_choose | escape_sed_replacement)"
 
-    prefix="$(echo "$4" | list_sanitize | list_choose)"
-    suffix="$(echo "$5" | list_sanitize | list_choose)"
+    prefix="$(echo "$4" | list_normalize | list_choose | escape_sed_replacement)"
+    suffix="$(echo "$5" | list_normalize | list_choose | escape_sed_replacement)"
 
     template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" \
                           -e "s/%%THEY%%/$they/g" \
                           -e "s/%%THEM%%/$them/g" \
                           -e "s/%%THEIR%%/$their/g" \
-                          -e "s/%%CAREGIVER%%/$caregiver/g")"
+                          -e "s/%%CAREGIVER%%/$caregiver/g" \
+                          -e "s/%%N%%/\\$n/g")"
 
     capitalize "$prefix$template$suffix" "$6"
     return 0
@@ -253,7 +261,7 @@ else
     fi
 
     # Choose and fill template (if enabled)
-    if list_contains_any "$command_exit_code" "$(echo "$MOMMY_IGNORED_STATUSES" | list_sanitize)"; then
+    if list_contains_any "$command_exit_code" "$(echo "$MOMMY_IGNORED_STATUSES" | list_normalize)"; then
         exit "$command_exit_code"
     elif [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
         templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
@@ -263,11 +271,11 @@ else
         exit "$command_exit_code"
     fi
 
-    color="$(echo "$MOMMY_COLOR" | list_sanitize | list_choose)"
-    forbidden_words="$(echo "$MOMMY_FORBIDDEN_WORDS" | list_sanitize)"
+    color="$(echo "$MOMMY_COLOR" | list_normalize | list_choose)"
+    forbidden_words="$(echo "$MOMMY_FORBIDDEN_WORDS" | list_normalize)"
 
     response="$(echo "$templates" |
-                    list_sanitize "$forbidden_words" |
+                    list_normalize "$forbidden_words" |
                     list_choose |
                     fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" \
                                   "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE")"

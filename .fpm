@@ -7,5 +7,6 @@
 --description "mommy's here to support you~"
 --url "https://github.com/FWDekker/mommy"
 --maintainer "Florine W. Dekker"
---deb-changelog ./CHANGELOG.md
---rpm-changelog ./CHANGELOG.md
+--deb-changelog ./pkg/fpm/deb.changelog
+--deb-upstream-changelog ./CHANGELOG.md
+--rpm-changelog ./pkg/fpm/rpm.changelog
