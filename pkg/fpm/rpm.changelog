@@ -1,5 +1,5 @@
 # This changelog is only for packages built using fpm.
 
-* Mon Jan 1 2000 Florine W. Dekker - 1.2.7-1
+* Wed Jan 10 2024 Florine W. Dekker - 1.3.0-1
 - finally added a changelog for rpm builds on github~
 - no package changes compared to previous versions though~
