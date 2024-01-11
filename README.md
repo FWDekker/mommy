@@ -742,12 +742,13 @@ users connect to the server, get the latest instructions, and their system build
 
 ### 📯 release
 [`main`](https://github.com/FWDekker/mommy/tree/main) always contains the latest stable version.
-every merge into `main` automatically build and releases a new version~
+to release a new version, just use the [deploy action](https://github.com/FWDekker/mommy/actions/workflows/cd.yml),
+which can be activated using a `workflow_dispatch` event~
 
 <details>
 <summary>release checklists</summary>
 
-* **before merging into `main`**
+* **before triggering deployment**
   * update `version`~
   * update all changelogs~
     * update `CHANGELOG.md`~
@@ -761,7 +762,7 @@ every merge into `main` automatically build and releases a new version~
   * update acknowledgements in `README.md`~
   * update promotional images in `.github/img/`~
 
-* **after merging into `main`**
+* **after triggering deployment**
   * a new github release is created automatically~
   * [aur-mommy](https://github.com/FWDekker/aur-mommy/)
     * updated automatically when `mommy` updates

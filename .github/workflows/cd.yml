@@ -1,11 +1,12 @@
-name: CD
+name: 🚚 deploy~
 
 on:
-  # 'push' creates a real release
-  push:
-    branches: [ main ]
-  # 'workflow_dispatch' does a dry run of the workflow
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -13,16 +14,36 @@ permissions:
   packages: read
 
 jobs:
-  check-release-needed:
+  pre-flight-checks:
     if: "!(contains(github.event.head_commit.message, '[cd skip]') || contains(github.event.head_commit.message, '[skip cd]'))"
     runs-on: ubuntu-latest
+
+    outputs:
+      MOMMY_VERSION: ${{ steps.mommy_version.outputs.MOMMY_VERSION }}
+
     steps:
-      - name: nop
-        run: true
+      - name: Print inputs
+        run: |
+          echo "dry_run: ${{ github.event.inputs.dry_run }}"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Extract mommy's version number
+        id: mommy_version
+        run: |
+          MOMMY_VERSION="v$(head -n 1 ./version)"
+          echo "MOMMY_VERSION=$MOMMY_VERSION" >> "$GITHUB_ENV"
+          echo "MOMMY_VERSION=$MOMMY_VERSION" >> "$GITHUB_OUTPUT"
+      - name: Check if release already exists
+        # yes, you really do need to compare with a string, and no, using ! does not work~
+        if: ${{ github.event.inputs.dry_run == 'false' }}
+        # using `fetch-tags` option of `actions/checkout` does not work properly~
+        run: |
+          git fetch --prune --unshallow --tags
+          ! git show-ref --tags "$MOMMY_VERSION" --quiet
 
 
   build-linux:
-    needs: [ check-release-needed ]
+    needs: [ pre-flight-checks ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +61,7 @@ jobs:
           path: dist/mommy*
 
   build-macos:
-    needs: [ check-release-needed ]
+    needs: [ pre-flight-checks ]
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -56,7 +77,7 @@ jobs:
           path: dist/mommy*
 
   build-freebsd:
-    needs: [ check-release-needed ]
+    needs: [ pre-flight-checks ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -99,7 +120,7 @@ jobs:
           path: dist/mommy*
 
   build-netbsd:
-    needs: [ check-release-needed ]
+    needs: [ pre-flight-checks ]
     runs-on: macos-12
     steps:
       - name: Checkout
@@ -137,7 +158,7 @@ jobs:
           path: dist/mommy*
 
   build-openbsd:
-    needs: [ check-release-needed ]
+    needs: [ pre-flight-checks ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -174,8 +195,11 @@ jobs:
 
 
   release-mommy:
-    needs: [ build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
+    needs: [ pre-flight-checks, build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
     runs-on: ubuntu-latest
+
+    env:
+      MOMMY_VERSION: ${{ needs.pre-flight-checks.outputs.MOMMY_VERSION }}
 
     steps:
       - name: Checkout
@@ -184,8 +208,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist
-      - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./version)" >> $GITHUB_ENV
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
@@ -194,9 +216,9 @@ jobs:
       - name: Prepend release notes
         run: |
           echo -e "mommy can also be installed using a package manager. [check the readme for more info](https://github.com/FWDekker/mommy/tree/${MOMMY_VERSION}#-installation)~\n" | cat - RELEASE_NOTES.md | tee RELEASE_NOTES.md
-      - name: Checkout release
+      - name: Publish release
         uses: softprops/action-gh-release@v1
-        if: github.event_name != 'workflow_dispatch'
+        if: ${{ github.event.inputs.dry_run == 'false' }}
         with:
           target_commitish: main
           tag_name: ${{ env.MOMMY_VERSION }}
@@ -207,17 +229,17 @@ jobs:
           discussion_category_name: announcements
 
   release-apt:
-    needs: [ release-mommy ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
+
+    env:
+      MOMMY_VERSION: ${{ needs.pre-flight-checks.outputs.MOMMY_VERSION }}
 
     steps:
       - name: Checkout mommy
         uses: actions/checkout@v4
         with:
           path: src-mommy
-      - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
-
       - name: Checkout apt-mommy
         uses: actions/checkout@v4
         with:
@@ -253,7 +275,7 @@ jobs:
           git commit -m "🔖 mommy added package mommy $MOMMY_VERSION~"
           echo "::endgroup::"
 
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ]; then
             echo "::group::Push changes"
             git push origin
             echo "::endgroup::"
@@ -263,9 +285,12 @@ jobs:
           fi;
 
   release-aur:
-    needs: [ release-mommy ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
     container: archlinux:latest
+
+    env:
+      MOMMY_VERSION: ${{ needs.pre-flight-checks.outputs.MOMMY_VERSION }}
 
     steps:
       - name: Set up basic system
@@ -287,8 +312,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: src-mommy
-      - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
 
       - name: Checkout aur-mommy
         uses: actions/checkout@v4
@@ -326,7 +349,7 @@ jobs:
           sudo -u build git merge --commit master
           echo "::endgroup::"
 
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ]; then
             echo "::group::Push changes"
             sudo -u build git push origin master dev
             echo "::endgroup::"
@@ -336,17 +359,17 @@ jobs:
           fi;
 
   release-homebrew:
-    needs: [ release-mommy ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
+
+    env:
+      MOMMY_VERSION: ${{ needs.pre-flight-checks.outputs.MOMMY_VERSION }}
 
     steps:
       - name: Checkout mommy
         uses: actions/checkout@v4
         with:
           path: src-mommy
-      - name: Extract version number
-        run: echo "MOMMY_VERSION=v$(head -n 1 ./src-mommy/version)" >> $GITHUB_ENV
-
       - name: Checkout homebrew-mommy
         uses: actions/checkout@v4
         with:
@@ -381,7 +404,7 @@ jobs:
           git merge --commit main
           echo "::endgroup::"
 
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ]; then
             echo "::group::Push changes"
             git push origin main dev
             echo "::endgroup::"
