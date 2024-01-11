@@ -1,4 +1,4 @@
-name: CI
+name: 🧪 ci~
 
 on:
   push:
@@ -429,7 +429,7 @@ jobs:
 
 
   test-netbsd:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -474,6 +474,7 @@ jobs:
             gmake test
             echo "::endgroup::"
 
+# Extra tests disabled until https://github.com/vmactions/netbsd-vm/issues/4 is fixed
 #            echo "::group::Build package"
 #            gmake dist/netbsd
 #            echo "::endgroup::"
