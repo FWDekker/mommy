@@ -22,6 +22,9 @@ jobs:
       MOMMY_VERSION: ${{ steps.mommy_version.outputs.MOMMY_VERSION }}
 
     steps:
+      - name: Print inputs
+        run: |
+          echo "dry_run: ${{ github.event.inputs.dry_run }}"
       - name: Checkout
         uses: actions/checkout@v4
       - name: Extract mommy's version number
@@ -213,7 +216,7 @@ jobs:
       - name: Prepend release notes
         run: |
           echo -e "mommy can also be installed using a package manager. [check the readme for more info](https://github.com/FWDekker/mommy/tree/${MOMMY_VERSION}#-installation)~\n" | cat - RELEASE_NOTES.md | tee RELEASE_NOTES.md
-      - name: Checkout release
+      - name: Publish release
         uses: softprops/action-gh-release@v1
         if: ${{ github.event.inputs.dry_run == 'false' }}
         with:
