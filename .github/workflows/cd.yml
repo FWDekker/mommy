@@ -121,36 +121,30 @@ jobs:
 
   build-netbsd:
     needs: [ pre-flight-checks ]
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install fpm && Build package
-        uses: vmactions/netbsd-vm@v0
+        uses: cross-platform-actions/action@v0.22.0
         with:
-          usesh: true
-          prepare: |
+          operating_system: netbsd
+          version: "9.3"
+          run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
 
             echo "::group::Install basic packages"
-            pkg_add git gmake mozilla-rootcerts-openssl
-            echo "::endgroup::"
-
-            echo "::group::Install fpm"
-            pkg_add ruby
-            /usr/pkg/bin/gem install --no-document fpm
-            pkg_add pkg_install  # This is necessary to make 'fpm' work with 'pkgin' format for some reason
+            sudo pkgin -y in git gmake mozilla-rootcerts-openssl
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
-          run: |
-            set -e
-            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
 
+            echo "::group::Build package"
             gmake dist/netbsd
+            echo "::endgroup::"
       - name: Upload built package
         uses: actions/upload-artifact@v3
         with:
