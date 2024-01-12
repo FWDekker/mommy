@@ -429,67 +429,58 @@ jobs:
 
 
   test-netbsd:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Test script and package
-        uses: vmactions/netbsd-vm@v1
+        uses: cross-platform-actions/action@v0.22.0
         with:
-          usesh: true
-          prepare: |
+          operating_system: netbsd
+          version: "9.3"
+          run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
+            export MOMMY_ZSH_SKIP=1  # zsh completion capturing totally does not work~
 
             echo "::group::Install basic packages"
-            pkg_add git gmake mozilla-rootcerts-openssl
+            sudo pkgin -y in git gmake mozilla-rootcerts-openssl
             echo "::endgroup::"
 
             echo "::group::Install ShellSpec"
             git clone --depth=1 https://github.com/shellspec/shellspec.git /tmp/shellspec/
-            gmake -C /tmp/shellspec/ install
+            sudo gmake -C /tmp/shellspec/ install
             rm -rf /tmp/shellspec
             echo "::endgroup::"
 
             echo "::group::Install additional shells"
-            pkg_add fish zsh
+            sudo pkgin -y in fish zsh
             touch "$HOME/.zshrc"
-            echo "::endgroup::"
-
-            echo "::group::Install fpm"
-            pkg_add ruby
-            /usr/pkg/bin/gem install --no-document fpm
-            pkg_add pkg_install  # This is necessary to make 'fpm' work with 'pkgin' format for some reason
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
             git config --global --add safe.directory "$GITHUB_WORKSPACE"
             echo "::endgroup::"
-          run: |
-            set -e
-            export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
-            export MOMMY_ZSH_SKIP=1  # Zsh completion capturing totally does not work
 
             echo "::group::Test script"
             gmake test
             echo "::endgroup::"
 
-# Extra tests disabled until https://github.com/vmactions/netbsd-vm/issues/4 is fixed
-#            echo "::group::Build package"
-#            gmake dist/netbsd
-#            echo "::endgroup::"
-#
-#            echo "::group::Install package"
-#            pkg_add ./dist/mommy-*+netbsd.tgz
-#            echo "::endgroup::"
-#
-#            echo "::group::Test package"
-#            MOMMY_SYSTEM=1 gmake test
-#            echo "::endgroup::"
-#
-#            echo "::group::Uninstall package"
-#            pkg_delete mommy
-#            echo "::endgroup::"
+            echo "::group::Build package"
+            gmake dist/netbsd
+            echo "::endgroup::"
+
+            echo "::group::Install package"
+            sudo pkg_add ./dist/mommy-*+netbsd.tgz
+            echo "::endgroup::"
+
+            echo "::group::Test package"
+            MOMMY_SYSTEM=1 gmake test
+            echo "::endgroup::"
+
+            echo "::group::Uninstall package"
+            sudo pkg_delete mommy
+            echo "::endgroup::"
 
 
   test-openbsd:
