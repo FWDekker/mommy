@@ -2,7 +2,7 @@
 ## [1.3.0] -- 2024-01-10
 ### added
 * 🪹 mommy now supports newlines in templates using `%%N%%`~ ([#58](https://github.com/FWDekker/mommy/issues/58)) ([#82](https://github.com/FWDekker/mommy/issues/82))
-* 🛡️ mommy now has a [security policy](https://github.com/FWDekker/intellij-randomness/security)~
+* 🛡️ mommy now has a [security policy](https://github.com/FWDekker/mommy/security)~
 
 ### fixed
 * 🚒 mommy fixes the description url in her manual page~ ([#81](https://github.com/FWDekker/mommy/issues/81)) ([#82](https://github.com/FWDekker/mommy/issues/82))
