@@ -17,9 +17,11 @@ export MOMMY_EXEC
 export MOMMY_TMP_DIR
 
 
-## Constants
+## Constants and helpers
 export n="
 "
+
+strip_opt() { echo "$1" | sed "s/[-= ]//g"; }
 
 
 ## Hooks

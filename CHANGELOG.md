@@ -1,4 +1,10 @@
 # Changelog
+## [unreleased]
+### added
+* improved input validation
+* improved links (back and forth from toc) in readme
+
+
 ## [1.3.0] -- 2024-01-10
 ### added
 * 🪹 mommy now supports newlines in templates using `%%N%%`~ ([#58](https://github.com/FWDekker/mommy/issues/58)) ([#82](https://github.com/FWDekker/mommy/issues/82))
