@@ -6,7 +6,7 @@
 
 ---
 
-🚚&nbsp;[**installation**](#-installation) | 📖&nbsp;[**usage**](#-usage) | 🙋&nbsp;[**configuration**](#-configuration) | 🐚&nbsp;[**shell integration**](#-shell-integration) | ⚗️&nbsp;[**development**](#%EF%B8%8F-development) | 💖&nbsp;[**acknowledgements**](#-acknowledgements)
+<a name="toc"></a>🚚&nbsp;[**installation**](#installation) | 📖&nbsp;[**usage**](#usage) | 🙋&nbsp;[**configuration**](#configuration) | 🐚&nbsp;[**shell integration**](#shell-integration) | ⚗️&nbsp;[**development**](#development) | 💖&nbsp;[**acknowledgements**](#acknowledgements)
 
 ---
 
@@ -20,7 +20,7 @@ much~ ❤️
 ![mommy demo](.github/img/demo.gif)
 
 
-## 🚚 installation
+## 🚚 installation<a name="installation"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy works on any system.
 mommy is tested on ubuntu, debian, archlinux, fedora, nixpkgs, macos, freebsd, netbsd, openbsd, and windows~
 
@@ -214,7 +214,7 @@ find your operating system and package manager for the right instructions~
     })
   ];
   ```
-  check [the full list of configuration options](#-configuration).
+  check [the full list of configuration options](#configuration).
   note that your nix configuration should use lowercase variable names~
 * **nixos** (persistent)  
   install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`):
@@ -234,7 +234,7 @@ find your operating system and package manager for the right instructions~
     })
   ];
   ```
-  check [the full list of configuration options](#-configuration).
+  check [the full list of configuration options](#configuration).
   note that your nix configuration should use lowercase variable names~
 
 </details>
@@ -398,13 +398,13 @@ tar -C ./ -xzf mommy-*.tar.gz
 </details>
 
 ### 🔮 what's next?
-check out [how to use mommy](#-usage), read all about [ways you can configure mommy](#-configuration), and
-[integrate mommy with your shell](#-shell-integration)~
+check out [how to use mommy](#usage), read all about [ways you can configure mommy](#configuration), and
+[integrate mommy with your shell](#shell-integration)~
 
 <img width="450px" src=".github/img/sample1.png" alt="mommy integrated with the fish shell" />
 
 
-## 📖 usage
+## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
 it fails~
 
@@ -424,7 +424,7 @@ by default, mommy outputs to stderr, but if you use `mommy -1 [other options]` s
 use `mommy -v` to see which version of mommy you're using~
 
 
-## 🙋 configuration
+## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
 
 > ℹ️ mommy is used to instructions being scribbled down in unusual places, and will check inside `XDG_CONFIG_HOME`
@@ -516,7 +516,7 @@ outputs `your mommy loves you`~
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~
 
-> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to write `daddy` in the first place~
+> ℹ️ if you [integrate mommy with your shell](#shell-integration) you won't have to write `daddy` in the first place~
 
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
@@ -538,7 +538,7 @@ sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 > ℹ️ uninstalling mommy will not remove the manually created symlinks~
 
 
-## 🐚 shell integration
+## 🐚 shell integration<a name="shell-integration"></a> <small><sup>[top ▲](#toc)</sup></small>
 instead of calling mommy for each command, you can fully integrate mommy with your shell to get mommy's output each time
 you run any command.
 here are some examples on how you can do that in various shells.
@@ -637,7 +637,7 @@ log out and back in, and mommy will appear in your shell~
 </details>
 
 
-## ⚗️ development
+## ⚗️ development<a name="development"></a> <small><sup>[top ▲](#toc)</sup></small>
 this section explains how to build mommy from source, in case you want to help with development or for any other reason~
 
 ### 🎬 run
@@ -790,7 +790,7 @@ surely we'll be able to figure something out together~
 * your pull request should go into `dev`, not into `main`~
 
 
-## 💖 acknowledgements
+## 💖 acknowledgements<a name="acknowledgements"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy recognises _all_ contributors, no matter the size of the contribution.
 if mommy should add, remove, or change anything here, [open an issue](https://github.com/FWDekker/mommy/issues/new) or
 [contact the author](https://fwdekker.com/about/)~
