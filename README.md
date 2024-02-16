@@ -405,41 +405,64 @@ check out [how to use mommy](#usage), read all about [ways you can configure mom
 
 
 ## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
-mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
-it fails~
+mommy processes the output status of a command and compliments you if the command succeeds and encourages you if it
+fails~
+
+you can ask mommy to support you in a few ways, shown below.
+alternatively, you can [integrate mommy into your shell](#shell-integration) so `mommy` is invoked for each command~
 
 ```shell
-$ mommy [-1] [-c config] [command] ...
+$ mommy [command] ...
 # e.g. `mommy npm test`
 
-$ mommy [-1] [-c config] -e eval
+$ mommy -e eval
 # e.g. `mommy -e "ls -l | wc -l"`
 
-$ mommy [-1] [-c config] -s status
-# e.g. `mommy -s $?`
+$ mommy -s status
+# e.g. `mommy -s 0` or `mommy -s $?`
 ```
 
-by default, mommy outputs to stderr, but if you use `mommy -1 [other options]` she'll output to stdout~
+additionally, mommy knows a few extra options, which you can use to discover who mommy is and to tell mommy which
+[configuration files](#configuration) she should use.
 
-use `mommy -v` to see which version of mommy you're using~
+| short option | long option                   | description                                                                               |
+|--------------|-------------------------------|-------------------------------------------------------------------------------------------|
+| `-h`         | `--help`                      | opens mommy's manual page~                                                                |
+| `-v`         | `--version`                   | displays version information~                                                             |
+| `-1`         |                               | writes output to stdout instead of stderr~                                                |
+| `-c <file>`  | `--config=<file>`             | reads [config](#configuration) from `<file>`~                                             |
+|              | `--global-config-dirs=<dirs>` | sets global [configuration](#configuration) dirs to the colon-separated list in `<dirs>`~ |
 
 
 ## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
-mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
+mommy's behavior can be configured using config files.
+the easiest way to do so is to add your config to the file `~/.config/mommy/config.sh`.
+you can also set up a global config file that is applied to all users in `/etc/mommy/config.sh`.
+mommy will explain in detail below~
 
-> ℹ️ mommy is used to instructions being scribbled down in unusual places, and will check inside `XDG_CONFIG_HOME`
-> instead of `~/.config/` if the former is set~
+### 🔍 config file locations
+when mommy runs, she will first load the system-wide **global** config file.
+after that, she will read the user-specific **local** config file, overriding the values from the global file~
 
-you can specify a different config file by pointing the environment variable `MOMMY_OPT_CONFIG_FILE` to that file, or by
-running mommy as `mommy -c ./my_config.sh [other options]`~
+* to find the **global** config file, mommy runs the following procedure.
+    1. mommy determines the list of global config dirs.
+        1. if a list is specified using a [command-line option](#usage), that list is used.
+        2. otherwise, the list consists of all directories in `$XDG_CONFIG_DIRS`, plus `/etc/mommy`, plus
+         `/usr/local/etc/mommy/`.
+    2. mommy traverses this list, and stops once she finds a directory that contains the file `config.sh`.
+       this file will be the global config file~
+* to find the **local** config file, mommy runs the following procedure.
+    1. if a config file is specified using a [command-line option](#usage), that file is used. 
+    2. if `$XDG_CONFIG_HOME` is defined, the file `$XDG_CONFIG_HOME/mommy/config.sh` is used.
+    3. otherwise, `$HOME/.config/mommy/config.sh` is used~
 
 ### 🗃️ config file format
-mommy executes the config file as a shell script and keeps the environment variables.
+mommy executes config files as shell scripts and keeps the environment variables.
 so, to change the value of `MOMMY_SWEETIE`, add the following line to your config file:
 ```shell
 MOMMY_SWEETIE="catgirl"
 ```
-make sure you do not put spaces around the `=`~
+make sure you _do not_ put spaces around the `=`, and you _do_ put quotes (`"`) around the value~
 
 ### 👛 available settings
 | variable                       | description                                                                                                                                                                                                                                                                                                                                                 | list? | default       |

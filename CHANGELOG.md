@@ -1,12 +1,13 @@
 # Changelog
 ## [unreleased]
 ### added
-* global config file!
-* improved input validation
-* improved links (back and forth from toc) in readme
+* 🌍 mommy now supports a global config file that applies to all users, stored for example in `/usr/mommy/config.sh`~ ([#95](https://github.com/FWDekker/mommy/issues/95)) ([#96](https://github.com/FWDekker/mommy/issues/96))
+* 📏 mommy accepts long command-line options for all options (like `--config=<file>` for `-c <file>`)~
 
-### fixed
-* an empty config file path is now interpreted as disabling the default config (but not necessarily the global config)
+### changed
+* 🕳️ mommy now interprets an empty config file path (`-c`) as you not wanting to use a config file~
+* ✅ mommy improved her input validation, giving clearer error messages when something is wrong~
+* 🏓 mommy improved the links to and from the table of contents in her readme~
 
 
 ## [1.3.0] -- 2024-01-10
