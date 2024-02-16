@@ -1,5 +1,4 @@
 #!/bin/sh
-
 n="
 "
 
@@ -217,6 +216,7 @@ opt_help=""
 opt_version=""
 opt_target="2"
 opt_config="${opt_config:-"${XDG_CONFIG_HOME:-"$HOME/.config"}/mommy/config.sh"}"
+opt_global_config_dirs="${XDG_CONFIG_DIRS}:/etc/mommy/:/usr/local/etc/mommy/"
 opt_eval=""
 opt_status=""
 
@@ -233,7 +233,8 @@ while getopts ":hv1c:e:s:-:" OPT; do
     h|help) opt_help="1" ;;
     v|version) opt_version="1" ;;
     1) opt_target="1" ;;
-    c|config) require_arg; opt_config="$OPTARG" ;;
+    global-config-dirs) require_arg; opt_global_config_dirs="$OPTARG" ;;
+    c|config) opt_config="$OPTARG" ;;
     e|eval) require_arg; opt_eval="$OPTARG" ;;
     s|status) require_arg; require_int; opt_status="$OPTARG" ;;
     :) die "mommy's last option is missing its argument~" ;;
@@ -246,6 +247,20 @@ shift "$((OPTIND - 1))"
 
 
 ## Load configuration
+# Global
+config_dir=""
+while [ "$opt_global_config_dirs" != "$config_dir" ] ;do
+    config_dir="${opt_global_config_dirs%%:*}"
+    opt_global_config_dirs="${opt_global_config_dirs#$config_dir:}"
+
+    if [ -d "$config_dir" ] && [ -f "$config_dir/config.sh" ] && [ -r "$config_dir/config.sh" ]; then
+        # shellcheck source=/dev/null # User-defined target
+        . "$config_dir/config.sh"
+        break
+    fi
+done
+
+# User
 # shellcheck source=/dev/null # User-defined target
 [ -f "$opt_config" ] && [ -r "$opt_config" ] && . "$opt_config"
 

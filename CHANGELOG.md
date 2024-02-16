@@ -1,8 +1,12 @@
 # Changelog
 ## [unreleased]
 ### added
+* global config file!
 * improved input validation
 * improved links (back and forth from toc) in readme
+
+### fixed
+* an empty config file path is now interpreted as disabling the default config (but not necessarily the global config)
 
 
 ## [1.3.0] -- 2024-01-10

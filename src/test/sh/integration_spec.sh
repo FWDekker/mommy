@@ -24,8 +24,8 @@ Describe "integration of mommy with other programs"
         }
 
         It "uninstalls all files that are installed"
-            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
-            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
 
             Assert is_empty "$MOMMY_TMP_DIR/"
         End

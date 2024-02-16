@@ -33,7 +33,7 @@ spec_helper_configure() {
 }
 
 mommy_before_each() {
-    mkdir -p "$MOMMY_TMP_DIR"
+    mkdir -p "$MOMMY_TMP_DIR" "$MOMMY_TMP_DIR/global1/" "$MOMMY_TMP_DIR/global2/"
 }
 
 mommy_after_each() {

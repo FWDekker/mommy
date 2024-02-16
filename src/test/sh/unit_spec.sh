@@ -5,9 +5,10 @@
 
 
 ## Functions
-# Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
+# Writes `$1` to `$2` (the latter defaulting to `$MOMMY_CONFIG_FILE`), setting both `MOMMY_COLOR` and `MOMMY_SUFFIX` to
+# the empty string, unless overridden in `$1`.
 set_config() {
-    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
+    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "${2:-$MOMMY_CONFIG_FILE}"
 }
 
 
@@ -74,13 +75,46 @@ Describe "mommy"
             End
         End
 
-        Describe "-c/--c/--config: custom configuration file"
+        Describe "--global-config-dirs"
+            It "gives an error when no argument is given"
+                When run "$MOMMY_EXEC" --global-config-dirs="" -c "" true
+                The error should equal "mommy is missing the argument for option 'global-config-dirs'~"
+                The status should be failure
+            End
+
+            It "uses the configuration from the file"
+                set_config "MOMMY_COMPLIMENTS='sport revive'" "$MOMMY_TMP_DIR/global1/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" -c "" true
+                The error should equal "sport revive"
+                The status should be success
+            End
+
+            It "non-existing directories are skipped until an existing directory is found"
+                set_config "MOMMY_COMPLIMENTS='cherry crop'" "$MOMMY_TMP_DIR/global2/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                The error should equal "cherry crop"
+                The status should be success
+            End
+
+            It "when multiple global directories exist, only the first is used"
+                set_config "MOMMY_COMPLIMENTS='film style'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='care smile'" "$MOMMY_TMP_DIR/global2/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                The error should equal "film style"
+                The status should be success
+            End
+        End
+
+        Describe "-c/--config: custom configuration file"
             Parameters:value "-c " "--config="
 
-            It "gives an error when no argument is given with $1"
+            It "ignores an empty path given to $1"
                 When run "$MOMMY_EXEC" $1"" true
-                The error should equal "mommy is missing the argument for option '$(strip_opt "$1")'~"
-                The status should be failure
+                The error should not equal ""
+                The status should be success
             End
 
             It "ignores an invalid path given to $1"
@@ -100,6 +134,24 @@ Describe "mommy"
 
                 When run "$MOMMY_EXEC" $1"$MOMMY_CONFIG_FILE" true
                 The error should equal "apply news"
+                The status should be success
+            End
+
+            It "overrides the global config file when using $1"
+                set_config "MOMMY_COMPLIMENTS='ceremony isolation'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='lesson literature'"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" $1"$MOMMY_CONFIG_FILE" true
+                The error should equal "lesson literature"
+                The status should be success
+            End
+
+            It "retains the non-overridden parts of the global config file when using $1"
+                set_config "MOMMY_COMPLIMENTS='theory gallon';MOMMY_PREFIX='!'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='player plain'"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" $1"$MOMMY_CONFIG_FILE" true
+                The error should equal "!player plain"
                 The status should be success
             End
         End
