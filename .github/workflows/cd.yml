@@ -55,9 +55,9 @@ jobs:
       - name: Build packages
         run: make dist/generic dist/apk dist/deb dist/rpm dist/pacman
       - name: Upload built package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-linux
           path: dist/mommy*
 
   build-macos:
@@ -71,9 +71,9 @@ jobs:
       - name: Build package
         run: make dist/osxpkg
       - name: Upload built package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-macos
           path: dist/mommy*
 
   build-freebsd:
@@ -114,9 +114,9 @@ jobs:
 
             gmake dist/freebsd
       - name: Upload built package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-freebsd
           path: dist/mommy*
 
   build-netbsd:
@@ -146,9 +146,9 @@ jobs:
             gmake dist/netbsd
             echo "::endgroup::"
       - name: Upload built package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-netbsd
           path: dist/mommy*
 
   build-openbsd:
@@ -182,9 +182,9 @@ jobs:
 
             gmake dist/openbsd
       - name: Upload built package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-openbsd
           path: dist/mommy*
 
 
@@ -199,12 +199,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download built packages
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: dist
+          pattern: dist-*
+          merge-multiple: true
+          path: dist
       - name: Extract release notes
         id: extract-release-notes
-        uses: ffurrer2/extract-release-notes@v1
+        uses: ffurrer2/extract-release-notes@v2
         with:
           release_notes_file: RELEASE_NOTES.md
       - name: Prepend release notes
@@ -244,9 +246,10 @@ jobs:
           # Required to push '.deb' to repository
           token: ${{ secrets.personal_access_token }}
       - name: Download built packages
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: dist
+          pattern: dist-*
+          merge-multiple: true
           path: dist-mommy
       - name: Move .deb into apt-mommy
         run: cp dist-mommy/*.deb apt-mommy/deb/
@@ -321,6 +324,12 @@ jobs:
       - name: Update build files
         working-directory: aur-mommy
         run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ]; then
+            empty_option=""
+          else
+            empty_option="--allow-empty"
+          fi;
+
           echo "::group::Fast-forward main"
           sudo -u build git checkout dev
           sudo -u build git checkout master
@@ -335,7 +344,7 @@ jobs:
           sudo -u build git config --global user.name "FWDekkerBot"
           sudo -u build git config --global user.email "bot@fwdekker.com"
           sudo -u build git add --all
-          sudo -u build git commit -m "🔖 mommy updated the build files to mommy $MOMMY_VERSION~"
+          sudo -u build git commit -m "🔖 mommy updated the build files to mommy $MOMMY_VERSION~" "$empty_option"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
@@ -376,6 +385,12 @@ jobs:
       - name: Update formula
         working-directory: homebrew-mommy
         run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ]; then
+            empty_option=""
+          else
+            empty_option="--allow-empty"
+          fi;
+
           echo "::group::Fast-forward main"
           git checkout dev
           git checkout main
@@ -390,7 +405,7 @@ jobs:
           git config --global user.name "FWDekkerBot"
           git config --global user.email "bot@fwdekker.com"
           git add --all
-          git commit -m "🔖 mommy updated the formula to mommy $MOMMY_VERSION~"
+          git commit -m "🔖 mommy updated the formula to mommy $MOMMY_VERSION~" "$empty_option"
           echo "::endgroup::"
 
           echo "::group::Fast-forward dev"
