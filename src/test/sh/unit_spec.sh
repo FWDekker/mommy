@@ -5,9 +5,10 @@
 
 
 ## Functions
-# Writes `$1` to the config file, setting `MOMMY_COLOR` and `MOMMY_SUFFIX` to the empty string if not set in `$1`.
+# Writes `$1` to `$2` (the latter defaulting to `$MOMMY_CONFIG_FILE`), setting both `MOMMY_COLOR` and `MOMMY_SUFFIX` to
+# the empty string, unless overridden in `$1`.
 set_config() {
-    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "$MOMMY_CONFIG_FILE"
+    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "${2:-$MOMMY_CONFIG_FILE}"
 }
 
 
@@ -16,45 +17,37 @@ Describe "mommy"
     Describe "command-line options"
         It "gives an error for unknown short options"
             When run "$MOMMY_EXEC" -d
-            The error should equal "mommy does not know option -d~"
+            The error should equal "mommy doesn't know option -d~"
             The status should be failure
         End
 
         It "gives an error for unknown long options"
             When run "$MOMMY_EXEC" --doesnotexist
-            The error should equal "mommy does not know option --doesnotexist~"
+            The error should equal "mommy doesn't know option --doesnotexist~"
+            The status should be failure
+        End
+
+        It "gives an error for missing required argument to short option when no command is given"
+            When run "$MOMMY_EXEC" -s
+            The error should equal "mommy's last option is missing its argument~"
             The status should be failure
         End
 
         # -h/--help is tested in `integration_spec.sh`
 
         Describe "-v/--version: version information"
-            It "outputs version information using -v"
-                When run "$MOMMY_EXEC" -v
+            Parameters:value "-v" "--version"
+
+            It "outputs version information using $1"
+                When run "$MOMMY_EXEC" "$1"
                 The word 1 of output should equal "mommy,"
                 The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
                 The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
                 The status should be success
             End
 
-            It "outputs version information using --version"
-                When run "$MOMMY_EXEC" --version
-                The word 1 of output should equal "mommy,"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
-                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
-                The status should be success
-            End
-
-            It "outputs version information even when --v is not the first option"
-                When run "$MOMMY_EXEC" -s 138 --v
-                The word 1 of output should equal "mommy,"
-                The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
-                The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
-                The status should be success
-            End
-
-            It "outputs version information even when --version is not the first option"
-                When run "$MOMMY_EXEC" -s 911 --version
+            It "outputs version information even when $1 is not the first option"
+                When run "$MOMMY_EXEC" -s 138 "$1"
                 The word 1 of output should equal "mommy,"
                 The word 2 of output should match pattern "v%%VERSION_NUMBER%%,|v[0-9a-z\.\+]*,"
                 The word 3 of output should match pattern "%%VERSION_DATE%%|[0-9]*-[0-9]*-[0-9]*"
@@ -82,18 +75,83 @@ Describe "mommy"
             End
         End
 
-        Describe "-c: custom configuration file"
-            It "ignores an invalid path"
-                When run "$MOMMY_EXEC" -c "./does_not_exist" true
+        Describe "--global-config-dirs"
+            It "gives an error when no argument is given"
+                When run "$MOMMY_EXEC" --global-config-dirs="" -c "" true
+                The error should equal "mommy is missing the argument for option 'global-config-dirs'~"
+                The status should be failure
+            End
+
+            It "uses the configuration from the file"
+                set_config "MOMMY_COMPLIMENTS='sport revive'" "$MOMMY_TMP_DIR/global1/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" -c "" true
+                The error should equal "sport revive"
+                The status should be success
+            End
+
+            It "non-existing directories are skipped until an existing directory is found"
+                set_config "MOMMY_COMPLIMENTS='cherry crop'" "$MOMMY_TMP_DIR/global2/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                The error should equal "cherry crop"
+                The status should be success
+            End
+
+            It "when multiple global directories exist, only the first is used"
+                set_config "MOMMY_COMPLIMENTS='film style'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='care smile'" "$MOMMY_TMP_DIR/global2/config.sh"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                The error should equal "film style"
+                The status should be success
+            End
+        End
+
+        Describe "-c/--config: custom configuration file"
+            Parameters:value "-c " "--config="
+
+            It "ignores an empty path given to $1"
+                When run "$MOMMY_EXEC" $1"" true
                 The error should not equal ""
                 The status should be success
             End
 
-            It "uses the configuration from the given file"
+            It "ignores an invalid path given to $1"
+                When run "$MOMMY_EXEC" $1"./does_not_exist" true
+                The error should not equal ""
+                The status should be success
+            End
+
+            It "ignores a directory path given to $1"
+                When run "$MOMMY_EXEC" "$1""." true
+                The error should not equal ""
+                The status should be success
+            End
+
+            It "uses the configuration from the file given to $1"
                 set_config "MOMMY_COMPLIMENTS='apply news'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                When run "$MOMMY_EXEC" $1"$MOMMY_CONFIG_FILE" true
                 The error should equal "apply news"
+                The status should be success
+            End
+
+            It "overrides the global config file when using $1"
+                set_config "MOMMY_COMPLIMENTS='ceremony isolation'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='lesson literature'"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" $1"$MOMMY_CONFIG_FILE" true
+                The error should equal "lesson literature"
+                The status should be success
+            End
+
+            It "retains the non-overridden parts of the global config file when using $1"
+                set_config "MOMMY_COMPLIMENTS='theory gallon';MOMMY_PREFIX='!'" "$MOMMY_TMP_DIR/global1/config.sh"
+                set_config "MOMMY_COMPLIMENTS='player plain'"
+
+                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" $1"$MOMMY_CONFIG_FILE" true
+                The error should equal "!player plain"
                 The status should be success
             End
         End
@@ -131,75 +189,98 @@ Describe "mommy"
             End
         End
 
-        Describe "-e: eval"
-            It "writes a compliment to stderr if the evaluated command returns 0 status"
+        Describe "-e/--eval: eval"
+            Parameters:value "-e " "--eval="
+
+            It "gives an error when no argument is given with $1"
+                When run "$MOMMY_EXEC" $1""
+                The error should equal "mommy is missing the argument for option '$(strip_opt "$1")'~"
+                The status should be failure
+            End
+
+            It "writes a compliment to stderr if the evaluated command returns 0 status when using $1"
                 set_config "MOMMY_COMPLIMENTS='bold accord'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -e "true"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"true"
                 The error should equal "bold accord"
                 The status should be success
             End
 
-            It "writes an encouragement to stderr if the evaluated command returns non-0 status"
+            It "writes an encouragement to stderr if the evaluated command returns non-0 status when using $1"
                 set_config "MOMMY_ENCOURAGEMENTS='head log'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -e "false"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"false"
                 The error should equal "head log"
                 The status should be failure
             End
 
-            It "returns the non-0 status of the evaluated command"
-                When run "$MOMMY_EXEC" -e "exit 4"
+            It "returns the non-0 status of the evaluated command when using $1"
+                When run "$MOMMY_EXEC" $1"exit 4"
                 The error should not equal ""
                 The status should equal 4
             End
 
-            It "passes all arguments to the command"
+            It "passes all arguments to the command when using $1"
                 set_config "MOMMY_COMPLIMENTS='desire bread'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -e "echo a b c"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"echo a b c"
                 The output should equal "a b c"
                 The error should equal "desire bread"
                 The status should be success
             End
 
-            It "considers the command a success if all parts succeed"
+            It "considers the command a success if all parts succeed when using $1"
                 set_config "MOMMY_COMPLIMENTS='milk literary'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -e "echo 'a/b/c' | cut -d '/' -f 1"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"echo 'a/b/c' | cut -d '/' -f 1"
                 The output should be present
                 The error should equal "milk literary"
                 The status should be success
             End
 
-            It "considers the command a failure if any part fails"
+            It "considers the command a failure if any part fails when using $1"
                 set_config "MOMMY_ENCOURAGEMENTS='bear cupboard'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -e "echo 'a/b/c' | cut -d '/' -f 0"
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"echo 'a/b/c' | cut -d '/' -f 0"
                 The error should be present
                 The status should be failure
             End
         End
 
-        Describe "-s: status"
-            It "writes a compliment to stderr if the status is 0"
+        Describe "-s/--status: status"
+            Parameters:value "-s " "--status="
+
+            It "gives an error when no argument is given with $1"
+                When run "$MOMMY_EXEC" $1"" true
+                The error should equal "mommy is missing the argument for option '$(strip_opt "$1")'~"
+                The status should be failure
+            End
+
+            It "gives an error when the given status is not an integer"
+                When run "$MOMMY_EXEC" $1"kick" true
+                The error should equal \
+                    "mommy expected the argument for option '$(strip_opt "$1")' to be an integer, but it was 'kick'~"
+                The status should be failure
+            End
+
+            It "writes a compliment to stderr if the status is 0 when using $1"
                 set_config "MOMMY_COMPLIMENTS='station top'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -s 0
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"0"
                 The error should equal "station top"
                 The status should be success
             End
 
-            It "writes an encouragement to stderr if the status is non-0"
+            It "writes an encouragement to stderr if the status is non-0 when using $1"
                 set_config "MOMMY_ENCOURAGEMENTS='mend journey'"
 
-                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" -s 1
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" $1"1"
                 The error should equal "mend journey"
                 The status should be failure
             End
 
-            It "returns the given non-0 status"
-                When run "$MOMMY_EXEC" -s 167
+            It "returns the given non-0 status when using $1"
+                When run "$MOMMY_EXEC" $1"167"
                 The error should not equal ""
                 The status should equal 167
             End

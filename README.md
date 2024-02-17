@@ -6,7 +6,7 @@
 
 ---
 
-🚚&nbsp;[**installation**](#-installation) | 📖&nbsp;[**usage**](#-usage) | 🙋&nbsp;[**configuration**](#-configuration) | 🐚&nbsp;[**shell integration**](#-shell-integration) | ⚗️&nbsp;[**development**](#%EF%B8%8F-development) | 💖&nbsp;[**acknowledgements**](#-acknowledgements)
+<a name="toc"></a>🚚&nbsp;[**installation**](#installation) | 📖&nbsp;[**usage**](#usage) | 🙋&nbsp;[**configuration**](#configuration) | 🐚&nbsp;[**shell integration**](#shell-integration) | ⚗️&nbsp;[**development**](#development) | 💖&nbsp;[**acknowledgements**](#acknowledgements)
 
 ---
 
@@ -20,7 +20,7 @@ much~ ❤️
 ![mommy demo](.github/img/demo.gif)
 
 
-## 🚚 installation
+## 🚚 installation<a name="installation"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy works on any system.
 mommy is tested on ubuntu, debian, archlinux, fedora, nixpkgs, macos, freebsd, netbsd, openbsd, and windows~
 
@@ -214,7 +214,7 @@ find your operating system and package manager for the right instructions~
     })
   ];
   ```
-  check [the full list of configuration options](#-configuration).
+  check [the full list of configuration options](#configuration).
   note that your nix configuration should use lowercase variable names~
 * **nixos** (persistent)  
   install mommy by adding the following to your nixos configuration (usually in `/etc/nixos/configuration.nix`):
@@ -234,7 +234,7 @@ find your operating system and package manager for the right instructions~
     })
   ];
   ```
-  check [the full list of configuration options](#-configuration).
+  check [the full list of configuration options](#configuration).
   note that your nix configuration should use lowercase variable names~
 
 </details>
@@ -398,48 +398,71 @@ tar -C ./ -xzf mommy-*.tar.gz
 </details>
 
 ### 🔮 what's next?
-check out [how to use mommy](#-usage), read all about [ways you can configure mommy](#-configuration), and
-[integrate mommy with your shell](#-shell-integration)~
+check out [how to use mommy](#usage), read all about [ways you can configure mommy](#configuration), and
+[integrate mommy with your shell](#shell-integration)~
 
 <img width="450px" src=".github/img/sample1.png" alt="mommy integrated with the fish shell" />
 
 
-## 📖 usage
-mommy integrates with your normal command-line usage and compliments you if the command succeeds and encourages you if
-it fails~
+## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
+mommy processes the output status of a command and compliments you if the command succeeds and encourages you if it
+fails~
+
+you can ask mommy to support you in a few ways, shown below.
+alternatively, you can [integrate mommy into your shell](#shell-integration) so `mommy` is invoked for each command~
 
 ```shell
-$ mommy [-1] [-c config] [command] ...
+$ mommy [command] ...
 # e.g. `mommy npm test`
 
-$ mommy [-1] [-c config] -e eval
+$ mommy -e eval
 # e.g. `mommy -e "ls -l | wc -l"`
 
-$ mommy [-1] [-c config] -s status
-# e.g. `mommy -s $?`
+$ mommy -s status
+# e.g. `mommy -s 0` or `mommy -s $?`
 ```
 
-by default, mommy outputs to stderr, but if you use `mommy -1 [other options]` she'll output to stdout~
+additionally, mommy knows a few extra options, which you can use to discover who mommy is and to tell mommy which
+[configuration files](#configuration) she should use.
 
-use `mommy -v` to see which version of mommy you're using~
+| short option | long option                   | description                                                                               |
+|--------------|-------------------------------|-------------------------------------------------------------------------------------------|
+| `-h`         | `--help`                      | opens mommy's manual page~                                                                |
+| `-v`         | `--version`                   | displays version information~                                                             |
+| `-1`         |                               | writes output to stdout instead of stderr~                                                |
+| `-c <file>`  | `--config=<file>`             | reads [config](#configuration) from `<file>`~                                             |
+|              | `--global-config-dirs=<dirs>` | sets global [configuration](#configuration) dirs to the colon-separated list in `<dirs>`~ |
 
 
-## 🙋 configuration
-mommy's behavior can be configured by defining variables in `~/.config/mommy/config.sh`.
+## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
+mommy's behavior can be configured using config files.
+the easiest way to do so is to add your config to the file `~/.config/mommy/config.sh`.
+you can also set up a global config file that is applied to all users in `/etc/mommy/config.sh`.
+mommy will explain in detail below~
 
-> ℹ️ mommy is used to instructions being scribbled down in unusual places, and will check inside `XDG_CONFIG_HOME`
-> instead of `~/.config/` if the former is set~
+### 🔍 config file locations
+when mommy runs, she will first load the system-wide **global** config file.
+after that, she will read the user-specific **local** config file, overriding the values from the global file~
 
-you can specify a different config file by pointing the environment variable `MOMMY_OPT_CONFIG_FILE` to that file, or by
-running mommy as `mommy -c ./my_config.sh [other options]`~
+* to find the **global** config file, mommy runs the following procedure.
+    1. mommy determines the list of global config dirs.
+        1. if a list is specified using a [command-line option](#usage), that list is used.
+        2. otherwise, the list consists of all directories in `$XDG_CONFIG_DIRS`, plus `/etc/mommy`, plus
+         `/usr/local/etc/mommy/`.
+    2. mommy traverses this list, and stops once she finds a directory that contains the file `config.sh`.
+       this file will be the global config file~
+* to find the **local** config file, mommy runs the following procedure.
+    1. if a config file is specified using a [command-line option](#usage), that file is used. 
+    2. if `$XDG_CONFIG_HOME` is defined, the file `$XDG_CONFIG_HOME/mommy/config.sh` is used.
+    3. otherwise, `$HOME/.config/mommy/config.sh` is used~
 
 ### 🗃️ config file format
-mommy executes the config file as a shell script and keeps the environment variables.
+mommy executes config files as shell scripts and keeps the environment variables.
 so, to change the value of `MOMMY_SWEETIE`, add the following line to your config file:
 ```shell
 MOMMY_SWEETIE="catgirl"
 ```
-make sure you do not put spaces around the `=`~
+make sure you _do not_ put spaces around the `=`, and you _do_ put quotes (`"`) around the value~
 
 ### 👛 available settings
 | variable                       | description                                                                                                                                                                                                                                                                                                                                                 | list? | default       |
@@ -516,7 +539,7 @@ outputs `your mommy loves you`~
 ### ✍️ renaming the mommy executable
 if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~
 
-> ℹ️ if you [integrate mommy with your shell](#-shell-integration) you won't have to write `daddy` in the first place~
+> ℹ️ if you [integrate mommy with your shell](#shell-integration) you won't have to write `daddy` in the first place~
 
 mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
 installed with `whereis mommy`:
@@ -538,7 +561,7 @@ sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 > ℹ️ uninstalling mommy will not remove the manually created symlinks~
 
 
-## 🐚 shell integration
+## 🐚 shell integration<a name="shell-integration"></a> <small><sup>[top ▲](#toc)</sup></small>
 instead of calling mommy for each command, you can fully integrate mommy with your shell to get mommy's output each time
 you run any command.
 here are some examples on how you can do that in various shells.
@@ -637,7 +660,7 @@ log out and back in, and mommy will appear in your shell~
 </details>
 
 
-## ⚗️ development
+## ⚗️ development<a name="development"></a> <small><sup>[top ▲](#toc)</sup></small>
 this section explains how to build mommy from source, in case you want to help with development or for any other reason~
 
 ### 🎬 run
@@ -790,7 +813,7 @@ surely we'll be able to figure something out together~
 * your pull request should go into `dev`, not into `main`~
 
 
-## 💖 acknowledgements
+## 💖 acknowledgements<a name="acknowledgements"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy recognises _all_ contributors, no matter the size of the contribution.
 if mommy should add, remove, or change anything here, [open an issue](https://github.com/FWDekker/mommy/issues/new) or
 [contact the author](https://fwdekker.com/about/)~

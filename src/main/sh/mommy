@@ -1,5 +1,4 @@
 #!/bin/sh
-
 n="
 "
 
@@ -72,6 +71,22 @@ MOMMY_FORBIDDEN_WORDS=""
 MOMMY_IGNORED_STATUSES="130"
 
 
+## Input validation
+# Writes whitespace-concatenated input arguments to stderr and exits.
+die() { echo "$*" >&2; exit 1; }
+
+# Dies if `$OPTARG` is an empty string.
+require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi }
+
+# Dies if `$OPTARG` is not a non-negative integer.
+require_int() {
+    case "$OPTARG" in
+    ''|*[!0-9]*) die "mommy expected the argument for option '$OPT' to be an integer, but it was '$OPTARG'~" ;;
+    *) ;;
+    esac
+}
+
+
 ## Lists
 # A list is a collection of entries. Entries are separated by a forward slash (`/`) or by a newline. Entries containing
 # only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#`, all `/`
@@ -121,7 +136,7 @@ escape_sed_replacement() {
 }
 
 
-## Functions
+## Templates
 # Prints `$2`, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_echo() {
@@ -197,29 +212,34 @@ fill_template() {
 
 
 ## Read options
-MOMMY_OPT_HELP=""
-MOMMY_OPT_VERSION=""
-MOMMY_OPT_TARGET="2"
-MOMMY_OPT_CONFIG_FILE="${MOMMY_OPT_CONFIG_FILE:-"${XDG_CONFIG_HOME:-"$HOME/.config"}/mommy/config.sh"}"
-MOMMY_OPT_EVAL=""
-MOMMY_OPT_STATUS=""
+opt_help=""
+opt_version=""
+opt_target="2"
+opt_config="${opt_config:-"${XDG_CONFIG_HOME:-"$HOME/.config"}/mommy/config.sh"}"
+opt_global_config_dirs="${XDG_CONFIG_DIRS}:/etc/mommy/:/usr/local/etc/mommy/"
+opt_eval=""
+opt_status=""
 
-while getopts ":hv1c:e:s:-:" OPTION; do
-    # Cheap workaround for long options without arguments
-    if [ "$OPTION" = "-" ]; then
-        OPTION="$OPTARG"
+while getopts ":hv1c:e:s:-:" OPT; do
+    # Cheap workaround for long options, cf. https://stackoverflow.com/a/28466267
+    if [ "$OPT" = "-" ]; then
+        OPT="${OPTARG%%=*}"
+        OPTARG="${OPTARG#$OPT}"
+        OPTARG="${OPTARG#=}"
     fi
 
     # shellcheck disable=SC2214 # Handled by workaround
-    case "$OPTION" in
-    h|help) MOMMY_OPT_HELP="1" ;;
-    v|version) MOMMY_OPT_VERSION="1" ;;
-    1) MOMMY_OPT_TARGET="1" ;;
-    c) MOMMY_OPT_CONFIG_FILE="$OPTARG" ;;
-    e) MOMMY_OPT_EVAL="$OPTARG" ;;
-    s) MOMMY_OPT_STATUS="$OPTARG" ;;
-    ?) echo "mommy does not know option -$OPTARG~" >&2; exit 1 ;;
-    *) echo "mommy does not know option --$OPTION~" >&2; exit 1 ;;
+    case "$OPT" in
+    h|help) opt_help="1" ;;
+    v|version) opt_version="1" ;;
+    1) opt_target="1" ;;
+    global-config-dirs) require_arg; opt_global_config_dirs="$OPTARG" ;;
+    c|config) opt_config="$OPTARG" ;;
+    e|eval) require_arg; opt_eval="$OPTARG" ;;
+    s|status) require_arg; require_int; opt_status="$OPTARG" ;;
+    :) die "mommy's last option is missing its argument~" ;;
+    ?) die "mommy doesn't know option -$OPTARG~" ;;
+    *) die "mommy doesn't know option --$OPT~" ;;
     esac
 done
 
@@ -227,34 +247,46 @@ shift "$((OPTIND - 1))"
 
 
 ## Load configuration
-# shellcheck disable=SC1090 # User-defined target
-[ -r "$MOMMY_OPT_CONFIG_FILE" ] && . "$MOMMY_OPT_CONFIG_FILE"
+# Global
+config_dir=""
+while [ "$opt_global_config_dirs" != "$config_dir" ] ;do
+    config_dir="${opt_global_config_dirs%%:*}"
+    opt_global_config_dirs="${opt_global_config_dirs#$config_dir:}"
+
+    if [ -d "$config_dir" ] && [ -f "$config_dir/config.sh" ] && [ -r "$config_dir/config.sh" ]; then
+        # shellcheck source=/dev/null # User-defined target
+        . "$config_dir/config.sh"
+        break
+    fi
+done
+
+# User
+# shellcheck source=/dev/null # User-defined target
+[ -f "$opt_config" ] && [ -r "$opt_config" ] && . "$opt_config"
 
 
 ## Output
-if [ -n "$MOMMY_OPT_HELP" ]; then
+if [ -n "$opt_help" ]; then
     man mommy
 
     status="$?"
     if [ "$status" -ne 0 ]; then
-        printf "%s" \
-            "oops! " \
-            "mommy couldn't find the help page. " \
-            "but you can visit https://github.com/FWDekker/mommy/blob/%%VERSION_NUMBER%%/README.md for more " \
-            "information~" \
-            "$n" >&2
+        die "oops!" \
+            "mommy couldn't find the help page." \
+            "but you can visit https://github.com/FWDekker/mommy/blob/%%VERSION_NUMBER%%/README.md for more" \
+            "information~"
     fi
     exit "$status"
-elif [ -n "$MOMMY_OPT_VERSION" ]; then
+elif [ -n "$opt_version" ]; then
     echo "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0
 else
     # Run command
-    if [ -n "$MOMMY_OPT_EVAL" ]; then
-        (eval "$MOMMY_OPT_EVAL")
+    if [ -n "$opt_eval" ]; then
+        (eval "$opt_eval")
         command_exit_code="$?"
-    elif [ -n "$MOMMY_OPT_STATUS" ]; then
-        command_exit_code="$MOMMY_OPT_STATUS"
+    elif [ -n "$opt_status" ]; then
+        command_exit_code="$opt_status"
     else
         ("$@")
         command_exit_code="$?"
@@ -281,7 +313,7 @@ else
                                   "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE")"
 
     # Output template
-    case "$MOMMY_OPT_TARGET" in
+    case "$opt_target" in
     1) color_echo "$color" "$response" >&1 ;;
     2) color_echo "$color" "$response" >&2 ;;
     esac
