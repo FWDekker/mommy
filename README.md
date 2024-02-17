@@ -236,7 +236,6 @@ find your operating system and package manager for the right instructions~
   ```
   check [the full list of configuration options](#configuration).
   note that your nix configuration should use lowercase variable names~
-
 </details>
 
 <details>
@@ -313,7 +312,7 @@ if you want to customise where and how mommy installs, you can just compile her 
 
 1. **prerequisites**
     * [git](https://git-scm.com/)
-    * [gnu make](https://www.gnu.org/software/make/)
+    * [gnu make](https://www.gnu.org/software/make/) (`gmake`)
 2. **clone repository**
    ```shell
    git clone https://github.com/FWDekker/mommy.git
@@ -425,22 +424,31 @@ $ mommy -s status
 additionally, mommy knows a few extra options, which you can use to discover who mommy is and to tell mommy which
 [configuration files](#configuration) she should use.
 
-| short option | long option                   | description                                                                               |
-|--------------|-------------------------------|-------------------------------------------------------------------------------------------|
-| `-h`         | `--help`                      | opens mommy's manual page~                                                                |
-| `-v`         | `--version`                   | displays version information~                                                             |
-| `-1`         |                               | writes output to stdout instead of stderr~                                                |
-| `-c <file>`  | `--config=<file>`             | reads [config](#configuration) from `<file>`~                                             |
-|              | `--global-config-dirs=<dirs>` | sets global [configuration](#configuration) dirs to the colon-separated list in `<dirs>`~ |
+| short option | long option                   | description                                                                                       |
+|--------------|-------------------------------|---------------------------------------------------------------------------------------------------|
+| `-h`         | `--help`                      | opens mommy's manual page~                                                                        |
+| `-v`         | `--version`                   | displays version information~                                                                     |
+| `-1`         |                               | writes output to stdout instead of stderr~                                                        |
+| `-c <file>`  | `--config=<file>`             | reads the [configuration](#configuration) from `<file>`~                                          |
+|              | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
 
 
 ## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
-mommy's behavior can be configured using config files.
+mommy's behavior can be modified using config files.
 the easiest way to do so is to add your config to the file `~/.config/mommy/config.sh`.
-you can also set up a global config file that is applied to all users in `/etc/mommy/config.sh`.
-mommy will explain in detail below~
+you can also set up a global config file that is applied to all users, by default in `/etc/mommy/config.sh`.
+[read more about the way config files are loaded](#config-file-locations)~
 
-### 🔍 config file locations
+mommy supports [a lot of different settings](#list-of-all-settings).
+if you want to configure the value of `MOMMY_SWEETIE`, add the following line to your config file:
+```shell
+MOMMY_SWEETIE="catgirl"
+```
+make sure you _do not_ put spaces around the `=`, and you _do_ put quotes (`"`) around the value~
+
+<details>
+<summary><a name="config-file-locations"></a>🔍 config file locations</summary>
+
 when mommy runs, she will first load the system-wide **global** config file.
 after that, she will read the user-specific **local** config file, overriding the values from the global file~
 
@@ -455,38 +463,37 @@ after that, she will read the user-specific **local** config file, overriding th
     1. if a config file is specified using a [command-line option](#usage), that file is used. 
     2. if `$XDG_CONFIG_HOME` is defined, the file `$XDG_CONFIG_HOME/mommy/config.sh` is used.
     3. otherwise, `$HOME/.config/mommy/config.sh` is used~
+</details>
 
-### 🗃️ config file format
-mommy executes config files as shell scripts and keeps the environment variables.
-so, to change the value of `MOMMY_SWEETIE`, add the following line to your config file:
-```shell
-MOMMY_SWEETIE="catgirl"
-```
-make sure you _do not_ put spaces around the `=`, and you _do_ put quotes (`"`) around the value~
+<details>
+<summary><a name="list-of-all-settings"></a>👛 list of all settings</summary>
 
-### 👛 available settings
-| variable                       | description                                                                                                                                                                                                                                                                                                                                                 | list? | default       |
-|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|---------------|
-| `MOMMY_CAREGIVER`              | what mommy calls herself                                                                                                                                                                                                                                                                                                                                    | yes   | `mommy`       |
-| `MOMMY_PRONOUNS`               | mommy's pronouns for herself. should be three words separated by spaces, as in `they them their` (subject, object, possessive)                                                                                                                                                                                                                              | yes   | `she her her` |
-| `MOMMY_SWEETIE`                | what mommy calls you                                                                                                                                                                                                                                                                                                                                        | yes   | `girl`        |
-| `MOMMY_PREFIX`                 | what mommy puts at the start of each sentence                                                                                                                                                                                                                                                                                                               | yes   | &lt;empty>    |
-| `MOMMY_SUFFIX`                 | what mommy puts at the end of each sentence                                                                                                                                                                                                                                                                                                                 | yes   | `~`           |
-| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                                                                                                                                                                                                                     | no    | `0`           |
-| `MOMMY_COLOR`                  | color of mommy's text. you can use any [xterm color code](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg), or write `lolcat` to use [lolcat](https://github.com/busyloop/lolcat) (install separately). specify multiple colors separated by `/` to randomly select one. set to empty string for your terminal's default color | yes   | `005`         |
-| `MOMMY_COMPLIMENTS`            | default compliment templates                                                                                                                                                                                                                                                                                                                                | yes   | &lt;various>  |
-| `MOMMY_COMPLIMENTS_EXTRA`      | additional compliment templates you can specify                                                                                                                                                                                                                                                                                                             | yes   | &lt;empty>    |
-| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                                                                                                                                                                                                                                                                                         | no    | `1`           |
-| `MOMMY_ENCOURAGEMENTS`         | default encouragement templates                                                                                                                                                                                                                                                                                                                             | yes   | &lt;various>  |
-| `MOMMY_ENCOURAGEMENTS_EXTRA`   | additional encouragement templates you can specify                                                                                                                                                                                                                                                                                                          | yes   | &lt;empty>    |
-| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                                                                                                                                                                                                                                                                                      | no    | `1`           |
-| `MOMMY_FORBIDDEN_WORDS`        | mommy will not use templates that contain forbidden / trigger words                                                                                                                                                                                                                                                                                         | yes   | &lt;empty>    |
-| `MOMMY_IGNORED_STATUSES`       | exit codes that mommy should never reply to. set to empty string to ignore nothing                                                                                                                                                                                                                                                                          | yes   | `130`         |
+| variable                       | description                                                                                                                                                                                                                                                                                                                                                 | [list](#how-to-configure-lists)? | default       |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|---------------|
+| `MOMMY_CAREGIVER`              | what mommy calls herself                                                                                                                                                                                                                                                                                                                                    | yes                              | `mommy`       |
+| `MOMMY_PRONOUNS`               | mommy's pronouns for herself. should be three words separated by spaces, as in `they them their` (subject, object, possessive)                                                                                                                                                                                                                              | yes                              | `she her her` |
+| `MOMMY_SWEETIE`                | what mommy calls you                                                                                                                                                                                                                                                                                                                                        | yes                              | `girl`        |
+| `MOMMY_PREFIX`                 | what mommy puts at the start of each sentence                                                                                                                                                                                                                                                                                                               | yes                              | &lt;empty>    |
+| `MOMMY_SUFFIX`                 | what mommy puts at the end of each sentence                                                                                                                                                                                                                                                                                                                 | yes                              | `~`           |
+| `MOMMY_CAPITALIZE`             | `0` to start sentences in lowercase, `1` for uppercase, anything else to change nothing                                                                                                                                                                                                                                                                     | no                               | `0`           |
+| `MOMMY_COLOR`                  | color of mommy's text. you can use any [xterm color code](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg), or write `lolcat` to use [lolcat](https://github.com/busyloop/lolcat) (install separately). specify multiple colors separated by `/` to randomly select one. set to empty string for your terminal's default color | yes                              | `005`         |
+| `MOMMY_COMPLIMENTS`            | default compliment [templates](#how-to-configure-templates)                                                                                                                                                                                                                                                                                                 | yes                              | &lt;various>  |
+| `MOMMY_COMPLIMENTS_EXTRA`      | additional compliment templates you can specify                                                                                                                                                                                                                                                                                                             | yes                              | &lt;empty>    |
+| `MOMMY_COMPLIMENTS_ENABLED`    | `1` to enable compliments, anything else to disable                                                                                                                                                                                                                                                                                                         | no                               | `1`           |
+| `MOMMY_ENCOURAGEMENTS`         | default encouragement [templates](#how-to-configure-templates)                                                                                                                                                                                                                                                                                              | yes                              | &lt;various>  |
+| `MOMMY_ENCOURAGEMENTS_EXTRA`   | additional encouragement templates you can specify                                                                                                                                                                                                                                                                                                          | yes                              | &lt;empty>    |
+| `MOMMY_ENCOURAGEMENTS_ENABLED` | `1` to enable encouragements, anything else to disable                                                                                                                                                                                                                                                                                                      | no                               | `1`           |
+| `MOMMY_FORBIDDEN_WORDS`        | mommy will not use templates that contain forbidden / trigger words                                                                                                                                                                                                                                                                                         | yes                              | &lt;empty>    |
+| `MOMMY_IGNORED_STATUSES`       | exit codes that mommy should never reply to. set to empty string to ignore nothing                                                                                                                                                                                                                                                                          | yes                              | `130`         |
+</details>
 
-### 🪣 lists
+<details>
+<summary><a name="how-to-configure-lists"></a>🪣 how to configure lists</summary>
+
 some of these settings support lists.
 mommy chooses a random element from each list each time she is called by you.
-(except for `MOMMY_FORBIDDEN_WORDS` and `MOMMY_SUPPRESS_EXIT`, where mommy always considers all elements of the list.)
+(except for `MOMMY_FORBIDDEN_WORDS` and `MOMMY_IGNORED_STATUSES`, where mommy always considers all elements of the
+list.)
 in a list, elements are separated by a newline or by a `/`.
 elements that contain whitespace only, and elements that start with a `#` are ignored~
 
@@ -512,9 +519,13 @@ elements that contain whitespace only, and elements that start with a `#` are ig
   MOMMY_FORBIDDEN_WORDS="cat/dog"
   ```
   then mommy will never use templates that contain `cat`, and will never use templates that contain `dog`~
+</details>
 
-### 🧬 custom templates
-you can add a [list](#-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or `MOMMY_COMPLIMENTS_EXTRA`.
+<details>
+<summary><a name="how-to-configure-templates"></a>🧬 how to configure templates</summary>
+
+you can add a [list](#how-to-configure-lists) of your own compliments to either `MOMMY_COMPLIMENTS` or
+`MOMMY_COMPLIMENTS_EXTRA`.
 there is a slight difference between the two lists:
 
 * if you want both the default _and_ your own compliments, add your own compliments to `MOMMY_COMPLIMENTS_EXTRA`~
@@ -522,43 +533,19 @@ there is a slight difference between the two lists:
 
 and similarly so for encouragements~
 
-### 📛 template variables
 inside compliments and encouragements, you can put placeholders that contain the random values that mommy chose.
 for example, if you add the compliment `%%CAREGIVER%% loves you`, and have `MOMMY_CAREGIVER=your mommy`, then mommy
 outputs `your mommy loves you`~
 
-| variable        | description                                       |
-|-----------------|---------------------------------------------------|
-| `%%CAREGIVER%%` | what mommy calls herself                          |
-| `%%THEY%%`      | mommy's subject pronoun (e.g. he, she, they)      |
-| `%%THEM%%`      | mommy's object pronoun (e.g. him, her, them)      |
-| `%%THEIR%%`     | mommy's possessive pronoun (e.g. his, her, their) |
-| `%%SWEETIE%%`   | what mommy calls you                              |
-| `%%N%%`         | a newline                                         |
-
-### ✍️ renaming the mommy executable
-if you want to write `daddy npm test` instead of `mommy npm test`, you can create a symlink~
-
-> ℹ️ if you [integrate mommy with your shell](#shell-integration) you won't have to write `daddy` in the first place~
-
-mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
-installed with `whereis mommy`:
-```shell
-$ whereis mommy
-mommy: /usr/bin/mommy /usr/share/man/man1/mommy.1.gz
-```
-the exact output of `whereis` differs depending on your system, but in this case you can see that the program is
-installed in `/usr/bin/mommy` and the manual page in `/usr/share/man/man1/mommy.1.gz`.
-if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
-
-anyway, after finding mommy, you can just symlink using the following commands:
-(if `whereis` gave different paths than seen above, you should adapt these commands accordingly)
-```shell
-sudo ln -fs /usr/bin/mommy /usr/bin/daddy
-sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
-```
-
-> ℹ️ uninstalling mommy will not remove the manually created symlinks~
+| variable        | description                                      |
+|-----------------|--------------------------------------------------|
+| `%%CAREGIVER%%` | what mommy calls herself                         |
+| `%%THEY%%`      | mommy's subject pronoun (e.g. they, she, he)     |
+| `%%THEM%%`      | mommy's object pronoun (e.g. them, her, he)      |
+| `%%THEIR%%`     | mommy's possessive pronoun (e.g. their, her, he) |
+| `%%SWEETIE%%`   | what mommy calls you                             |
+| `%%N%%`         | a newline                                        |
+</details>
 
 
 ## 🐚 shell integration<a name="shell-integration"></a> <small><sup>[top ▲](#toc)</sup></small>
@@ -659,16 +646,49 @@ after that, add the above-mentioned line that defines `PS1` to `~/.shrc`.
 log out and back in, and mommy will appear in your shell~
 </details>
 
+<details>
+<summary><a name="renaming-the-mommy-executable"></a>✍️ renaming the mommy executable</summary>
+
+if you use any of the above integrations, you don't have to call mommy directly.
+if you don't want that, but also don't want to write `mommy`, this section explains how you can instead write, say,
+`daddy`, `marija`, or `sinterklaas`~
+
+mommy is installed in slightly different locations on different systems, but you can easily find where mommy is
+installed with `whereis mommy`:
+```shell
+$ whereis mommy
+mommy: /usr/bin/mommy /usr/share/man/man1/mommy.1.gz
+```
+the exact output of `whereis` differs depending on your system, but in this case you can see that the program is
+installed in `/usr/bin/mommy` (and the manual page in `/usr/share/man/man1/mommy.1.gz`).
+if `whereis mommy` doesn't work, mommy is not on your path, but you can still find her with `find / -name mommy`~
+
+anyway, after finding mommy, you can just symlink using the following commands:
+(if `whereis` gave different paths than the ones above, then change these commands accordingly)
+```shell
+sudo ln -fs /usr/bin/mommy /usr/bin/daddy
+sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
+```
+
+> ℹ️ uninstalling mommy will not remove the manually created symlinks~
+</details>
+
 
 ## ⚗️ development<a name="development"></a> <small><sup>[top ▲](#toc)</sup></small>
-this section explains how to build mommy from source, in case you want to help with development or for any other reason~
+this section explains how to build mommy from source, in case you want to
+[help with development](https://github.com/FWDekker/mommy/blob/main/CONTRIBUTING.md) or for any other reason~
 
-### 🎬 run
+<details>
+<summary>🎬 run</summary>
+
 you can actually just directly run the script in `src/main/sh/mommy`.
 the only difference will be that the `-h` and `-v` options may not work correctly.
 if that annoys you, run `make build` after each change, and use `build/bin/mommy` instead~
+</details>
 
-### 🧪 tests
+<details>
+<summary>🧪 tests</summary>
+
 1. **requirements**  
    [shellspec](https://github.com/shellspec/shellspec)
 2. **test local code**
@@ -691,8 +711,11 @@ if that annoys you, run `make build` after each change, and use `build/bin/mommy
 4. **configuration**  
    except for `system=1`, test behaviour is configured with environment variables.
    check the various files in [`src/test/`](https://github.com/FWDekker/mommy/tree/main/src/test) to find 'em all~
+</details>
 
-### 🏬 distribution
+<details>
+<summary>🏬 distribution</summary>
+
 mommy is distributed in three ways:
 * attached as **binary packages** to each github release,
 * built on **build servers**,
@@ -700,82 +723,76 @@ mommy is distributed in three ways:
 
 let's go into them in more detail~
 
-<details>
-<summary>📦 binary packages</summary>
+* **📦 binary packages**  
+  the binary packages attached to the github release are built with the
+  [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile).
+  run `make list` to see a list of build targets;
+  you're looking for the ones starting with `dist/`~
 
-the binary packages attached to the github release are built with the
-[makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile).
-run `make list` to see a list of build targets;
-you're looking for the ones starting with `dist/`~
+  to build the packages, you need at least gnu make, ruby, and [fpm](https://github.com/jordansissel/fpm).
+  (actually, you don't need fpm for netbsd and openbsd.)
+  on debian-based systems, you already have gnu make, so you only need
+  ```shell
+  sudo apt install ruby
+  sudo gem install fpm
+  ```
 
-to build the packages, you need at least gnu make, ruby, and [fpm](https://github.com/jordansissel/fpm).
-(actually, you don't need fpm for netbsd and openbsd.)
-on debian-based systems, you already have gnu make, so you only need
-```shell
-sudo apt install ruby
-sudo gem install fpm
-```
+  after that, just run `make dist/deb` (or better: `mommy make dist/deb`), and a `.deb` package will be built in
+  `dist/`.
+  run `make` or `make list` for a list of valid build targets.
+  a special target is `install`, which directly copies the files into the specified directories on your system.
+  these directories can be changed by setting `prefix` variables, as in `make prefix=/usr/ install`.
+  i recommend running `make --dry-run prefix=/usr/ install` first so you can verify that all directories are calculated
+  correctly.
+  check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for more details~
 
-after that, just run `make dist/deb` (or better: `mommy make dist/deb`), and a `.deb` package will be built in `dist/`.
-run `make` or `make list` for a list of valid build targets.
-a special target is `install`, which directly copies the files into the specified directories on your system.
-these directories can be changed by setting `prefix` variables, as in `make prefix=/usr/ install`.
-i recommend running `make --dry-run prefix=/usr/ install` first so you can verify that all directories are calculated
-correctly.
-check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for more details~
+  all systems can build packages for themselves without additional dependencies beyond those noted above.
+  if you want to compile for a different system, you may need additional dependencies.
+  for example, if you want to build packages for alpine linux, archlinux, and rpm from a debian-like system, you will
+  respectively need
+  ```shell
+  sudo apt install libarchive-tools rpm zstd
+  ```
+  and then you can run
+  ```shell
+  make dist/apk dist/pacman dist/rpm
+  ```
+  unfortunately, packages for macos, netbsd, and openbsd cannot be built on systems other than themselves~
+* **🏗️ build servers**  
+  build servers build mommy distributions on-demand for each release, and make the created packages available for all
+  users.
+  how sweet~
 
-all systems can build packages for themselves without additional dependencies beyond those noted above.
-if you want to compile for a different system, you may need additional dependencies.
-for example, if you want to build packages for alpine linux, archlinux, and rpm from a debian-like system, you will
-respectively need
-```shell
-sudo apt install libarchive-tools rpm zstd
-```
-and then you can run
-```shell
-make dist/apk dist/pacman dist/rpm
-```
-unfortunately, packages for macos, netbsd, and openbsd cannot be built on systems other than themselves~
+  * [apt-mommy](https://github.com/FWDekker/apt-mommy) is a github-based apt repository that hosts mommy's `.deb`
+    packages after they have been built in
+    [mommy's cd pipeline](https://github.com/FWDekker/mommy/actions/workflows/cd.yml)~
+  * [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) builds packages for fedora and epel~
+* **🌱 source builds**  
+  some servers host instructions on how to build mommy, but don't do any work beyond that.
+  users connect to the server, get the latest instructions, and their system builds mommy for them locally~
+
+  * for **arch linux**, the [arch user repository](https://aur.archlinux.org/) hosts the
+    [mommy package](https://aur.archlinux.org/packages/mommy).
+    a development mirror is hosted on github in [aur-mommy](https://github.com/FWDekker/aur-mommy)~
+  * for **homebrew**, mommy has the [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy) repository on github,
+    which is resolved automatically by the brew client based on the repository's name~
 </details>
 
 <details>
-<summary>🏗️ build servers</summary>
+<summary>📯 release</summary>
 
-build servers build mommy distributions on-demand for each release, and make the created packages available for all
-users.
-how sweet~
-
-* [apt-mommy](https://github.com/FWDekker/apt-mommy) is a github-based apt repository that hosts mommy's `.deb` packages
-  after they have been built in [mommy's cd pipeline](https://github.com/FWDekker/mommy/actions/workflows/cd.yml)~
-* [copr](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/) builds packages for fedora and epel~
-</details>
-
-<details>
-<summary>🌱 source builds</summary>
-
-some servers host instructions on how to build mommy, but don't do any work beyond that.
-users connect to the server, get the latest instructions, and their system builds mommy for them locally~
-
-* for **arch linux**, the [arch user repository](https://aur.archlinux.org/) hosts the
-  [mommy package](https://aur.archlinux.org/packages/mommy).
-  a development mirror is hosted on github in [aur-mommy](https://github.com/FWDekker/aur-mommy)~
-* for **homebrew**, mommy has the [homebrew-mommy](https://github.com/FWDekker/homebrew-mommy) repository on github,
-  which is resolved automatically by the brew client based on the repository's name~
-</details>
-
-### 📯 release
 [`main`](https://github.com/FWDekker/mommy/tree/main) always contains the latest stable version.
 to release a new version, just use the [deploy action](https://github.com/FWDekker/mommy/actions/workflows/cd.yml),
 which can be activated using a `workflow_dispatch` event~
 
-<details>
-<summary>release checklists</summary>
+<b>release checklists</b>
 
 * **before triggering deployment**
   * update `version`~
   * update all changelogs~
     * update `CHANGELOG.md`~
-      * do not leave a placeholder section for `[Unreleased]`, because that will end up in the `.deb` changelogs~
+      * do not leave a placeholder section for `[Unreleased]`, because that will end up in the `.deb`'s
+        `changelog.gz`~
       * remove empty subsections for the new release~
       * ensure no line breaks are used as whitespace;
         github release notes use them as actual line breaks~
@@ -801,17 +818,6 @@ which can be activated using a `workflow_dispatch` event~
     * always [manually check deployment status](https://github.com/FWDekker/homebrew-mommy/actions?query=branch%3Amain)~
 </details>
 
-### 🤠 contribution guidelines
-thank you for considering contributing to mommy!
-below are some guidelines for contributions, but honestly, _any_ contribution is welcome, even if it's broken, because
-surely we'll be able to figure something out together~
-
-* add relevant documentation and tests~
-* add relevant emojis in your commit messages~
-* ensure that the tests pass (on your machine, at least)~
-* describe your changes in `CHANGELOG.md`~
-* your pull request should go into `dev`, not into `main`~
-
 
 ## 💖 acknowledgements<a name="acknowledgements"></a> <small><sup>[top ▲](#toc)</sup></small>
 mommy recognises _all_ contributors, no matter the size of the contribution.
@@ -833,8 +839,9 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
 * mommy thanks [wei he](https://github.com/wei) for creating [socialify](https://github.com/wei/socialify),
   which mommy uses for her github social preview~
 * mommy thanks [ckie](https://github.com/ckiee) for
-  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034) and
-  [several neat improvements](https://github.com/FWDekker/mommy/pull/61)~
+  [bringing mommy to nixpkgs](https://github.com/NixOS/nixpkgs/pull/250034),
+  [several neat improvements](https://github.com/FWDekker/mommy/pull/61), and for
+  [maintaining the nixpkg](https://github.com/NixOS/nixpkgs/pull/274867)~
 * mommy thanks [aemogie.](https://github.com/aemogie) for
   [telling her how to integrate with nushell](https://github.com/FWDekker/mommy/issues/65)~
 * mommy thanks [maximilian downey twiss](https://github.com/Zopolis4) for

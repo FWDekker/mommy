@@ -8,6 +8,7 @@
 * 🕳️ mommy now interprets an empty config file path (`-c`) as you not wanting to use a config file~
 * ✅ mommy improved her input validation, giving clearer error messages when something is wrong~
 * 🏓 mommy improved the links to and from the table of contents in her readme~
+* 🏋️‍♀️ mommy made her readme easier to navigate and scroll through~ ([#97](https://github.com/FWDekker/mommy/issues/97))
 
 
 ## [1.3.0] -- 2024-01-10
