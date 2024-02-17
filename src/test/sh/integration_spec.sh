@@ -24,8 +24,8 @@ Describe "integration of mommy with other programs"
         }
 
         It "uninstalls all files that are installed"
-            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
-            $MOMMY_MAKE -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" install >/dev/null
+            "$MOMMY_MAKE" -C ../../../ prefix="$MOMMY_TMP_DIR/" uninstall >/dev/null
 
             Assert is_empty "$MOMMY_TMP_DIR/"
         End
@@ -38,40 +38,31 @@ Describe "integration of mommy with other programs"
         man_before_each() {
             unset MANPATH  # Required on Windows
             if [ "$MOMMY_SYSTEM" != "1" ]; then
-                export MANPATH="$(readlink -f "$(pwd)/../../main/man/")"
+                MANPATH="$(readlink -f "$(pwd)/../../main/man/")"
+                export MANPATH
             fi
         }
         BeforeEach "man_before_each"
 
 
-        It "outputs help information using -h"
-            When run "$MOMMY_EXEC" -h
+        Parameters:value "-h" "--help"
+
+        It "outputs help information using $1"
+            When run "$MOMMY_EXEC" "$1"
             The word 1 of output should equal "mommy(1)"
             The status should be success
         End
 
-        It "outputs help information using --help"
-            When run "$MOMMY_EXEC" --help
+        It "outputs help information even when $1 is not the first option"
+            When run "$MOMMY_EXEC" -s 432 "$1"
             The word 1 of output should equal "mommy(1)"
             The status should be success
         End
 
-        It "outputs help information even when -h is not the first option"
-            When run "$MOMMY_EXEC" -s 432 -h
-            The word 1 of output should equal "mommy(1)"
-            The status should be success
-        End
-
-        It "outputs help information even when --help is not the first option"
-            When run "$MOMMY_EXEC" -s 221 --help
-            The word 1 of output should equal "mommy(1)"
-            The status should be success
-        End
-
-        It "outputs a link to github if the manual page could not be found when using -h"
+        It "outputs a link to github if the manual page could not be found when using $1"
             export MANPATH="/invalid-path"
 
-            When run "$MOMMY_EXEC" -h
+            When run "$MOMMY_EXEC" "$1"
             The output should equal ""
             The error should include "github.com"
             The status should be failure

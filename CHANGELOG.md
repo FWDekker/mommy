@@ -1,4 +1,16 @@
 # Changelog
+## [unreleased]
+### added
+* 🌍 mommy now supports a global config file that applies to all users, stored for example in `/usr/mommy/config.sh`~ ([#95](https://github.com/FWDekker/mommy/issues/95)) ([#96](https://github.com/FWDekker/mommy/issues/96))
+* 📏 mommy accepts long command-line options for all options (like `--config=<file>` for `-c <file>`)~
+
+### changed
+* 🕳️ mommy now interprets an empty config file path (`-c`) as you not wanting to use a config file~
+* ✅ mommy improved her input validation, giving clearer error messages when something is wrong~
+* 🏓 mommy improved the links to and from the table of contents in her readme~
+* 🏋️‍♀️ mommy made her readme easier to navigate and scroll through~ ([#97](https://github.com/FWDekker/mommy/issues/97))
+
+
 ## [1.3.0] -- 2024-01-10
 ### added
 * 🪹 mommy now supports newlines in templates using `%%N%%`~ ([#58](https://github.com/FWDekker/mommy/issues/58)) ([#82](https://github.com/FWDekker/mommy/issues/82))
