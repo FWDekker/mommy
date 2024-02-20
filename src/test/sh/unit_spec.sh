@@ -8,7 +8,7 @@
 # Writes `$1` to `$2` (the latter defaulting to `$MOMMY_CONFIG_FILE`), setting both `MOMMY_COLOR` and `MOMMY_SUFFIX` to
 # the empty string, unless overridden in `$1`.
 set_config() {
-    echo "MOMMY_COLOR='';MOMMY_SUFFIX='';$1" > "${2:-$MOMMY_CONFIG_FILE}"
+    printf "MOMMY_COLOR='';MOMMY_SUFFIX='';%s\n" "$1" > "${2:-$MOMMY_CONFIG_FILE}"
 }
 
 

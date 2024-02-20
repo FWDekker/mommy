@@ -73,7 +73,7 @@ MOMMY_IGNORED_STATUSES="130"
 
 ## Input validation
 # Writes whitespace-concatenated input arguments to stderr and exits.
-die() { echo "$*" >&2; exit 1; }
+die() { printf "%s\n" "$*" >&2; exit 1; }
 
 # Dies if `$OPTARG` is an empty string.
 require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi }
@@ -81,7 +81,7 @@ require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for
 # Dies if `$OPTARG` is not a non-negative integer.
 require_int() {
     case "$OPTARG" in
-    ''|*[!0-9]*) die "mommy expected the argument for option '$OPT' to be an integer, but it was '$OPTARG'~" ;;
+    ""|*[!0123456789]*) die "mommy expected the argument for option '$OPT' to be an integer, but it was '$OPTARG'~" ;;
     *) ;;
     esac
 }
@@ -93,12 +93,42 @@ require_int() {
 # on that line are part of the comment and are not considered separators. A sanitized list is a list in which there are
 # no forward slashes (`/`) and in which there are no comments.
 
+# Replaces in `$1` any character in `$2` by a newline.
+split() {
+    test "${-#*f}" != "$-"
+    globbing_enabled="$?"
+
+    set -f
+    old_ifs="$IFS"
+    IFS="$2"
+
+    set -- $1  # Do not quote this!
+    printf "%s\n" "$@"
+
+    IFS="$old_ifs"
+    if [ "$globbing_enabled" != "0" ]; then set +f; fi
+}
+
+# Returns `0` if and only if `$1` consists of more than just whitespace.
+is_blank() {
+    trim="${1#${1%%[![:space:]]*}}"
+    trim="${trim%${trim##*[![:space:]]}}"
+    test -z "$trim"
+    return "$?"
+}
+
+# Returns `0` if and only if `$1` starts with a `#`.
+is_comment() {
+    test -z "${1##\#*}"
+    return "$?"
+}
+
 # Returns `0` if the string `$1` contains any of the entries in the sanitized list `$2` as a substring, and returns `1`
 # otherwise.
 list_contains_any() {
     if [ -z "$2" ]; then return 1; fi
 
-    echo "$2" | while IFS="$n" read -r needle; do [ -z "${1##*"$needle"*}" ] && return 0; done
+    printf "%s\n" "$2" | while IFS="$n" read -r needle; do [ -z "${1##*"$needle"*}" ] && return 0; done
     return "$?"
 }
 
@@ -107,10 +137,10 @@ list_contains_any() {
 # substring.
 list_normalize() {
     cat |
-        grep -v "^#" |
-        tr "/" "$n" |
-        grep -v "^[[:space:]]*\$" |
-        while IFS="$n" read -r line; do list_contains_any "$line" "$1" || echo "$line"; done
+        while IFS="$n" read -r line; do if ! is_comment "$line"; then split "$line" "/"; fi; done |
+        while IFS="$n" read -r line; do
+            if ! is_blank "$line" && ! list_contains_any "$line" "$1"; then printf "%s\n" "$line"; fi
+        done
     return 0
 }
 
@@ -122,9 +152,9 @@ if [ -x "$(command -v shuf)" ]; then
 else
     list_choose() {
         lines="$(cat)"
-        count="$(echo "$lines" | wc -l)"
+        count="$(printf "%s\n" "$lines" | wc -l)"
         idx="$(jot -r 1 1 "$count")"
-        echo "$lines" | sed "${idx}q;d"
+        printf "%s\n" "$lines" | sed "${idx}q;d"
     }
 fi
 
@@ -139,19 +169,19 @@ escape_sed_replacement() {
 ## Templates
 # Prints `$2`, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
-color_echo() {
+color_print() {
     colors="$(tput colors 2>/dev/null)"
 
     if [ "$1" = "lolcat" ]; then
-        echo "$2" | lolcat -f
+        printf "%s\n" "$2" | lolcat -f
     elif [ -z "$1" ] || [ -z "$colors" ] || [ "$colors" -lt 8 ]; then
-        echo "$2"
+        printf "%s\n" "$2"
     else
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
         tput setaf 0 1>/dev/null 2>/dev/null || tput_bug="0 0"
 
         # shellcheck disable=SC2086 # Intentional word splitting: OpenBSD workaround requires two arguments
-        echo "$(tput setaf "$1" $tput_bug)$2$(tput sgr0)"
+        printf "%s\n" "$(tput setaf "$1" $tput_bug)$2$(tput sgr0)"
     fi
     return 0
 }
@@ -162,10 +192,10 @@ capitalize() {
     case "$2" in
     0) mapping="tolower" ;;
     1) mapping="toupper" ;;
-    *) echo "$1"; return 0 ;;
+    *) printf "%s\n" "$1"; return 0 ;;
     esac
 
-    echo "$1" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
+    printf "%s\n" "$1" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
@@ -192,12 +222,12 @@ split_pronouns() {
 # 4. prepends `$4` and appends `$5`; and
 # 5. writes to stdout.
 fill_template() {
-    sweetie="$(echo "$1" | list_normalize | list_choose | escape_sed_replacement)"
-    split_pronouns "$(echo "$2" | list_normalize | list_choose | escape_sed_replacement)"
-    caregiver="$(echo "$3" | list_normalize | list_choose | escape_sed_replacement)"
+    sweetie="$(printf "%s\n" "$1" | list_normalize | list_choose | escape_sed_replacement)"
+    split_pronouns "$(printf "%s\n" "$2" | list_normalize | list_choose | escape_sed_replacement)"
+    caregiver="$(printf "%s\n" "$3" | list_normalize | list_choose | escape_sed_replacement)"
 
-    prefix="$(echo "$4" | list_normalize | list_choose | escape_sed_replacement)"
-    suffix="$(echo "$5" | list_normalize | list_choose | escape_sed_replacement)"
+    prefix="$(printf "%s\n" "$4" | list_normalize | list_choose | escape_sed_replacement)"
+    suffix="$(printf "%s\n" "$5" | list_normalize | list_choose | escape_sed_replacement)"
 
     template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" \
                           -e "s/%%THEY%%/$they/g" \
@@ -278,7 +308,7 @@ if [ -n "$opt_help" ]; then
     fi
     exit "$status"
 elif [ -n "$opt_version" ]; then
-    echo "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
+    printf "%s\n" "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0
 else
     # Run command
@@ -293,7 +323,7 @@ else
     fi
 
     # Choose and fill template (if enabled)
-    if list_contains_any "$command_exit_code" "$(echo "$MOMMY_IGNORED_STATUSES" | list_normalize)"; then
+    if list_contains_any "$command_exit_code" "$(printf "%s\n" "$MOMMY_IGNORED_STATUSES" | list_normalize)"; then
         exit "$command_exit_code"
     elif [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
         templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
@@ -303,10 +333,10 @@ else
         exit "$command_exit_code"
     fi
 
-    color="$(echo "$MOMMY_COLOR" | list_normalize | list_choose)"
-    forbidden_words="$(echo "$MOMMY_FORBIDDEN_WORDS" | list_normalize)"
+    color="$(printf "%s\n" "$MOMMY_COLOR" | list_normalize | list_choose)"
+    forbidden_words="$(printf "%s\n" "$MOMMY_FORBIDDEN_WORDS" | list_normalize)"
 
-    response="$(echo "$templates" |
+    response="$(printf "%s\n" "$templates" |
                     list_normalize "$forbidden_words" |
                     list_choose |
                     fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" \
@@ -314,8 +344,8 @@ else
 
     # Output template
     case "$opt_target" in
-    1) color_echo "$color" "$response" >&1 ;;
-    2) color_echo "$color" "$response" >&2 ;;
+    1) color_print "$color" "$response" >&1 ;;
+    2) color_print "$color" "$response" >&2 ;;
     esac
 
     exit "$command_exit_code"

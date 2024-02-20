@@ -21,7 +21,7 @@ export MOMMY_TMP_DIR
 export n="
 "
 
-strip_opt() { echo "$1" | sed "s/[-= ]//g"; }
+strip_opt() { printf "%s\n" "$1" | sed "s/[-= ]//g"; }
 
 
 ## Hooks
