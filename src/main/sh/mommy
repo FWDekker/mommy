@@ -76,7 +76,7 @@ MOMMY_IGNORED_STATUSES="130"
 die() { printf "%s\n" "$*" >&2; exit 1; }
 
 # Dies if `$OPTARG` is an empty string.
-require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi; return 0; }
+require_arg() { if [ "x" = "x$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi; return 0; }
 
 # Dies if `$OPTARG` is not a non-negative integer.
 require_int() {
@@ -95,10 +95,10 @@ replace_all() {
     replace_all__remainder="$1"
     replace_all__out=""
 
-    while [ -n "$replace_all__remainder" ]; do
+    while [ "x" != "x$replace_all__remainder" ]; do
         replace_all__section="${replace_all__remainder%%"$2"*}"
 
-        if [ "$replace_all__section" = "$replace_all__remainder" ]; then
+        if [ "x$replace_all__section" = "x$replace_all__remainder" ]; then
             replace_all__out="$replace_all__out$replace_all__remainder"
             break
         fi
@@ -113,26 +113,26 @@ replace_all() {
 # Replaces in `$1` all occurrences of any single character in `$2` by a newline, and writes the resulting lines to
 # variable `$split__out`, separated by a newline each, without a trailing newline.
 split() {
-    test "${-#*f}" != "$-"; split__glob="$?"; set -f; split__ifs="$IFS"; IFS="$2"
+    test "x${-#*f}" != "x$-"; split__glob="$?"; set -f; split__ifs="$IFS"; IFS="$2"
 
     set -- $1  # Do not quote this!
     IFS="$n"
     split__out="$*"
 
-    IFS="$split__ifs"; if [ "$split__glob" != "0" ]; then set +f; fi
+    IFS="$split__ifs"; if [ 0 -ne "$split__glob" ]; then set +f; fi
     return 0
 }
 
 # Returns `0` if and only if `$1` consists of more than just whitespace.
 is_blank() {
     is_blank__trimmed="${1#${1%%[![:space:]]*}}"
-    test -z "${is_blank__trimmed%${is_blank__trimmed##*[![:space:]]}}"
+    test "x" = "x${is_blank__trimmed%${is_blank__trimmed##*[![:space:]]}}"
     return "$?"
 }
 
 # Returns `0` if and only if `$1` starts with a `#`.
 is_comment() {
-    test -z "${1##\#*}"
+    test "x" = "x${1##\#*}"
     return "$?"
 }
 
@@ -159,15 +159,15 @@ capitalize() {
 # Returns `0` if the string `$1` contains any of the entries in the normalized list `$2` as a substring, and returns `1`
 # otherwise.
 list_contains_any() {
-    if [ -z "$2" ]; then return 1; fi
+    if [ "x" = "x$2" ]; then return 1; fi
 
-    test "${-#*f}" != "$-"; list_contains_any__glob="$?"; set -f; list_contains_any__ifs="$IFS"; IFS="$n"
+    test "x${-#*f}" != "x$-"; list_contains_any__glob="$?"; set -f; list_contains_any__ifs="$IFS"; IFS="$n"
 
     for list_contains_any__needle in $2; do
-        if [ -z "${1##*"$list_contains_any__needle"*}" ]; then return 0; fi
+        if [ "x" = "x${1##*"$list_contains_any__needle"*}" ]; then return 0; fi
     done
 
-    IFS="$list_contains_any__ifs"; if [ "$list_contains_any__glob" != "0" ]; then set +f; fi
+    IFS="$list_contains_any__ifs"; if [ 0 -ne "$list_contains_any__glob" ]; then set +f; fi
     return 1
 }
 
@@ -175,7 +175,7 @@ list_contains_any() {
 # all blank lines, and (4) removes all entries that contain any of the entries in the normalized list `$2` as a
 # substring, and stores the output in `$list_normalize__out`, separated by newlines, without a trailing newline.
 list_normalize() {
-    test "${-#*f}" != "$-"; list_normalize__glob="$?"; set -f; list_normalize__ifs="$IFS"; IFS="$n"
+    test "x${-#*f}" != "x$-"; list_normalize__glob="$?"; set -f; list_normalize__ifs="$IFS"; IFS="$n"
 
     # Remove comments and split at `/`
     list_normalize__lines=""
@@ -195,18 +195,18 @@ list_normalize() {
     done
     list_normalize__out="${list_normalize__out%?}"  # Remove trailing newline
 
-    IFS="$list_normalize__ifs"; if [ "$list_normalize__glob" != "0" ]; then set +f; fi
+    IFS="$list_normalize__ifs"; if [ 0 -ne "$list_normalize__glob" ]; then set +f; fi
     return 0
 }
 
 # Outputs a random line from `$1` to `$list_choose__out`.
 if [ -x "$(command -v shuf)" ]; then
     list_choose() {
-        test "${-#*f}" != "$-"; list_choose__glob="$?"; set -f; list_choose__ifs="$IFS"; IFS="$n"
+        test "x${-#*f}" != "x$-"; list_choose__glob="$?"; set -f; list_choose__ifs="$IFS"; IFS="$n"
 
         list_choose__out="$(shuf -n1 -e $1)"
 
-        IFS="$list_choose__ifs"; if [ "$list_choose__glob" != "0" ]; then set +f; fi
+        IFS="$list_choose__ifs"; if [ 0 -ne "$list_choose__glob" ]; then set +f; fi
         return 0
     }
 else
@@ -233,9 +233,9 @@ list_normal_choose() {
 color_print() {
     color_print__colors="$(tput colors 2>/dev/null)"
 
-    if [ "$1" = "lolcat" ]; then
+    if [ "lolcat" = "$1" ]; then
         printf "%s\n" "$2" | lolcat -f
-    elif [ -z "$1" ] || [ -z "$color_print__colors" ] || [ "$color_print__colors" -lt 8 ]; then
+    elif [ "x" = "x$1" ] || [ "x" = "x$color_print__colors" ] || [ 8 -gt "$color_print__colors" ]; then
         printf "%s\n" "$2"
     else
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
@@ -302,7 +302,7 @@ opt_status=""
 
 while getopts ":hv1c:e:s:-:" OPT; do
     # Cheap workaround for long options, cf. https://stackoverflow.com/a/28466267
-    if [ "$OPT" = "-" ]; then
+    if [ "-" = "$OPT" ]; then
         OPT="${OPTARG%%=*}"
         OPTARG="${OPTARG#$OPT}"
         OPTARG="${OPTARG#=}"
@@ -329,7 +329,7 @@ shift "$((OPTIND - 1))"
 ## Load configuration
 # Global
 config_dir=""
-while [ "$opt_global_config_dirs" != "$config_dir" ] ;do
+while [ "x$opt_global_config_dirs" != "x$config_dir" ] ;do
     config_dir="${opt_global_config_dirs%%:*}"
     opt_global_config_dirs="${opt_global_config_dirs#$config_dir:}"
 
@@ -346,26 +346,26 @@ done
 
 
 ## Output
-if [ -n "$opt_help" ]; then
+if [ "x" != "x$opt_help" ]; then
     man mommy
 
     status="$?"
-    if [ "$status" -ne 0 ]; then
+    if [ 0 -ne "$status" ]; then
         die "oops!" \
             "mommy couldn't find the help page." \
             "but you can visit https://github.com/FWDekker/mommy/blob/%%VERSION_NUMBER%%/README.md for more" \
             "information~"
     fi
     exit "$status"
-elif [ -n "$opt_version" ]; then
+elif [ "x" != "x$opt_version" ]; then
     printf "%s\n" "mommy, v%%VERSION_NUMBER%%, %%VERSION_DATE%%"
     exit 0
 else
     # Run command
-    if [ -n "$opt_eval" ]; then
+    if [ "x" != "x$opt_eval" ]; then
         (eval "$opt_eval")
         command_exit_code="$?"
-    elif [ -n "$opt_status" ]; then
+    elif [ "x" != "x$opt_status" ]; then
         command_exit_code="$opt_status"
     else
         ("$@")
@@ -377,9 +377,9 @@ else
     if list_contains_any "$command_exit_code" "$ignored_statuses"; then exit "$command_exit_code"; fi
 
     # Populate list of templates
-    if [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
+    if [ 0 -eq "$command_exit_code" ] && [ 1 -eq "$MOMMY_COMPLIMENTS_ENABLED" ]; then
         templates="$MOMMY_COMPLIMENTS$n$MOMMY_COMPLIMENTS_EXTRA"
-    elif [ "$command_exit_code" -ne 0 ] && [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
+    elif [ 0 -ne "$command_exit_code" ] && [ 1 -eq "$MOMMY_ENCOURAGEMENTS_ENABLED" ]; then
         templates="$MOMMY_ENCOURAGEMENTS$n$MOMMY_ENCOURAGEMENTS_EXTRA"
     else
         exit "$command_exit_code"
