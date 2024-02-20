@@ -76,44 +76,57 @@ MOMMY_IGNORED_STATUSES="130"
 die() { printf "%s\n" "$*" >&2; exit 1; }
 
 # Dies if `$OPTARG` is an empty string.
-require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi }
+require_arg() { if [ -z "$OPTARG" ]; then die "mommy is missing the argument for option '$OPT'~"; fi; return 0; }
 
 # Dies if `$OPTARG` is not a non-negative integer.
 require_int() {
     case "$OPTARG" in
     ""|*[!0123456789]*) die "mommy expected the argument for option '$OPT' to be an integer, but it was '$OPTARG'~" ;;
-    *) ;;
+    *) return 0 ;;
     esac
 }
 
 
-## Lists
-# A list is a collection of entries. Entries are separated by a forward slash (`/`) or by a newline. Entries containing
-# only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#`, all `/`
-# on that line are part of the comment and are not considered separators. A sanitized list is a list in which there are
-# no forward slashes (`/`) and in which there are no comments.
+## String manipulation
+# Replaces in `$1` all occurrences of `$2` with `$3`, and writes to a variable named `$replace_all__out`. If the input
+# has no trailing newline, neither will the output.
+# Based on https://stackoverflow.com/a/75037170/
+replace_all() {
+    replace_all__remainder="$1"
+    replace_all__out=""
 
-# Replaces in `$1` any character in `$2` by a newline.
+    while [ -n "$replace_all__remainder" ]; do
+        replace_all__section="${replace_all__remainder%%"$2"*}"
+
+        if [ "$replace_all__section" = "$replace_all__remainder" ]; then
+            replace_all__out="$replace_all__out$replace_all__remainder"
+            break
+        fi
+
+        replace_all__out="$replace_all__out$replace_all__section$3"
+        replace_all__remainder="${replace_all__remainder#*"$2"}"
+    done
+
+    return 0
+}
+
+# Replaces in `$1` all occurrences of any single character in `$2` by a newline, and writes the resulting lines to
+# variable `$split__out`, separated by a newline each, without a trailing newline.
 split() {
-    test "${-#*f}" != "$-"
-    globbing_enabled="$?"
-
-    set -f
-    old_ifs="$IFS"
-    IFS="$2"
+    test "${-#*f}" != "$-"; split__glob="$?"; set -f; split__ifs="$IFS"; IFS="$2"
 
     set -- $1  # Do not quote this!
-    printf "%s\n" "$@"
+    IFS="$n"
+    split__out="$*"
 
-    IFS="$old_ifs"
-    if [ "$globbing_enabled" != "0" ]; then set +f; fi
+    IFS="$split__ifs"; if [ "$split__glob" != "0" ]; then set +f; fi
+    return 0
 }
 
 # Returns `0` if and only if `$1` consists of more than just whitespace.
 is_blank() {
-    trim="${1#${1%%[![:space:]]*}}"
-    trim="${trim%${trim##*[![:space:]]}}"
-    test -z "$trim"
+    is_blank__trimmed="${1#${1%%[![:space:]]*}}"
+    test -z "${is_blank__trimmed%${is_blank__trimmed##*[![:space:]]}}"
     return "$?"
 }
 
@@ -123,46 +136,94 @@ is_comment() {
     return "$?"
 }
 
-# Returns `0` if the string `$1` contains any of the entries in the sanitized list `$2` as a substring, and returns `1`
+# Reads `$1`; if `$2` is `0`, the first character on the line is changed to lowercase, if `$2` is `1`, the first
+# character is changed to uppercase, and otherwise nothing is changed; and stores the output in `$capitalize__out`.
+capitalize() {
+    case "$2" in
+    0) capitalize__mapping="tolower" ;;
+    1) capitalize__mapping="toupper" ;;
+    *) capitalize__out="$1"; return 0 ;;
+    esac
+
+    capitalize__out="$(printf "%s\n" "$1" | awk "{ print $capitalize__mapping(substr(\$0, 1, 1)) substr(\$0, 2) }")"
+    return 0
+}
+
+
+## Lists
+# A list is a collection of entries. Entries are separated by a forward slash (`/`) or by a newline. Entries containing
+# only whitespace or starting with a `#` are considered comments and are ignored. If a line starts with a `#`, all `/`
+# on that line are part of the comment and are not considered separators. A normalized list is a list in which there are
+# no forward slashes (`/`) and in which there are no comments.
+
+# Returns `0` if the string `$1` contains any of the entries in the normalized list `$2` as a substring, and returns `1`
 # otherwise.
 list_contains_any() {
     if [ -z "$2" ]; then return 1; fi
 
-    printf "%s\n" "$2" | while IFS="$n" read -r needle; do [ -z "${1##*"$needle"*}" ] && return 0; done
-    return "$?"
+    test "${-#*f}" != "$-"; list_contains_any__glob="$?"; set -f; list_contains_any__ifs="$IFS"; IFS="$n"
+
+    for list_contains_any__needle in $2; do
+        if [ -z "${1##*"$list_contains_any__needle"*}" ]; then return 0; fi
+    done
+
+    IFS="$list_contains_any__ifs"; if [ "$list_contains_any__glob" != "0" ]; then set +f; fi
+    return 1
 }
 
-# Takes the list in stdin and (1) removes all lines starting with `#`, (2) replaces each `/` with a newline, (3) removes
-# all blank lines, and (4) removes all entries that contain any of the entries in the sanitized list `$1` as a
-# substring.
+# Takes the list in `$1` and (1) removes all lines starting with `#`, (2) replaces each `/` with a newline, (3) removes
+# all blank lines, and (4) removes all entries that contain any of the entries in the normalized list `$2` as a
+# substring, and stores the output in `$list_normalize__out`, separated by newlines, without a trailing newline.
 list_normalize() {
-    cat |
-        while IFS="$n" read -r line; do if ! is_comment "$line"; then split "$line" "/"; fi; done |
-        while IFS="$n" read -r line; do
-            if ! is_blank "$line" && ! list_contains_any "$line" "$1"; then printf "%s\n" "$line"; fi
-        done
+    test "${-#*f}" != "$-"; list_normalize__glob="$?"; set -f; list_normalize__ifs="$IFS"; IFS="$n"
+
+    # Remove comments and split at `/`
+    list_normalize__lines=""
+    for list_normalize__line in $1; do
+        if ! is_comment "$list_normalize__line"; then
+            split "$list_normalize__line" "/"
+            list_normalize__lines="$list_normalize__lines$split__out$n"
+        fi
+    done
+
+    # Remove blank lines and "forbidden" entries
+    list_normalize__out=""
+    for list_normalize__line in $list_normalize__lines; do
+        if ! is_blank "$list_normalize__line" && ! list_contains_any "$list_normalize__line" "$2"; then
+            list_normalize__out="$list_normalize__out$list_normalize__line$n"
+        fi
+    done
+    list_normalize__out="${list_normalize__out%?}"  # Remove trailing newline
+
+    IFS="$list_normalize__ifs"; if [ "$list_normalize__glob" != "0" ]; then set +f; fi
     return 0
 }
 
-# Writes a random entry from the sanitized list in stdin to stdout.
+# Outputs a random line from `$1` to `$list_choose__out`.
 if [ -x "$(command -v shuf)" ]; then
     list_choose() {
-        cat | shuf -n1
+        test "${-#*f}" != "$-"; list_choose__glob="$?"; set -f; list_choose__ifs="$IFS"; IFS="$n"
+
+        list_choose__out="$(shuf -n1 -e $1)"
+
+        IFS="$list_choose__ifs"; if [ "$list_choose__glob" != "0" ]; then set +f; fi
+        return 0
     }
 else
     list_choose() {
-        lines="$(cat)"
-        count="$(printf "%s\n" "$lines" | wc -l)"
-        idx="$(jot -r 1 1 "$count")"
-        printf "%s\n" "$lines" | sed "${idx}q;d"
+        list_choose__lines="$1"
+        list_choose__count="$(printf "%s\n" "$list_choose__lines" | wc -l)"
+        list_choose__idx="$(jot -r 1 1 "$list_choose__count")"
+        list_choose__out="$(printf "%s\n" "$list_choose__lines" | sed "${list_choose__idx}q;d")"
+        return 0
     }
 fi
 
-# Escapes stdin to be used as a replacement string in sed.
-#
-# Only the characters `\` and `&` need replacement, since we assume that `/` does not occur.
-escape_sed_replacement() {
-    cat | sed -e 's/\\/\\\\/g' -e 's/&/\\\&/g'
+# Invokes both `list_normalize` and `list_choose`. Input arguments are the same as with `list_normalize`, and the output
+# argument is the same as with `list_choose`.
+list_normal_choose() {
+    list_normalize "$1" "$2"
+    list_choose "$list_normalize__out"
 }
 
 
@@ -170,11 +231,11 @@ escape_sed_replacement() {
 # Prints `$2`, but with color depending on `$1`. If `$1` equals `lolcat`, stdin is piped to `lolcat`. If `$1` is empty,
 # or color is not enabled in the terminal, stdin is printed normally. Otherwise, `$1` is used as the xterm color.
 color_print() {
-    colors="$(tput colors 2>/dev/null)"
+    color_print__colors="$(tput colors 2>/dev/null)"
 
     if [ "$1" = "lolcat" ]; then
         printf "%s\n" "$2" | lolcat -f
-    elif [ -z "$1" ] || [ -z "$colors" ] || [ "$colors" -lt 8 ]; then
+    elif [ -z "$1" ] || [ -z "$color_print__colors" ] || [ "$color_print__colors" -lt 8 ]; then
         printf "%s\n" "$2"
     else
         # Work around OpenBSD bug https://www.mail-archive.com/bugs@openbsd.org/msg18443.html
@@ -183,19 +244,7 @@ color_print() {
         # shellcheck disable=SC2086 # Intentional word splitting: OpenBSD workaround requires two arguments
         printf "%s\n" "$(tput setaf "$1" $tput_bug)$2$(tput sgr0)"
     fi
-    return 0
-}
 
-# Reads `$1`; if `$2` is `0`, the first character on the line is changed to lowercase, if `$2` is `1`, the first
-# character is changed to uppercase, and otherwise nothing is changed; and writes to stdout.
-capitalize() {
-    case "$2" in
-    0) mapping="tolower" ;;
-    1) mapping="toupper" ;;
-    *) printf "%s\n" "$1"; return 0 ;;
-    esac
-
-    printf "%s\n" "$1" | awk "{ print $mapping(substr(\$0, 1, 1)) substr(\$0, 2) }"
     return 0
 }
 
@@ -203,40 +252,41 @@ capitalize() {
 # respectively.
 split_pronouns() {
     they="${1%% *}"
-    remainder="${1#* }"
-    them="${remainder%% *}"
-    their="${remainder##* }"
+    replace_all__remainder="${1#* }"
+    them="${replace_all__remainder%% *}"
+    their="${replace_all__remainder##* }"
 
     return 0
 }
 
-# Reads stdin, and
+# Reads `$1`, and
 # 1. replaces
-#    * `%%SWEETIE%%` with a random entry from `$1`,
-#    * `%%THEY%%` with the first word of a random entry from `$2`,
-#    * `%%THEM%%` with the second word of the same random entry from `$2`,
-#    * `%%THEIR%%` with the third word of the same random entry from `$2`, and
-#    * `%%CAREGIVER%%` with a random entry from `$3`;
-# 2. applies `capitalize_lines` using `$6` as the choice parameter;
+#    * `%%SWEETIE%%` with a random entry from `$2`,
+#    * `%%THEY%%` with the first word of a random entry from `$3`,
+#    * `%%THEM%%` with the second word of the same random entry from `$3`,
+#    * `%%THEIR%%` with the third word of the same random entry from `$3`, and
+#    * `%%CAREGIVER%%` with a random entry from `$4`;
+# 2. applies `capitalize_lines` using `$7` as the choice parameter;
 # 3. removes leading and trailing newlines;
-# 4. prepends `$4` and appends `$5`; and
-# 5. writes to stdout.
+# 4. prepends `$5` and appends `$6`; and
+# 5. stores the output in `$fill_template__out`.
 fill_template() {
-    sweetie="$(printf "%s\n" "$1" | list_normalize | list_choose | escape_sed_replacement)"
-    split_pronouns "$(printf "%s\n" "$2" | list_normalize | list_choose | escape_sed_replacement)"
-    caregiver="$(printf "%s\n" "$3" | list_normalize | list_choose | escape_sed_replacement)"
+    list_normal_choose "$2"; sweetie="$list_choose__out"
+    list_normal_choose "$3"; split_pronouns "$list_choose__out"
+    list_normal_choose "$4"; caregiver="$list_choose__out"
 
-    prefix="$(printf "%s\n" "$4" | list_normalize | list_choose | escape_sed_replacement)"
-    suffix="$(printf "%s\n" "$5" | list_normalize | list_choose | escape_sed_replacement)"
+    list_normal_choose "$5"; prefix="$list_choose__out"
+    list_normal_choose "$6"; suffix="$list_choose__out"
 
-    template="$(cat | sed -e "s/%%SWEETIE%%/$sweetie/g" \
-                          -e "s/%%THEY%%/$they/g" \
-                          -e "s/%%THEM%%/$them/g" \
-                          -e "s/%%THEIR%%/$their/g" \
-                          -e "s/%%CAREGIVER%%/$caregiver/g" \
-                          -e "s/%%N%%/\\$n/g")"
+    replace_all__out="$1"
+    replace_all "$replace_all__out" "%%SWEETIE%%" "$sweetie"
+    replace_all "$replace_all__out" "%%THEY%%" "$they"
+    replace_all "$replace_all__out" "%%THEM%%" "$them"
+    replace_all "$replace_all__out" "%%THEIR%%" "$their"
+    replace_all "$replace_all__out" "%%CAREGIVER%%" "$caregiver"
+    replace_all "$replace_all__out" "%%N%%" "$n"
 
-    capitalize "$prefix$template$suffix" "$6"
+    capitalize "$prefix$replace_all__out$suffix" "$7"; fill_template__out="$capitalize__out"
     return 0
 }
 
@@ -322,30 +372,31 @@ else
         command_exit_code="$?"
     fi
 
-    # Choose and fill template (if enabled)
-    if list_contains_any "$command_exit_code" "$(printf "%s\n" "$MOMMY_IGNORED_STATUSES" | list_normalize)"; then
-        exit "$command_exit_code"
-    elif [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
-        templates="$MOMMY_COMPLIMENTS/$MOMMY_COMPLIMENTS_EXTRA"
+    # Check if premature exit is desired
+    list_normalize "$MOMMY_IGNORED_STATUSES"; ignored_statuses="$list_normalize__out"
+    if list_contains_any "$command_exit_code" "$ignored_statuses"; then exit "$command_exit_code"; fi
+
+    # Populate list of templates
+    if [ "$command_exit_code" -eq 0 ] && [ "$MOMMY_COMPLIMENTS_ENABLED" = "1" ]; then
+        templates="$MOMMY_COMPLIMENTS$n$MOMMY_COMPLIMENTS_EXTRA"
     elif [ "$command_exit_code" -ne 0 ] && [ "$MOMMY_ENCOURAGEMENTS_ENABLED" = "1" ]; then
-        templates="$MOMMY_ENCOURAGEMENTS/$MOMMY_ENCOURAGEMENTS_EXTRA"
+        templates="$MOMMY_ENCOURAGEMENTS$n$MOMMY_ENCOURAGEMENTS_EXTRA"
     else
         exit "$command_exit_code"
     fi
 
-    color="$(printf "%s\n" "$MOMMY_COLOR" | list_normalize | list_choose)"
-    forbidden_words="$(printf "%s\n" "$MOMMY_FORBIDDEN_WORDS" | list_normalize)"
-
-    response="$(printf "%s\n" "$templates" |
-                    list_normalize "$forbidden_words" |
-                    list_choose |
-                    fill_template "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" \
-                                  "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE")"
+    # Select and fill template
+    list_normalize "$MOMMY_FORBIDDEN_WORDS"; forbidden_words="$list_normalize__out"
+    list_normal_choose "$templates" "$forbidden_words"; template="$list_choose__out"
+    fill_template "$template" "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" "$MOMMY_SUFFIX" \
+                  "$MOMMY_CAPITALIZE"; template="$fill_template__out"
 
     # Output template
+    list_normalize "$MOMMY_COLOR"; list_choose "$list_normalize__out"; color="$list_choose__out"
+
     case "$opt_target" in
-    1) color_print "$color" "$response" >&1 ;;
-    2) color_print "$color" "$response" >&2 ;;
+    1) color_print "$color" "$template" >&1 ;;
+    2) color_print "$color" "$template" >&2 ;;
     esac
 
     exit "$command_exit_code"
