@@ -1,5 +1,10 @@
 # Changelog
 ## [unreleased]
+### changed
+* 🚀 mommy is now 4 times as fast~ ([#106](https://github.com/FWDekker/mommy/issues/106))
+
+
+## [1.4.0] -- 2024-02-17
 ### added
 * 🌍 mommy now supports a global config file that applies to all users, stored for example in `/usr/mommy/config.sh`~ ([#95](https://github.com/FWDekker/mommy/issues/95)) ([#96](https://github.com/FWDekker/mommy/issues/96))
 * 📏 mommy accepts long command-line options for all options (like `--config=<file>` for `-c <file>`)~

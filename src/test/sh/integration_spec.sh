@@ -104,11 +104,11 @@ Describe "integration of mommy with other programs"
         Skip if "zsh is skipped or not installed" zsh_is_skipped_or_not_installed
 
         zsh_before_each() {
-            echo "source '$(pwd)/../resources/zsh_loader.zsh'" > "$MOMMY_ZSH_PREAMBLE_FILE"
+            printf "source '%s/../resources/zsh_loader.zsh'\n" "$(pwd)" > "$MOMMY_ZSH_PREAMBLE_FILE"
             if [ "$MOMMY_SYSTEM" != "1" ]; then
-                echo "FPATH='$(pwd)/../../main/completions/zsh/:'\"\$FPATH\"" >> "$MOMMY_ZSH_PREAMBLE_FILE"
+                printf "FPATH='%s/../../main/completions/zsh/:'\"\$FPATH\"\n" "$(pwd)" >> "$MOMMY_ZSH_PREAMBLE_FILE"
             fi
-            echo "autoload -U compinit; compinit -u" >> "$MOMMY_ZSH_PREAMBLE_FILE"
+            printf "autoload -U compinit; compinit -u\n" >> "$MOMMY_ZSH_PREAMBLE_FILE"
         }
         BeforeEach "zsh_before_each"
 
