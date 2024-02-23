@@ -398,14 +398,15 @@ else
     list_normalize "$MOMMY_FORBIDDEN_WORDS"; forbidden_words="$list_normalize__out"
     list_normal_choose "$templates" "$forbidden_words"; template="$list_choose__out"
     fill_template "$template" "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" "$MOMMY_SUFFIX" \
-                  "$MOMMY_CAPITALIZE"; template="$fill_template__out"
+                  "$MOMMY_CAPITALIZE"; response="$fill_template__out"
+    list_filter_not "$response" "$forbidden_words"; safe_response="$list_filter_not__out"
 
     # Output template
     list_normalize "$MOMMY_COLOR"; list_choose "$list_normalize__out"; color="$list_choose__out"
 
     case "$opt_target" in
-    1) color_print "$color" "$template" >&1 ;;
-    2) color_print "$color" "$template" >&2 ;;
+    1) color_print "$color" "$safe_response" >&1 ;;
+    2) color_print "$color" "$safe_response" >&2 ;;
     esac
 
     exit "$command_exit_code"
