@@ -158,23 +158,26 @@ capitalize() {
 
 # Returns `0` if the string `$1` contains any of the entries in the normalized list `$2` as a substring, and returns `1`
 # otherwise.
-list_contains_any() {
-    if [ "x" = "x$2" ]; then return 1; fi
+list_any_equals() {
+    test "x${-#*f}" != "x$-"; list_any_equals__glob="$?"; set -f; list_any_equals__ifs="$IFS"; IFS="$n"
 
-    test "x${-#*f}" != "x$-"; list_contains_any__glob="$?"; set -f; list_contains_any__ifs="$IFS"; IFS="$n"
-
-    for list_contains_any__regex in $2; do
-        case "$list_contains_any__regex" in
-            ""|*[!0123456789]*)
-                if printf "%s\n" "$1" | grep -q -E "$(printf "%b" "$list_contains_any__regex")"; then return 0; fi ;;
-            *)
-                # Special case for digit-only matching
-                if [ "x" = "x${1##*"$list_contains_any__regex"*}" ]; then return 0; fi ;;
-        esac
+    for list_any_equals__regex in $2; do
+        if [ "x" = "x${1##*"$list_any_equals__regex"*}" ]; then return 0; fi
     done
 
-    IFS="$list_contains_any__ifs"; if [ 0 -ne "$list_contains_any__glob" ]; then set +f; fi
+    IFS="$list_any_equals__ifs"; if [ 0 -ne "$list_any_equals__glob" ]; then set +f; fi
     return 1
+}
+
+# Returns in `$list_filter_not__out` all entries of the normalized list `$1` that do not match any of the extended
+# regexes in the normalized list `$2`.
+list_filter_not() {
+    if [ "x" = "x$2" ]; then
+        list_filter_not__out="$1"
+    else
+        list_filter_not__out="$(printf "%s\n" "$1" | grep -E -v -e "$(printf "%b\n" "$2")")"
+    fi
+    return 0
 }
 
 # Takes the list in `$1` and (1) removes all lines starting with `#`, (2) replaces each `/` with a newline, (3) removes
@@ -183,25 +186,25 @@ list_contains_any() {
 list_normalize() {
     test "x${-#*f}" != "x$-"; list_normalize__glob="$?"; set -f; list_normalize__ifs="$IFS"; IFS="$n"
 
-    # Remove comments and split at `/`
     list_normalize__lines=""
     for list_normalize__line in $1; do
         if ! is_comment "$list_normalize__line"; then
             split "$list_normalize__line" "/"
-            list_normalize__lines="$list_normalize__lines$split__out$n"
-        fi
-    done
+            list_normalize__split_lines="$split__out"
 
-    # Remove blank lines and "forbidden" entries
-    list_normalize__out=""
-    for list_normalize__line in $list_normalize__lines; do
-        if ! is_blank "$list_normalize__line" && ! list_contains_any "$list_normalize__line" "$2"; then
-            list_normalize__out="$list_normalize__out$list_normalize__line$n"
+            for list_normalize__line2 in $list_normalize__split_lines; do
+                if ! is_blank "$list_normalize__line2"; then
+                    list_normalize__lines="$list_normalize__lines$list_normalize__line2$n"
+                fi
+            done
         fi
     done
-    list_normalize__out="${list_normalize__out%?}"  # Remove trailing newline
+    list_normalize__lines="${list_normalize__lines%?}"  # Remove trailing newline
 
     IFS="$list_normalize__ifs"; if [ 0 -ne "$list_normalize__glob" ]; then set +f; fi
+
+    list_filter_not "$list_normalize__lines" "$2"
+    list_normalize__out="$list_filter_not__out"
     return 0
 }
 
@@ -380,7 +383,7 @@ else
 
     # Check if premature exit is desired
     list_normalize "$MOMMY_IGNORED_STATUSES"; ignored_statuses="$list_normalize__out"
-    if list_contains_any "$command_exit_code" "$ignored_statuses"; then exit "$command_exit_code"; fi
+    if list_any_equals "$command_exit_code" "$ignored_statuses"; then exit "$command_exit_code"; fi
 
     # Populate list of templates
     if [ 0 -eq "$command_exit_code" ] && [ 1 -eq "$MOMMY_COMPLIMENTS_ENABLED" ]; then
