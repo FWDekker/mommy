@@ -163,8 +163,14 @@ list_contains_any() {
 
     test "x${-#*f}" != "x$-"; list_contains_any__glob="$?"; set -f; list_contains_any__ifs="$IFS"; IFS="$n"
 
-    for list_contains_any__needle in $2; do
-        if [ "x" = "x${1##*"$list_contains_any__needle"*}" ]; then return 0; fi
+    for list_contains_any__regex in $2; do
+        case "$list_contains_any__regex" in
+            ""|*[!0123456789]*)
+                if printf "%s\n" "$1" | grep -q -E "$(printf "%b" "$list_contains_any__regex")"; then return 0; fi ;;
+            *)
+                # Special case for digit-only matching
+                if [ "x" = "x${1##*"$list_contains_any__regex"*}" ]; then return 0; fi ;;
+        esac
     done
 
     IFS="$list_contains_any__ifs"; if [ 0 -ne "$list_contains_any__glob" ]; then set +f; fi

@@ -588,11 +588,51 @@ stimky<"
                 The status should be success
             End
 
-            It "does not output compliments containing a forbidden phrase"
+            It "does not output a compliment containing a forbidden phrase"
                 set_config "MOMMY_COMPLIMENTS='member rid letter/rid wish over growth/member letter improve';MOMMY_FORBIDDEN_WORDS='member letter/wish over'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                 The error should equal "member rid letter"
+                The status should be success
+            End
+
+            It "does not output a compliment containing any of the characters specified in the regex list"
+                set_config "MOMMY_COMPLIMENTS='a/z/c';MOMMY_FORBIDDEN_WORDS='[ac]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "does not output a compliment containing any of the characters specified in the regex range"
+                set_config "MOMMY_COMPLIMENTS='a/b/c/z';MOMMY_FORBIDDEN_WORDS='[a-c]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "does not output a compliment containing any of the character specified in the regex hex list"
+                set_config "MOMMY_COMPLIMENTS='z/a/b';MOMMY_FORBIDDEN_WORDS='[\0141\0142]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "does not output a compliment containing any of the character specified in the regex hex range"
+                set_config "MOMMY_COMPLIMENTS='a/b/z/c';MOMMY_FORBIDDEN_WORDS='[\0141-\0143]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "does not output a compliment containing any of the words specified in the regex list"
+                set_config "MOMMY_COMPLIMENTS='dinner/rent/shot';MOMMY_FORBIDDEN_WORDS='(dinner|rent)'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "shot"
                 The status should be success
             End
         End
