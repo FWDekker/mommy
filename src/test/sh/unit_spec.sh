@@ -572,7 +572,10 @@ stimky<"
         End
 
         Describe "forbidden words"
-            It "does not output a compliment containing the single forbidden word"
+            # Repeat 5 times because of randomization
+            Parameters:value 1 2 3 4 5
+
+            It "removes the template that equals the forbidden word"
                 set_config "MOMMY_COMPLIMENTS='mother search/fierce along';MOMMY_FORBIDDEN_WORDS='search'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
@@ -580,7 +583,15 @@ stimky<"
                 The status should be success
             End
 
-            It "does not output a compliment containing at least one of the forbidden words"
+            It "removes the template that contains the forbidden word"
+                set_config "MOMMY_COMPLIMENTS='clear bow flow/horn origin tired';MOMMY_FORBIDDEN_WORDS='bow'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "horn origin tired"
+                The status should be success
+            End
+
+            It "removes all templates that contain a forbidden word"
                 set_config "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
@@ -588,11 +599,51 @@ stimky<"
                 The status should be success
             End
 
-            It "does not output compliments containing a forbidden phrase"
-                set_config "MOMMY_COMPLIMENTS='member rid letter/rid wish over growth/member letter improve';MOMMY_FORBIDDEN_WORDS='member letter/wish over'"
+            It "removes all templates that match the bracket expansion"
+                set_config "MOMMY_COMPLIMENTS='a/z/c';MOMMY_FORBIDDEN_WORDS='[ac]'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
-                The error should equal "member rid letter"
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "removes all templates that match the bracket expansion range"
+                set_config "MOMMY_COMPLIMENTS='a/b/c/z';MOMMY_FORBIDDEN_WORDS='[a-c]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "maps octal escapes to the corresponding character"
+                set_config "MOMMY_COMPLIMENTS='z/a/b';MOMMY_FORBIDDEN_WORDS='[\0141\0142]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "maps octal escapes to the corresponding character in a range"
+                set_config "MOMMY_COMPLIMENTS='z/a/b';MOMMY_FORBIDDEN_WORDS='[\0141\0142]'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "z"
+                The status should be success
+            End
+
+            It "supports the | in a regex"
+                set_config "MOMMY_COMPLIMENTS='dinner/rent/shot';MOMMY_FORBIDDEN_WORDS='(dinner|rent)'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal "shot"
+                The status should be success
+            End
+
+            It "does not output anything even if the list only matches after variable substitutions"
+                set_config "MOMMY_COMPLIMENTS='%%THEY%%%%THEM%%';MOMMY_PRONOUNS='a b c';MOMMY_FORBIDDEN_WORDS='(ab)'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ""
                 The status should be success
             End
         End
