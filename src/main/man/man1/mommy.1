@@ -7,19 +7,42 @@ mommy - here to support you~
 
 .SH synopsis
 .TP
-\fBmommy\fP [\fB\-1\fP] [\fB\-c\fP \fIconfig\fP] \fIcommand\fP ...
+\fBmommy\fP [\fIoptions\fP] \fIcommand\fP ...
 e.g. \fBmommy\fP npm test
 .TP
-\fBmommy\fP [\fB\-1\fP] [\fB\-c\fP \fIconfig\fP] \fB-e\fP \fIeval\fP
+\fBmommy\fP [\fIoptions\fP] \fB-e\fP \fIeval\fP
 e.g. \fBmommy\fP -e "ls -l | wc -l"
 .TP
-\fBmommy\fP [\fB\-1\fP] [\fB\-c\fP \fIconfig\fP] \fB-s\fP \fIstatus\fP
+\fBmommy\fP [\fIoptions\fP] \fB-s\fP \fIstatus\fP
 e.g. \fBmommy\fP -s $?
 
 
 .SH description
-https://github.com/FWDekker/mommy/tree/v%%VERSION_NUMBER%%#readme
+\fIhttps://github.com/FWDekker/mommy/tree/v%%VERSION_NUMBER%%#readme\fP
+
+
+.SH options
+the following options are just for invoking \fBmommy\fP.
+to change mommy's output, you should change the config file.
+for more info about config files, check
+\fIhttps://github.com/FWDekker/mommy/tree/v%%VERSION_NUMBER%%#configuration\fP.
+
+.TP
+\fB-c\fP \fIfile\fP, \fB--config=\fP\fIfile\fP
+tells mommy that she should read your config from \fIfile\fP~
+.TP
+\fB--global-config-dirs=\fP\fIdirs\fP
+sets global configuration dirs to the colon-separated list in \fIdirs\fP~
+.TP
+\fB-1\fP
+writes output to \fBstdout\fP instead of \fBstderr\fP~
+.TP
+\fB-h\fP, \fB--help\fP
+opens \fBmommy\fP's manual page~
+.TP
+\fB-v\fP, \fB--version\fP
+displays \fBmommy\fP's version information~
 
 
 .SH bugs
-https://github.com/FWDekker/mommy/issues
+\fIhttps://github.com/FWDekker/mommy/issues\fP

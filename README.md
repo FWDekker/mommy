@@ -404,32 +404,31 @@ check out [how to use mommy](#usage), read all about [ways you can configure mom
 
 
 ## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
-mommy processes the output status of a command and compliments you if the command succeeds and encourages you if it
+mommy processes (the output status of) a command and compliments you if the command succeeds and encourages you if it
 fails~
 
-you can ask mommy to support you in a few ways, shown below.
-alternatively, you can [integrate mommy into your shell](#shell-integration) so `mommy` is invoked for each command~
+> ℹ️ the **recommended** way of long-term mommy usage is to [integrate mommy into your shell](#shell-integration), so
+> mommy will run after every command you run~
 
-```shell
-$ mommy [command] ...
-# e.g. `mommy npm test`
+### 💃 how to run<a name="how-to-run"></a>
+for reference, here's the three main ways to invoke mommy~
 
-$ mommy -e eval
-# e.g. `mommy -e "ls -l | wc -l"`
+| format                | example                     | when to use                                                          |
+|-----------------------|-----------------------------|----------------------------------------------------------------------|
+| `mommy [command] ...` | `mommy npm test`            | if you want mommy to respond to a single command~                    |
+| `mommy -e [eval]`     | `mommy -e "ls -l \| wc -l"` | if you want mommy when using `\|` or `>`, or need mommy in a script~ |
+| `mommy -s [status]`   | `mommy -s $?`               | if you already ran a command and want mommy's help afterwards~       |
 
-$ mommy -s status
-# e.g. `mommy -s 0` or `mommy -s $?`
-```
-
+### 🛸 extra options<a name="extra-options"></a>
 additionally, mommy knows a few extra options, which you can use to discover who mommy is and to tell mommy which
-[configuration files](#configuration) she should use.
+[configuration files](#configuration) she should use~
 
 | short option | long option                   | description                                                                                       |
 |--------------|-------------------------------|---------------------------------------------------------------------------------------------------|
 | `-h`         | `--help`                      | opens mommy's manual page~                                                                        |
-| `-v`         | `--version`                   | displays version information~                                                                     |
+| `-v`         | `--version`                   | displays mommy's version information~                                                             |
 | `-1`         |                               | writes output to stdout instead of stderr~                                                        |
-| `-c <file>`  | `--config=<file>`             | reads the [configuration](#configuration) from `<file>`~                                          |
+| `-c <file>`  | `--config=<file>`             | tells mommy that she should read your [config](#configuration) from `<file>`~                     |
 |              | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
 
 
