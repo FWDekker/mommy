@@ -1,5 +1,8 @@
 # Changelog
 ## [unreleased]
+### added
+* 🦓 mommy now supports templates with literal slashes using `%%S%%`~ ([#107](https://github.com/FWDekker/mommy/issues/107))
+
 ### changed
 * 🙅‍♀️ mommy's `MOMMY_FORBIDDEN_WORDS` setting now interprets each word as a regex~ ([#103](https://github.com/FWDekker/mommy/issues/103))
 * 🚀 mommy is now 4 times as fast~ ([#106](https://github.com/FWDekker/mommy/issues/106))
