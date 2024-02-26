@@ -456,6 +456,14 @@ stimky<"
                 The status should be success
             End
 
+            It "replaces %%S%%"
+                set_config "MOMMY_COMPLIMENTS='>global%%S%%seminar<'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ">global/seminar<"
+                The status should be success
+            End
+
             It "prepends the prefix"
                 set_config "MOMMY_COMPLIMENTS='<';MOMMY_PREFIX='woolen'"
 

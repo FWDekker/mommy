@@ -545,6 +545,7 @@ outputs `your mommy loves you`~
 | `%%THEIR%%`     | mommy's possessive pronoun (e.g. their, her, he) |
 | `%%SWEETIE%%`   | what mommy calls you                             |
 | `%%N%%`         | a newline                                        |
+| `%%S%%`         | a forward slash (`/`)                            |
 </details>
 
 
