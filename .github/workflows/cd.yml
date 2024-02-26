@@ -4,7 +4,23 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run'
+        description: 'dry run'
+        type: boolean
+        default: true
+      release_mommy:
+        description: 'create mommy release'
+        type: boolean
+        default: true
+      release_apt:
+        description: 'create apt-mommy release'
+        type: boolean
+        default: true
+      release_aur:
+        description: 'create aur-mommy release'
+        type: boolean
+        default: true
+      release_homebrew:
+        description: 'create homebrew-mommy release'
         type: boolean
         default: true
 
@@ -188,8 +204,19 @@ jobs:
           path: dist/mommy*
 
 
+  release-gate:
+    needs: [ build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Gate opened!
+        run: |
+          echo "The gates have opened!"
+
+
   release-mommy:
-    needs: [ pre-flight-checks, build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
+    if: ${{ github.event.inputs.release_mommy == 'true' }}
+    needs: [ release-gate ]
     runs-on: ubuntu-latest
 
     env:
@@ -225,7 +252,8 @@ jobs:
           discussion_category_name: announcements
 
   release-apt:
-    needs: [ pre-flight-checks, release-mommy ]
+    if: ${{ github.event.inputs.release_apt == 'true' }}
+    needs: [ release-gate ]
     runs-on: ubuntu-latest
 
     env:
@@ -282,7 +310,8 @@ jobs:
           fi;
 
   release-aur:
-    needs: [ pre-flight-checks, release-mommy ]
+    if: ${{ github.event.inputs.release_aur == 'true' }}
+    needs: [ release-gate ]
     runs-on: ubuntu-latest
     container: archlinux:latest
 
@@ -362,7 +391,8 @@ jobs:
           fi;
 
   release-homebrew:
-    needs: [ pre-flight-checks, release-mommy ]
+    if: ${{ github.event.inputs.release_homebrew == 'true' }}
+    needs: [ release-gate ]
     runs-on: ubuntu-latest
 
     env:
