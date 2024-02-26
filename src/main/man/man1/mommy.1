@@ -10,7 +10,7 @@ mommy - here to support you~
 \fBmommy\fP [\fIoptions\fP] \fIcommand\fP ...
 e.g. \fBmommy\fP npm test
 .TP
-\fBmommy\fP [\fIoptions\fP] \fB-e\fP \fIeval\fP
+\fBmommy\fP [\fIoptions\fP] \fB-e\fP \fIcommand\fP
 e.g. \fBmommy\fP -e "ls -l | wc -l"
 .TP
 \fBmommy\fP [\fIoptions\fP] \fB-s\fP \fIstatus\fP
@@ -28,6 +28,19 @@ for more info about config files, check
 \fIhttps://github.com/FWDekker/mommy/tree/v%%VERSION_NUMBER%%#configuration\fP.
 
 .TP
+\fB-h\fP, \fB--help\fP
+opens \fBmommy\fP's manual page~
+.TP
+\fB-v\fP, \fB--version\fP
+displays \fBmommy\fP's version information~
+.TP
+\fB-e\fP \fIcommand\fP, \fB--eval=\fP\fIcommand\fP
+runs \fIcommand\fP and responds to the output.
+note that \fIcommand\fP should be given as a single argument~
+.TP
+\fB-s\fP \fIstatus\fP, \fB--status=\fP\fIstatus\fP
+gives output corresponding to exit code \fIstatus\fP~
+.TP
 \fB-c\fP \fIfile\fP, \fB--config=\fP\fIfile\fP
 tells mommy that she should read your config from \fIfile\fP~
 .TP
@@ -36,12 +49,6 @@ sets global configuration dirs to the colon-separated list in \fIdirs\fP~
 .TP
 \fB-1\fP
 writes output to \fBstdout\fP instead of \fBstderr\fP~
-.TP
-\fB-h\fP, \fB--help\fP
-opens \fBmommy\fP's manual page~
-.TP
-\fB-v\fP, \fB--version\fP
-displays \fBmommy\fP's version information~
 
 
 .SH bugs

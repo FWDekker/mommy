@@ -416,7 +416,7 @@ for reference, here's the three main ways to invoke mommy~
 | format                | example                     | when to use                                                          |
 |-----------------------|-----------------------------|----------------------------------------------------------------------|
 | `mommy [command] ...` | `mommy npm test`            | if you want mommy to respond to a single command~                    |
-| `mommy -e [eval]`     | `mommy -e "ls -l \| wc -l"` | if you want mommy when using `\|` or `>`, or need mommy in a script~ |
+| `mommy -e [command]`  | `mommy -e "ls -l \| wc -l"` | if you want mommy when using `\|` or `>`, or need mommy in a script~ |
 | `mommy -s [status]`   | `mommy -s $?`               | if you already ran a command and want mommy's help afterwards~       |
 
 ### 🛸 extra options<a name="extra-options"></a>
