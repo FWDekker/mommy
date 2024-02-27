@@ -17,7 +17,7 @@ so well~
 mommy is fully customizable, integrates with any shell, works on any system, and most importantly, loves you very
 much~ ❤️
 
-![mommy demo](.github/img/demo.gif)
+<img width="450px" src=".github/img/fish.png" alt="a command-line interface showing the text 'it's okay to make mistakes' after the user has failed to enter their password correctly three times in a row" />
 
 
 ## 🚚 installation<a name="installation"></a> <small><sup>[top ▲](#toc)</sup></small>
@@ -400,7 +400,7 @@ tar -C ./ -xzf mommy-*.tar.gz
 check out [how to use mommy](#usage), read all about [ways you can configure mommy](#configuration), and
 [integrate mommy with your shell](#shell-integration)~
 
-<img width="450px" src=".github/img/sample1.png" alt="mommy integrated with the fish shell" />
+<img width="450px" src=".github/img/demo.gif" alt="a command-line interface showing the text 'never give up, my love' after running a command that has failed, and showing the text 'mommy knew you could do it' after running a command that has succeeded" />
 
 
 ## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
@@ -568,6 +568,8 @@ just add the following line to `~/.bashrc`:
 ```shell
 PROMPT_COMMAND="mommy -1 -s \$?; $PROMPT_COMMAND"
 ```
+
+<img width="450px" src=".github/img/demo.gif" alt="bash showing the text 'it's okay to make mistakes' after running a command that has failed" />
 </details>
 
 <details>
@@ -578,6 +580,8 @@ in nushell you can have mommy output a message on the right side of your prompt 
 ```shell
 $env.PROMPT_COMMAND_RIGHT = {|| mommy -1 -s $env.LAST_EXIT_CODE }
 ```
+
+<img width="450px" src=".github/img/nushell.png" alt="nushell showing the text 'just a little further, mommy knows you can do it' in the right prompt after running a command that has failed" />
 </details>
 
 <details>
@@ -594,6 +598,8 @@ if you have an [oh my fish](https://github.com/oh-my-fish/oh-my-fish) theme inst
 see if there's an easy way to extend the theme's right prompt.
 if not, you can either overwrite it with the above code, or copy-paste the theme's code into your own config file and
 then add mommy yourself~
+
+<img width="450px" src=".github/img/fish.png" alt="fish shell showing the text 'it's okay to make mistakes' in the right prompt after running a command that has failed" />
 </details>
 
 <details>
@@ -621,7 +627,7 @@ MOMMY_SUFFIX="~%f"
 this code randomly changes the output between magenta and cyan.
 note the `%f` in the suffix, which resets the color~
 
-<img width="450px" src=".github/img/sample2.png" alt="mommy integrated with the zsh shell" />
+<img width="450px" src=".github/img/zsh.png" alt="zsh showing the text 'never give up, my love' in the right prompt after running a command that has failed" />
 </details>
 
 <details>
