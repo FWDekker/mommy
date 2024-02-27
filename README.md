@@ -322,9 +322,11 @@ if you want to customise where and how mommy installs, you can just compile her 
    this step builds mommy's files and copies them into your system.
    the exact paths differ per system, so find the instructions that are right for your system.
 
-   > ℹ️ if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
+   > [!NOTE]
+   > if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
 
-   > ℹ️ check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
+   > [!TIP]
+   > check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
    > you can override~
 
     * _debian/ubuntu/apt-based_
@@ -407,7 +409,8 @@ check out [how to use mommy](#usage), read all about [ways you can configure mom
 mommy processes (the output status of) a command and compliments you if the command succeeds and encourages you if it
 fails~
 
-> ℹ️ the **recommended** way of long-term mommy usage is to [integrate mommy into your shell](#shell-integration), so
+> [!TIP]
+> the **recommended** way of long-term mommy usage is to [integrate mommy into your shell](#shell-integration), so
 > mommy will run after every command you run~
 
 ### 💃 how to run<a name="how-to-run"></a>
@@ -676,7 +679,8 @@ sudo ln -fs /usr/bin/mommy /usr/bin/daddy
 sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 ```
 
-> ℹ️ uninstalling mommy will not remove the manually created symlinks~
+> [!IMPORTANT]
+> uninstalling mommy will not remove the manually created symlinks~
 </details>
 
 
