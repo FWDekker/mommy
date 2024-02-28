@@ -2,6 +2,7 @@
 ## [unreleased]
 ### added
 * 🦓 mommy now supports templates with literal slashes using `%%S%%`~ ([#107](https://github.com/FWDekker/mommy/issues/107))
+* 🐟 mommy added completions for fish and zsh for the new options introduced in v1.4.0~ ([#105](https://github.com/FWDekker/mommy/issues/105))
 
 ### changed
 * 🙅‍♀️ mommy's `MOMMY_FORBIDDEN_WORDS` setting now interprets each word as a regex~ ([#103](https://github.com/FWDekker/mommy/issues/103))
