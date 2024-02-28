@@ -236,7 +236,7 @@ jobs:
           echo -e "mommy can also be installed using a package manager. [check the readme for more info](https://github.com/FWDekker/mommy/tree/${MOMMY_VERSION}#-installation)~\n" | cat - RELEASE_NOTES.md | tee RELEASE_NOTES.md
       - name: Publish release
         uses: softprops/action-gh-release@v1
-        if: ${{ github.event.inputs.dry_run == 'false' }} && ${{ github.event.inputs.release_mommy == 'true' }}
+        if: ${{ github.event.inputs.dry_run == 'false' && github.event.inputs.release_mommy == 'true' }}
         with:
           target_commitish: main
           tag_name: ${{ env.MOMMY_VERSION }}
