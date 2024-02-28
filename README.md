@@ -801,7 +801,7 @@ which can be activated using a `workflow_dispatch` event~
   * update `version`~
   * update all changelogs~
     * update `CHANGELOG.md`~
-      * do not leave a placeholder section for `[Unreleased]`, because that will end up in the `.deb`'s
+      * do not leave a placeholder section for `[unreleased]`, because it will end up like that in the `.deb`'s
         `changelog.gz`~
       * remove empty subsections for the new release~
       * ensure no line breaks are used as whitespace;
