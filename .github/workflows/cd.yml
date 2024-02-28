@@ -47,10 +47,14 @@ jobs:
         id: mommy_version
         run: |
           MOMMY_VERSION="v$(head -n 1 ./version)"
+          echo "Found version '$MOMMY_VERSION'"
           echo "MOMMY_VERSION=$MOMMY_VERSION" >> "$GITHUB_ENV"
           echo "MOMMY_VERSION=$MOMMY_VERSION" >> "$GITHUB_OUTPUT"
-      - name: Check if release already exists
+      - name: Check if corresponding section exists in changelog
         # yes, you really do need to compare with a string, and no, using ! does not work~
+        if: ${{ github.event.inputs.dry_run == 'false' }}
+        run: grep -qF "# [${MOMMY_VERSION#v}] --" CHANGELOG.md
+      - name: Check if release already exists
         if: ${{ github.event.inputs.dry_run == 'false' }}
         # using `fetch-tags` option of `actions/checkout` does not work properly~
         run: |
@@ -204,19 +208,10 @@ jobs:
           path: dist/mommy*
 
 
-  release-gate:
-    needs: [ build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Gate opened!
-        run: |
-          echo "The gates have opened!"
-
-
   release-mommy:
     if: ${{ github.event.inputs.release_mommy == 'true' }}
-    needs: [ release-gate ]
+    # `pre-flight-checks` is required to access `MOMMY_VERSION`
+    needs: [ pre-flight-checks, build-linux, build-macos, build-freebsd, build-netbsd, build-openbsd ]
     runs-on: ubuntu-latest
 
     env:
@@ -241,7 +236,7 @@ jobs:
           echo -e "mommy can also be installed using a package manager. [check the readme for more info](https://github.com/FWDekker/mommy/tree/${MOMMY_VERSION}#-installation)~\n" | cat - RELEASE_NOTES.md | tee RELEASE_NOTES.md
       - name: Publish release
         uses: softprops/action-gh-release@v1
-        if: ${{ github.event.inputs.dry_run == 'false' }}
+        if: ${{ github.event.inputs.dry_run == 'false' }} && ${{ github.event.inputs.release_mommy == 'true' }}
         with:
           target_commitish: main
           tag_name: ${{ env.MOMMY_VERSION }}
@@ -253,7 +248,7 @@ jobs:
 
   release-apt:
     if: ${{ github.event.inputs.release_apt == 'true' }}
-    needs: [ release-gate ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
 
     env:
@@ -311,7 +306,7 @@ jobs:
 
   release-aur:
     if: ${{ github.event.inputs.release_aur == 'true' }}
-    needs: [ release-gate ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
     container: archlinux:latest
 
@@ -392,7 +387,7 @@ jobs:
 
   release-homebrew:
     if: ${{ github.event.inputs.release_homebrew == 'true' }}
-    needs: [ release-gate ]
+    needs: [ pre-flight-checks, release-mommy ]
     runs-on: ubuntu-latest
 
     env:
