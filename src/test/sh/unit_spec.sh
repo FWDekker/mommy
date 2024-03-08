@@ -75,34 +75,36 @@ Describe "mommy"
             End
         End
 
-        Describe "--global-config-dirs"
-            It "gives an error when no argument is given"
-                When run "$MOMMY_EXEC" --global-config-dirs="" -c "" true
-                The error should equal "mommy is missing the argument for option 'global-config-dirs'~"
+        Describe "-d/--global-config-dirs"
+            Parameters:value "-d " "--global-config-dirs="
+
+            It "gives an error when no argument is given using $1"
+                When run "$MOMMY_EXEC" $1"" -c "" true
+                The error should equal "mommy is missing the argument for option '$(strip_opt "$1")'~"
                 The status should be failure
             End
 
-            It "uses the configuration from the file"
+            It "uses the configuration from the file when using $1"
                 set_config "MOMMY_COMPLIMENTS='sport revive'" "$MOMMY_TMP_DIR/global1/config.sh"
 
-                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/" -c "" true
+                When run "$MOMMY_EXEC" $1"$MOMMY_TMP_DIR/global1/" -c "" true
                 The error should equal "sport revive"
                 The status should be success
             End
 
-            It "non-existing directories are skipped until an existing directory is found"
+            It "non-existing directories are skipped until an existing directory is found when using $1"
                 set_config "MOMMY_COMPLIMENTS='cherry crop'" "$MOMMY_TMP_DIR/global2/config.sh"
 
-                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                When run "$MOMMY_EXEC" $1"$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
                 The error should equal "cherry crop"
                 The status should be success
             End
 
-            It "when multiple global directories exist, only the first is used"
+            It "when multiple global directories exist, only the first is used when using $1"
                 set_config "MOMMY_COMPLIMENTS='film style'" "$MOMMY_TMP_DIR/global1/config.sh"
                 set_config "MOMMY_COMPLIMENTS='care smile'" "$MOMMY_TMP_DIR/global2/config.sh"
 
-                When run "$MOMMY_EXEC" --global-config-dirs="$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
+                When run "$MOMMY_EXEC" $1"$MOMMY_TMP_DIR/global1/:$MOMMY_TMP_DIR/global2/" -c "" true
                 The error should equal "film style"
                 The status should be success
             End
