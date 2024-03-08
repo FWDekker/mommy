@@ -1,4 +1,9 @@
 # Changelog
+## [unreleased]
+### added
+* 🤸‍♀️ mommy now supports `-d` as an alias of `--global-config-dirs`~
+
+
 ## [1.5.0] -- 2024-02-28
 ### added
 * 🦓 mommy now supports templates with literal slashes using `%%S%%`~ ([#107](https://github.com/FWDekker/mommy/issues/107))

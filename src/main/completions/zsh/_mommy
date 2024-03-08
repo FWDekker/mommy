@@ -12,7 +12,7 @@ _arguments \
     "(- *)"{-v,--version}'[Show version]' \
     -1'[Write to stdout]' \
     {-c,--config}'[Configuration file]:config:_files' \
-    --global-config-dirs'[Colon-separated global config file dirs]:global config:_dir_list' \
+    {-d,--global-config-dirs}'[Colon-separated global config file dirs]:global config:_dir_list' \
     {-e,--eval}'[Evaluate string]:string' \
     {-s,--status}'[Exit code]:code:->status' \
     '*::command:'

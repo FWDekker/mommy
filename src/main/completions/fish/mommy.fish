@@ -64,7 +64,7 @@ complete --command mommy --short-option c --long-option config \
     --description "Configuration file" \
     --condition "not __fish_seen_argument $opt_help $opt_version"\
     --condition "test -z (get_args)"
-complete --command mommy --long-option global-config-dirs \
+complete --command mommy --short-option d --long-option global-config-dirs \
     --require-parameter \
     --arguments "(__fish_complete_directories)" \
     --description "Colon-separated global config file dirs" \

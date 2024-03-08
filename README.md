@@ -432,7 +432,7 @@ additionally, mommy knows a few extra options, which you can use to discover who
 | `-v`         | `--version`                   | displays mommy's version information~                                                             |
 | `-1`         |                               | writes output to stdout instead of stderr~                                                        |
 | `-c <file>`  | `--config=<file>`             | tells mommy that she should read your [config](#configuration) from `<file>`~                     |
-|              | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
+| `-d <dirs>`  | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
 
 
 ## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
