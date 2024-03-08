@@ -16,8 +16,8 @@ set_config() {
 Describe "mommy"
     Describe "command-line options"
         It "gives an error for unknown short options"
-            When run "$MOMMY_EXEC" -d
-            The error should equal "mommy doesn't know option -d~"
+            When run "$MOMMY_EXEC" -z
+            The error should equal "mommy doesn't know option -z~"
             The status should be failure
         End
 

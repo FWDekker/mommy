@@ -310,7 +310,7 @@ opt_global_config_dirs="${XDG_CONFIG_DIRS}:/etc/mommy/:/usr/local/etc/mommy/"
 opt_eval=""
 opt_status=""
 
-while getopts ":hv1c:e:s:-:" OPT; do
+while getopts ":hv1d:c:e:s:-:" OPT; do
     # Cheap workaround for long options, cf. https://stackoverflow.com/a/28466267
     if [ "-" = "$OPT" ]; then
         OPT="${OPTARG%%=*}"
@@ -323,7 +323,7 @@ while getopts ":hv1c:e:s:-:" OPT; do
     h|help) opt_help="1" ;;
     v|version) opt_version="1" ;;
     1) opt_target="1" ;;
-    global-config-dirs) require_arg; opt_global_config_dirs="$OPTARG" ;;
+    d|global-config-dirs) require_arg; opt_global_config_dirs="$OPTARG" ;;
     c|config) opt_config="$OPTARG" ;;
     e|eval) require_arg; opt_eval="$OPTARG" ;;
     s|status) require_arg; require_int; opt_status="$OPTARG" ;;
