@@ -1,12 +1,14 @@
 ## General settings
 ### Konsole
-* Set font size to 32
-* Set window size to 60x12
-* Hide all toolbars, hide the title bar, and hide the frame.
+* Set "Appearance" > "Color scheme & font" to "Solarized".
+* Set "Appearance" > "Color scheme & font" > "Font" to "Hack 32pt".
+* Set "Scrolling" > "Scrollbar position" to "Hidden".
+* Set window size to 60x12.
+* Hide all toolbars, the menu bar, the title bar, and the frame.
 
 ### Screenshot
 * Take a screenshot of the entire Konsole window.
-* Resize the image to be 450px wide.
+* Resize the image to be 900px wide.
 
 
 ## bash.png
@@ -18,13 +20,21 @@
    ```shell
    MOMMY_COMPLIMENTS_ENABLED="0";MOMMY_ENCOURAGEMENTS="it's okay to make mistakes"
    ```
-3. Apply the Konsole settings described above.
-4. Run
+3. Create the directories referenced in the sample:
    ```shell
-   ssh cia.gov
+   mkdir photos photos/test
    ```
-5. Take a screenshot as described above.
-   
+4. Apply the Konsole settings described above.
+5. In `bash`, run
+   ```shell
+   rmdir photos
+   ```
+6. Take a screenshot as described above.
+7. Remove the created directories:
+   ```shell
+   rmdir photos/test photos
+   ```
+
 
 ## fish.png
 1. Install fish, and add the following to `~/.config/fish/functions/fish_right_prompt.fish`:
@@ -38,7 +48,7 @@
    MOMMY_COMPLIMENTS_ENABLED="0";MOMMY_ENCOURAGEMENTS="it's okay to make mistakes";MOMMY_COLOR="lolcat"
    ```
 3. Apply the Konsole settings described above.
-4. Run
+4. In `fish`, run
    ```shell
    sudo apt update
    ```
@@ -74,7 +84,7 @@
    MOMMY_COMPLIMENTS_ENABLED="0";MOMMY_COLOR="";MOMMY_PREFIX="%F{005}";MOMMY_SUFFIX="~%f";MOMMY_ENCOURAGEMENTS="never give up, my love"
    ```
 3. Apply the Konsole settings described above.
-4. Run
+4. In `zsh`, run
    ```shell
    git clone git@github.com/nyancrimew/noflylist.git
    ```
