@@ -608,27 +608,34 @@ then add mommy yourself~
 <details>
 <summary>💤 zsh</summary>
 
-in zsh you can put mommy's output after each command by adding the following line to `~/.zshrc`:
+depending on where you want mommy's output, the instructions are a bit different.
+you can either get the output above your prompt, or aligned to the right~
+
+**above the prompt**  
+to get mommy's output on a separate line above your prompt, add the following line to `~/.zshrc`:
 ```shell
 precmd() { mommy -1 -s $? }
 ```
 
-to put mommy's output on the right side, add the following to `~/.zshrc`:
+**to the right of each command**  
+to get mommy's output on the same line as your prompt, aligned to the right, add the following to `~/.zshrc`:
 ```shell
 set -o PROMPT_SUBST
-RPS1='$(mommy -1 -s $?)'
+RPS1='$(mommy -1 -s $?)'  # using single quotes here is required!
 ```
-unfortunately, the `RPS1` solution does not work well with `MOMMY_COLOR`.
-instead, you'll have to use a special zsh syntax for
-[xterm color codes](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg) by adding the
-following to your config:
+and add the following to your mommy config:
 ```shell
 MOMMY_COLOR=""
 MOMMY_PREFIX="%F{005}/%F{006}"
 MOMMY_SUFFIX="~%f"
 ```
-this code randomly changes the output between magenta and cyan.
-note the `%f` in the suffix, which resets the color~
+
+normally, mommy sets colors using standard ansi color codes, but zsh's support is a bit special, resulting in zsh
+miscalculating the prompt width, which looks like your prompt is misaligned or shifted.
+to fix this, you should disable mommy's color feature and manually set colors in the prefix option.
+to specify colors, use zsh's special syntax, where the numbers correspond to the
+[xterm color codes](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg). 
+finally, the `%f` in the suffix resets the colors~
 
 <img width="450px" src=".github/img/zsh.png" alt="zsh showing the text 'never give up, my love' in the right prompt after running a command that has failed" />
 </details>
