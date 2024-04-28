@@ -241,7 +241,7 @@ jobs:
           target_commitish: main
           tag_name: ${{ env.MOMMY_VERSION }}
           body_path: RELEASE_NOTES.md
-          files: mommy*
+          files: dist/mommy*
           draft: false
           prerelease: false
           discussion_category_name: announcements
