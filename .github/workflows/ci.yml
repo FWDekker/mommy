@@ -288,7 +288,7 @@ jobs:
 
 
   test-macos:
-    runs-on: macos-latest
+    runs-on: macos-12  # fish tests don't seem to work well in macos 14~
     steps:
       - name: Install dependencies for mommy
         run: |
@@ -429,15 +429,15 @@ jobs:
 
 
   test-netbsd:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Test script and package
-        uses: cross-platform-actions/action@v0.22.0
+        uses: cross-platform-actions/action@v0.24.0
         with:
           operating_system: netbsd
-          version: "9.3"
+          version: "10.0"
           run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
