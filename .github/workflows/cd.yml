@@ -141,15 +141,15 @@ jobs:
 
   build-netbsd:
     needs: [ pre-flight-checks ]
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install fpm && Build package
-        uses: cross-platform-actions/action@v0.22.0
+        uses: cross-platform-actions/action@v0.24.0
         with:
           operating_system: netbsd
-          version: "9.3"
+          version: "10.0"
           run: |
             set -e
             export PATH="/usr/sbin:$PATH"  # Add 'pkg_*' commands to path
