@@ -288,7 +288,7 @@ jobs:
 
 
   test-macos:
-    runs-on: macos-latest
+    runs-on: macos-12  # fish tests don't seem to work well in macos 14~
     steps:
       - name: Install dependencies for mommy
         run: |

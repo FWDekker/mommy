@@ -145,7 +145,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install fpm && Build package
+      - name: Build package
         uses: cross-platform-actions/action@v0.24.0
         with:
           operating_system: netbsd
