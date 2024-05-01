@@ -860,5 +860,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [telling her how to integrate with nushell](https://github.com/FWDekker/mommy/issues/65)~
 * mommy thanks [maximilian downey twiss](https://github.com/Zopolis4) for
   [bumping mommy's actions to their latest versions](https://github.com/FWDekker/mommy/pull/68)~
-* mommy thanks [qeeg](https://github.com/qeeg) for
+* mommy thanks [fuel-pcbox](https://github.com/fuel-pcbox) for
   [her suggestion of supporting regexes for forbidden words](https://github.com/FWDekker/mommy/issues/103)~
