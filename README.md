@@ -289,16 +289,15 @@ find your operating system and package manager for the right instructions~
 <details>
 <summary>windows</summary>
 
+for **git bash** or **cygwin**, see 
+[the instructions for using mommy without a package manager](#-without-a-package-manager)~
+
 * **wsl** (automatic or manual updates)  
   follow any of the mommy installation instructions for your installed linux subsystem (default is ubuntu) or
   [build mommy from source](#-without-a-package-manager)~
 * **msys2** (automatic or manual updates)  
   follow any of the mommy installation instructions for _arch linux_ (except **do not use the arch user repository
   method**) or [build mommy from source](#-without-a-package-manager)~
-* **cygwin** (manual updates)  
-  there is no mommy package for cygwin.
-  instead, you can [build mommy from source](#-without-a-package-manager)
-  (aka: run a script that copies a few files for you)~
 </details>
 
 ### 🐐 without a package manager
@@ -319,10 +318,10 @@ if you want to customise where and how mommy installs, you can just compile her 
    this step builds mommy's files and copies them into your system.
    the exact paths differ per system, so find the instructions that are right for your system.
 
-   > [!NOTE]
+   > ℹ️
    > if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
 
-   > [!TIP]
+   > 💡
    > check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
    > you can override~
 
@@ -573,18 +572,6 @@ PROMPT_COMMAND="mommy -1 -s \$?; $PROMPT_COMMAND"
 </details>
 
 <details>
-<summary>📈 nushell</summary>
-
-in nushell you can have mommy output a message on the right side of your prompt by adding the following line to your
-`~/.config/nushell/config.nu` file:
-```shell
-$env.PROMPT_COMMAND_RIGHT = {|| mommy -1 -s $env.LAST_EXIT_CODE }
-```
-
-<img width="450px" src=".github/img/nushell.png" alt="nushell showing the text 'just a little further, mommy knows you can do it' in the right prompt after running a command that has failed" />
-</details>
-
-<details>
 <summary>🐟 fish</summary>
 
 in fish you can have mommy output a message on the right side of your prompt by creating
@@ -600,6 +587,65 @@ if not, you can either overwrite it with the above code, or copy-paste the theme
 then add mommy yourself~
 
 <img width="450px" src=".github/img/fish.png" alt="fish shell showing the text 'it's okay to make mistakes' in the right prompt after running a command that has failed" />
+</details>
+
+<details>
+<summary>📈 nushell</summary>
+
+in nushell you can have mommy output a message on the right side of your prompt by adding the following line to your
+`~/.config/nushell/config.nu` file:
+```shell
+$env.PROMPT_COMMAND_RIGHT = {|| mommy -1 -s $env.LAST_EXIT_CODE }
+```
+
+<img width="450px" src=".github/img/nushell.png" alt="nushell showing the text 'just a little further, mommy knows you can do it' in the right prompt after running a command that has failed" />
+</details>
+
+<details>
+<summary>🪟 powershell</summary>
+
+the exact instructions depend on [how and where you installed mommy](#installation)~
+
+1. **disable mommy's color output**  
+   mommy's colors don't really work well in powershell, so you'll have to disable them~
+   * **wsl**  
+     if you want to run mommy through wsl, open `wsl` and run
+     ```shell
+     # run this in wsl
+     mkdir -p ~/.config/mommy
+     echo "MOMMY_COLOR=" >> ~/.config/mommy/config.sh
+     ```
+   * **git bash**  
+     if you want to run mommy through git bash, run
+     ```shell
+     # run this in powershell
+     [IO.Directory]::CreateDirectory("$HOME/.config/mommy")
+     [IO.File]::WriteAllLines("$HOME/.config/mommy/config.sh", "MOMMY_COLOR=''")
+     ```
+2. **test prompt**  
+   change powershell's prompt to include mommy's message~
+   * **wsl**  
+     if you want to run mommy through wsl, run
+     ```shell
+     # run this in powershell
+     function prompt { "$(wsl -e mommy -1 -s $([int][bool]::Parse(!$?)))> " }
+     ```
+   * **git bash**  
+     if you want to run mommy through git bash, and you downloaded mommy to `C:\Users\username\mommy`, run
+     ```shell
+     # run this in powershell
+     function prompt { "$(& "C:\Program Files\Git\bin\sh.exe" -c "C:\Users\username\mommy" -1 -s $([int][bool]::Parse(!$?)))> " }
+     ```
+3. **save prompt**  
+   now let's make this prompt persistent.
+   in powershell, run `notepad $profile` to open your powershell settings, and add the `function prompt [...]` line from
+   above.
+   if you get an error that this file does not exist, run `new-item -itemtype file -path $profile -force` to create it~
+4. **improve prompt**  
+   the instructions above show the basics of using mommy in powershell.
+   you can make it way cooler using a theme engine like [oh-my-posh](https://ohmyposh.dev/).
+   for example, you can use background colors or display mommy in the right prompt instead of the left~
+
 </details>
 
 <details>
