@@ -318,10 +318,10 @@ if you want to customise where and how mommy installs, you can just compile her 
    this step builds mommy's files and copies them into your system.
    the exact paths differ per system, so find the instructions that are right for your system.
 
-   > ℹ️
+   > **ℹ️ note**  
    > if you want to install mommy only for the current user, add `prefix='~/.local/'` before `install`~
 
-   > 💡
+   > **💡 tip**  
    > check the [makefile](https://github.com/FWDekker/mommy/blob/main/GNUmakefile) for a list of all prefix variables
    > you can override~
 
@@ -634,13 +634,21 @@ the exact instructions depend on [how and where you installed mommy](#installati
      if you want to run mommy through git bash, and you downloaded mommy to `C:\Users\username\mommy`, run
      ```shell
      # run this in powershell
-     function prompt { "$(& "C:\Program Files\Git\bin\sh.exe" -c "C:\Users\username\mommy" -1 -s $([int][bool]::Parse(!$?)))> " }
+     function prompt { "$(& "C:\Program Files\Git\bin\sh.exe" "C:/Users/username/mommy" -1 -s $([int][bool]::Parse(!$?)))> " }
      ```
 3. **save prompt**  
    now let's make this prompt persistent.
    in powershell, run `notepad $profile` to open your powershell settings, and add the `function prompt [...]` line from
-   above.
-   if you get an error that this file does not exist, run `new-item -itemtype file -path $profile -force` to create it~
+   above~
+
+   > **ℹ️ note**  
+   > if you get an error that this file does not exist, run `new-item -itemtype file -path $profile -force` to create
+   > it~
+
+   > **ℹ️ note**  
+   > if you get an error that you cannot run local scripts, run 
+   > `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` as admin, or 
+   > [sign the script](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_signing?view=powershell-7.3#methods-of-signing-scripts)~
 4. **improve prompt**  
    the instructions above show the basics of using mommy in powershell.
    you can make it way cooler using a theme engine like [oh-my-posh](https://ohmyposh.dev/).
@@ -908,3 +916,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [bumping mommy's actions to their latest versions](https://github.com/FWDekker/mommy/pull/68)~
 * mommy thanks [fuel-pcbox](https://github.com/fuel-pcbox) for
   [her suggestion of supporting regexes for forbidden words](https://github.com/FWDekker/mommy/issues/103)~
+* mommy thanks [satyam singh niranjan](https://github.com/Satanarious) for
+  [suggesting powershell support](https://github.com/FWDekker/mommy/issues/124)~
