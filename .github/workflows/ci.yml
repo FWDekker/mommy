@@ -69,10 +69,11 @@ jobs:
       - name: Patch homebrew-mommy
         working-directory: homebrew-mommy
         env:
+          RELEVANT_URL: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           RELEVANT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           # Point the formula to the commit that is being tested in this workflow
-          sed -i -e "s|head \(.*\), branch: .*|head \1, revision: \"$RELEVANT_SHA\"|g" mommy.rb
+          sed -i -e "s|head \(.*\), branch: .*|head \"https://github.com/$RELEVANT_URL.git\", revision: \"$RELEVANT_SHA\"|g" mommy.rb
           git -c user.name="ignore" -c user.email="ignore" commit -am "ignore"
       - name: Test Homebrew package
         run: |
@@ -123,11 +124,11 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Install ShellSpec"
-          git clone https://aur.archlinux.org/shellspec-bin.git /tmp/shellspec-bin
-          chown -R build:build /tmp/shellspec-bin
-          cd /tmp/shellspec-bin
+          git clone https://aur.archlinux.org/shellspec-git.git /tmp/shellspec-git
+          chown -R build:build /tmp/shellspec-git
+          cd /tmp/shellspec-git
           sudo -u build makepkg -si --noconfirm
-          rm -rf /tmp/shellspec-bin
+          rm -rf /tmp/shellspec-git
           cd -
           echo "::endgroup::"
 
@@ -148,7 +149,7 @@ jobs:
       - name: Install fpm
         run: |
           pacman -S --noconfirm ruby
-          gem install --no-document fpm
+          gem install --no-document fpm erb
           ln -s "$HOME/.local/share/gem/ruby/"*"/bin/fpm" /usr/local/bin/fpm  # Symlink 'fpm' to latest version
       - name: Test fpm package
         working-directory: ./mommy/
@@ -335,10 +336,11 @@ jobs:
       - name: Patch homebrew-mommy
         working-directory: homebrew-mommy
         env:
+          RELEVANT_URL: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           RELEVANT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           # Point the formula to the commit that is being tested in this workflow
-          sed -i -e "s|head \(.*\), branch: .*|head \1, revision: \"$RELEVANT_SHA\"|g" mommy.rb
+          sed -i -e "s|head \(.*\), branch: .*|head \"https://github.com/$RELEVANT_URL.git\", revision: \"$RELEVANT_SHA\"|g" mommy.rb
           git -c user.name="ignore" -c user.email="ignore" commit -am "ignore"
       - name: Test Homebrew package
         run: |
