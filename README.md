@@ -918,3 +918,5 @@ if mommy should add, remove, or change anything here, [open an issue](https://gi
   [her suggestion of supporting regexes for forbidden words](https://github.com/FWDekker/mommy/issues/103)~
 * mommy thanks [satyam singh niranjan](https://github.com/Satanarious) for
   [suggesting powershell support](https://github.com/FWDekker/mommy/issues/124)~
+* mommy thanks [biko](https://github.com/Bikoil) for
+  [making mommy refer to people by their username by default](https://github.com/FWDekker/mommy/issues/131)~

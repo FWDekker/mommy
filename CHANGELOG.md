@@ -3,6 +3,9 @@
 ### added
 * 🤸‍♀️ mommy now supports `-d` as an alias of `--global-config-dirs`~
 
+### changed
+* 👤 mommy now refers to the user by their username by default~ ([#131](https://github.com/FWDekker/mommy/issues/131))
+
 
 ## [1.5.0] -- 2024-02-28
 ### added
