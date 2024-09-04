@@ -5,7 +5,7 @@ n="
 ## Configuration
 MOMMY_CAREGIVER="mommy"
 MOMMY_PRONOUNS="she her her"
-MOMMY_SWEETIE="girl"
+MOMMY_SWEETIE="${LOGNAME:-girl}"
 MOMMY_PREFIX=""
 MOMMY_SUFFIX="~"
 
