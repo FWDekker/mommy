@@ -191,7 +191,7 @@ jobs:
             echo "::group::Install fpm"
             pkg_add "$(pkg_info -Q ruby | grep "^ruby-[0-9]" | tail -n 1)"
             /usr/local/bin/gem* install --no-document fpm
-            ln -s /usr/local/bin/fpm* /usr/local/bin/fpm  # Symlink 'fpm' to latest version
+            ln -s "$(echo /usr/local/bin/fpm* | tr ' ' \\n | grep -E '[0-9]+$')" /usr/local/bin/fpm  # Symlink 'fpm' to latest version
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
