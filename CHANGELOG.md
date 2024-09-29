@@ -1,5 +1,5 @@
 # Changelog
-## [unreleased]
+## [1.5.1] -- 2024-09-28
 ### added
 * 🤸‍♀️ mommy now supports `-d` as an alias of `--global-config-dirs`~
 
