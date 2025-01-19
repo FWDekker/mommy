@@ -20,7 +20,7 @@ much~ ❤️
 <img width="450px" src=".github/img/fish.png" alt="a command-line interface showing the text 'it's okay to make mistakes' after the user has failed to enter their password correctly three times in a row" />
 
 
-## 🚚 installation<a name="installation"></a> <small><sup>[top ▲](#toc)</sup></small>
+## 🚚 installation<a name="installation"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 mommy works on any system.
 mommy is tested on ubuntu, debian, archlinux, fedora, nixpkgs, macos, freebsd, netbsd, openbsd, and windows~
 
@@ -401,7 +401,7 @@ check out [how to use mommy](#usage), read all about [ways you can configure mom
 <img width="450px" src=".github/img/demo.gif" alt="a command-line interface showing the text 'never give up, my love' after running a command that has failed, and showing the text 'mommy knew you could do it' after running a command that has succeeded" />
 
 
-## 📖 usage<a name="usage"></a> <small><sup>[top ▲](#toc)</sup></small>
+## 📖 usage<a name="usage"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 mommy processes (the output status of) a command and compliments you if the command succeeds and encourages you if it
 fails~
 
@@ -431,7 +431,7 @@ additionally, mommy knows a few extra options, which you can use to discover who
 | `-d <dirs>`  | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
 
 
-## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
+## 🙋 configuration<a name="configuration"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 mommy's behavior can be modified using config files.
 the easiest way to do so is to add your config to the file `~/.config/mommy/config.sh`.
 you can also set up a global config file that is applied to all users, by default in `/etc/mommy/config.sh`.
@@ -455,7 +455,7 @@ after that, she will read the user-specific **local** config file, overriding th
         1. if a list is specified using a [command-line option](#usage), that list is used.
         2. otherwise, the list consists of all directories in `$XDG_CONFIG_DIRS`, plus `/etc/mommy`, plus
          `/usr/local/etc/mommy/`.
-    2. mommy traverses this list, and stops once she finds a directory that contains the file `config.sh`.
+    2. mommy traverses this list, and sbottoms once she finds a directory that contains the file `config.sh`.
        this file will be the global config file~
 * to find the **local** config file, mommy runs the following procedure.
     1. if a config file is specified using a [command-line option](#usage), that file is used. 
@@ -547,7 +547,7 @@ outputs `your mommy loves you`~
 </details>
 
 
-## 🐚 shell integration<a name="shell-integration"></a> <small><sup>[top ▲](#toc)</sup></small>
+## 🐚 shell integration<a name="shell-integration"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 instead of calling mommy for each command, you can fully integrate mommy with your shell to get mommy's output each time
 you run any command.
 here are some examples on how you can do that in various shells.
@@ -742,7 +742,7 @@ sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 </details>
 
 
-## ⚗️ development<a name="development"></a> <small><sup>[top ▲](#toc)</sup></small>
+## ⚗️ development<a name="development"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 this section explains how to build mommy from source, in case you want to
 [help with development](https://github.com/FWDekker/mommy/blob/main/CONTRIBUTING.md) or for any other reason~
 
@@ -887,7 +887,7 @@ which can be activated using a `workflow_dispatch` event~
 </details>
 
 
-## 💖 acknowledgements<a name="acknowledgements"></a> <small><sup>[top ▲](#toc)</sup></small>
+## 💖 acknowledgements<a name="acknowledgements"></a> <small><sup>[bottom ▲](#toc)</sup></small>
 mommy recognises _all_ contributors, no matter the size of the contribution.
 if mommy should add, remove, or change anything here, [open an issue](https://github.com/FWDekker/mommy/issues/new) or
 [contact the author](https://fwdekker.com/about/)~
