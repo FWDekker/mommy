@@ -708,6 +708,8 @@ For example, use this to have mommy appear on your right prompt at all times~
 ```toml
 right_format = "$custom"
 ```
+
+<img width="450px" src=".github/img/starship.png" alt="starship with a left prompt with modules, and a right prompt with the custom mommy module, saying things like '*pets your head*' with empty commands." />
 </details>
 
 <details>
