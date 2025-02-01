@@ -1,4 +1,9 @@
 # Changelog
+## [9.9.9] -- 2099-12-31
+### added
+* 🚀 mommy now explains how to configure [starship](https://starship.rs/)~ ([#135](https://github.com/FWDekker/mommy/pull/135))
+
+
 ## [1.5.1] -- 2024-09-28
 ### added
 * 🤸‍♀️ mommy now supports `-d` as an alias of `--global-config-dirs`~
