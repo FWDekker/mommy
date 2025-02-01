@@ -692,6 +692,25 @@ finally, the `%f` in the suffix resets the colors~
 </details>
 
 <details>
+<summary>🚀 Starship</summary>
+
+When using Starship for `oh-my-posh`-like prompts (supporting many shells like `bash`, `zsh` and `fish`), you can change the prompt itself to
+contain a message from mommy by generating a custom `mommy` module in your `.config/starship.toml` file:
+```toml
+# Writing a custom module for mommy O_o
+[custom.mommy]
+command = "mommy -1 -s $status"
+when = "true"
+```
+You can place this anywhere in your Starship arrangements.
+
+For example, use this to have mommy appear on your right prompt at all times~
+```toml
+right_format = "$custom"
+```
+</details>
+
+<details>
 <summary>🐌 other shells</summary>
 
 as a generic method, in any posix shell (including `sh`, `ash`, `dash`, `bash`) you can change the prompt itself to
