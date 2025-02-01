@@ -702,7 +702,7 @@ contain a message from mommy by generating a custom `mommy` module in your `.con
 command = "mommy -1 -s $status"
 when = "true"
 ```
-You can place this anywhere in your Starship arrangements.
+You can place this anywhere in your Starship arrangements. The above code uses the mommy command from fish, however you can replace it with any of the mommy commands listed for another shell, when using it with another shell.
 
 For example, use this to have mommy appear on your right prompt at all times~
 ```toml
