@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "::group::Enable Homebrew"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
+          mkdir -p "$HOME/.config/fish/"; echo "set -p fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
           echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"
           echo "::endgroup::"
 
@@ -289,7 +289,7 @@ jobs:
 
 
   test-macos:
-    runs-on: macos-latest  # fish tests don't seem to work well in macos 14~
+    runs-on: macos-latest
     steps:
       - name: Install dependencies for mommy
         run: |
@@ -298,8 +298,12 @@ jobs:
           brew install shellspec
           echo "::endgroup::"
 
-          echo "::group::Install additional shells"
-          brew install fish
+          echo "::group::Install additional shell(s)"
+          curl -L -o /tmp/fish.pkg \
+            "$(curl -s -L https://fishshell.com/ | \
+                 grep -m 1 -io "https://github\.com/fish-shell/fish-shell/releases/download/[a-z0-9/\.\-]*.pkg")"
+          sudo installer -pkg /tmp/fish.pkg -target /
+          rm /tmp/fish.pkg
           echo "::endgroup::"
 
       - name: Checkout
@@ -344,8 +348,8 @@ jobs:
           git -c user.name="ignore" -c user.email="ignore" commit -am "ignore"
       - name: Test Homebrew package
         run: |
-          echo "::group::Enable Homebrew"
-          mkdir -p "$HOME/.config/fish/"; echo "set -gx fish_complete_path \$fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
+          echo "::group::Configure shell completions for Brew"
+          mkdir -p "$HOME/.config/fish/"; echo "set -p fish_complete_path $(brew --prefix)/share/fish/vendor_completions.d/" >> "$HOME/.config/fish/config.fish"
           echo "FPATH=\"$(brew --prefix)/share/zsh/site-functions/:\$FPATH\"" >> "$HOME/.zshrc"
           echo "::endgroup::"
 

@@ -165,12 +165,26 @@ find your operating system and package manager for the right instructions~
   ```
   after installing, check the
   [brew documentation on how to enable shell completions](https://docs.brew.sh/Shell-Completion)~
+
+  if you installed the [fish shell](https://fishshell.com/) from outside [brew](https://brew.sh/), you must add the following to your `~/.config/fish/config.fish` to enable shell completions for mommy:
+  ```shell
+  if test -d (brew --prefix)"/share/fish/completions"
+      set -p fish_complete_path (brew --prefix)"/share/fish/completions"
+  end
+  ```
 * **pkg (github release)** (manual updates)
   ```shell
   # download latest package from github release
   curl -s https://api.github.com/repos/FWDekker/mommy/releases/latest | grep "browser_download_url.*osx\.pkg" | cut -d : -f 2,3 | tr -d \" | xargs curl -sLOJ
   # install package
   sudo installer -pkg ./mommy*+osx.pkg -target /
+  ```
+
+  if you installed the [fish shell](https://fishshell.com/) using [brew](https://brew.sh/), you must add the following to your `~/.config/fish/config.fish` to enable shell completions for mommy:
+  ```shell
+  if test -d /usr/local/share/fish/vendor_completions.d/
+      set -p fish_complete_path /usr/local/share/fish/vendor_completions.d/
+  end
   ```
 </details>
 
