@@ -3,6 +3,9 @@
 ### added
 * 🚀 mommy now explains how to configure [starship](https://starship.rs/)~ ([#135](https://github.com/FWDekker/mommy/pull/135))
 
+### fixed
+* 👹 mommy ensured freebsd builds don't have the target version hardcoded~
+
 
 ## [1.5.1] -- 2024-09-28
 ### added
