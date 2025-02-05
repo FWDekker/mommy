@@ -195,6 +195,7 @@ fpm/%: build
 	@fpm -t "$(@:fpm/%=%)" \
 		-p "$(dist_dir)/mommy-$(version).$(@:fpm/%=%)" \
 		--version "$(version)" \
+		--freebsd-osversion "*" \
 		\
 		"$(build_dir)/bin/mommy=$(bin_prefix)/mommy" \
 		"$(build_dir)/man/man1/mommy.1.gz=$(man_prefix)/man1/mommy.1.gz" \
