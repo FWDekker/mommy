@@ -1,6 +1,8 @@
 # Changelog
 ## [9.9.9] -- 2099-12-31
 ### added
+* 📇 mommy now supports independent possessive (`theirs`) and reflexive (`themself`) pronouns. to use these new forms inside a compliment or encouragement, write `%%THEIRS%%` or `%%THEMSELF%%`, respectively. to choose mommy's pronouns, you should now write `MOMMY_PRONOUNS="they them their theirs theirself"` in your config instead of `MOMMY_PRONOUNS="they them their"`. specifying all five pronoun forms is recommended, but only specifying three forms still works and is _not_ deprecated. for more details, see [the list of all settings](https://github.com/FWDekker/mommy/tree/v1.6.0?tab=readme-ov-file#list-of-all-settings) and [how to configure templates](https://github.com/FWDekker/mommy/tree/v1.6.0?tab=readme-ov-file#how-to-configure-templates)~
+* ☄️ mommy now supports using whitespace inside pronouns using `%%_%%`~
 * 🚀 mommy now explains how to configure [starship](https://starship.rs/)~ ([#135](https://github.com/FWDekker/mommy/pull/135))
 * ☕ mommy explains how to use fish completions on macos~
 
