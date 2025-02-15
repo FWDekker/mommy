@@ -5,7 +5,8 @@ n="
 ## Configuration
 MOMMY_CAREGIVER="mommy"
 MOMMY_PRONOUNS="she her her hers herself"
-MOMMY_SWEETIE="${LOGNAME:-girl}"
+MOMMY_SWEETIE="${LOGNAME:-sweetie}"
+MOMMY_SWEETIE_PRONOUNS="they them their theirs themself"
 MOMMY_PREFIX=""
 MOMMY_SUFFIX="~"
 
@@ -24,16 +25,16 @@ that's a good %%SWEETIE%%
 who's my good %%SWEETIE%%
 
 # proud~
-%%CAREGIVER%% is very proud of you
-%%CAREGIVER%% is so proud of you
-%%CAREGIVER%% knew you could do it
-%%CAREGIVER%% loves you, you are doing amazing
+%%CAREGIVER%% is very proud of %%ME%%
+%%CAREGIVER%% is so proud of %%ME%%
+%%CAREGIVER%% knew %%I%% could do it
+%%CAREGIVER%% loves %%ME%%, %%I%% are doing amazing
 
 # compliment~
 %%CAREGIVER%%'s %%SWEETIE%% is so smart
 
 # reward~
-%%CAREGIVER%% thinks you deserve a special treat for that
+%%CAREGIVER%% thinks %%I%% deserve a special treat for that
 my little %%SWEETIE%% deserves a big fat kiss for that
 "
 MOMMY_COMPLIMENTS_EXTRA=""
@@ -41,10 +42,10 @@ MOMMY_COMPLIMENTS_ENABLED="1"
 
 MOMMY_ENCOURAGEMENTS="
 # trust~
-%%CAREGIVER%% believes in you
-%%CAREGIVER%% knows you'll get there
+%%CAREGIVER%% believes in %%ME%%
+%%CAREGIVER%% knows %%I%%'ll get there
 %%CAREGIVER%% knows %%THEIR%% little %%SWEETIE%% can do better
-just know that %%CAREGIVER%% still loves you
+just know that %%CAREGIVER%% still loves %%ME%%
 
 # consolation~
 don't worry, it'll be alright
@@ -52,14 +53,14 @@ it's okay to make mistakes
 %%CAREGIVER%% knows it's hard, but it will be okay
 
 # fallback~
-%%CAREGIVER%% is always here for you
-%%CAREGIVER%% is always here for you if you need %%THEM%%
+%%CAREGIVER%% is always here for %%ME%%
+%%CAREGIVER%% is always here for %%ME%% if %%I%% need %%THEM%%
 come here, sit on my lap while we figure this out together
 
 # encouragement~
 never give up, my love
-just a little further, %%CAREGIVER%% knows you can do it
-%%CAREGIVER%% knows you'll get there, don't worry about it
+just a little further, %%CAREGIVER%% knows %%I%% can do it
+%%CAREGIVER%% knows %%I%%'ll get there, don't worry about it
 
 # clean up~
 did %%CAREGIVER%%'s %%SWEETIE%% make a big mess
@@ -285,41 +286,53 @@ split_pronouns() {
 
 # Reads `$1`, and
 # 1. replaces, in the following order,
-#    * `%%SWEETIE%%` with a random entry from `$2`,
+#    * `%%CAREGIVER%%` with a random entry from `$2`,
 #    * `%%THEY%%` with the first word of a random entry from `$3`,
 #    * `%%THEM%%` with the second word of the same random entry from `$3`,
 #    * `%%THEIR%%` with the third word of the same random entry from `$3`,
 #    * `%%THEIRS%%` with the fourth word of the same random entry from `$3`,
 #    * `%%THEMSELF%%` with the fifth word of the same random entry frm `$3`,
-#    * `%%CAREGIVER%%` with a random entry from `$4`,
+#    * `%%SWEETIE%%` with a random entry from `$4`,
+#    * `%%I%%` with the first word of a random entry from `$5`,
+#    * `%%ME%%` with the second word of the same random entry from `$5`,
+#    * `%%MY%%` with the third word of the same random entry from `$5`,
+#    * `%%MINE%%` with the fourth word of the same random entry from `$5`,
+#    * `%%MYSELF%%` with the fifth word of the same random entry frm `$5`,
 #    * `%%N%%` with a literal newline character,
 #    * `%%S%%` with a literal forward slash character,
 #    * `%%_%%` with a literal whitespace character;
-# 2. applies `capitalize_lines` using `$7` as the choice parameter;
+# 2. applies `capitalize_lines` using `$8` as the choice parameter;
 # 3. removes leading and trailing newlines;
-# 4. prepends `$5` and appends `$6`; and
+# 4. prepends `$6` and appends `$7`; and
 # 5. stores the output in `$fill_template__out`.
 fill_template() {
-    list_normal_choose "$2"; sweetie="$list_choose__out"
+    list_normal_choose "$2"; caregiver="$list_choose__out"
+    list_normal_choose "$4"; sweetie="$list_choose__out"
+    list_normal_choose "$5"; split_pronouns "$list_choose__out"
+    i="$they"; me="$them"; my="$their"; mine="$theirs"; myself="$themself"
     list_normal_choose "$3"; split_pronouns "$list_choose__out"
-    list_normal_choose "$4"; caregiver="$list_choose__out"
 
-    list_normal_choose "$5"; prefix="$list_choose__out"
-    list_normal_choose "$6"; suffix="$list_choose__out"
+    list_normal_choose "$6"; prefix="$list_choose__out"
+    list_normal_choose "$7"; suffix="$list_choose__out"
 
     replace_all__out="$1"
-    replace_all "$replace_all__out" "%%SWEETIE%%" "$sweetie"
+    replace_all "$replace_all__out" "%%CAREGIVER%%" "$caregiver"
     replace_all "$replace_all__out" "%%THEY%%" "$they"
     replace_all "$replace_all__out" "%%THEM%%" "$them"
     replace_all "$replace_all__out" "%%THEIR%%" "$their"
     replace_all "$replace_all__out" "%%THEIRS%%" "$theirs"
     replace_all "$replace_all__out" "%%THEMSELF%%" "$themself"
-    replace_all "$replace_all__out" "%%CAREGIVER%%" "$caregiver"
+    replace_all "$replace_all__out" "%%SWEETIE%%" "$sweetie"
+    replace_all "$replace_all__out" "%%I%%" "$i"
+    replace_all "$replace_all__out" "%%ME%%" "$me"
+    replace_all "$replace_all__out" "%%MY%%" "$my"
+    replace_all "$replace_all__out" "%%MINE%%" "$mine"
+    replace_all "$replace_all__out" "%%MYSELF%%" "$myself"
     replace_all "$replace_all__out" "%%N%%" "$n"
     replace_all "$replace_all__out" "%%S%%" "/"
     replace_all "$replace_all__out" "%%_%%" " "
 
-    capitalize "$prefix$replace_all__out$suffix" "$7"; fill_template__out="$capitalize__out"
+    capitalize "$prefix$replace_all__out$suffix" "$8"; fill_template__out="$capitalize__out"
     return 0
 }
 
@@ -421,8 +434,8 @@ else
     # Select and fill template
     list_normalize "$MOMMY_FORBIDDEN_WORDS"; forbidden_words="$list_normalize__out"
     list_normal_choose "$templates" "$forbidden_words"; template="$list_choose__out"
-    fill_template "$template" "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" "$MOMMY_SUFFIX" \
-                  "$MOMMY_CAPITALIZE"; response="$fill_template__out"
+    fill_template "$template" "$MOMMY_CAREGIVER" "$MOMMY_PRONOUNS" "$MOMMY_SWEETIE" "$MOMMY_SWEETIE_PRONOUNS" \
+                  "$MOMMY_PREFIX" "$MOMMY_SUFFIX" "$MOMMY_CAPITALIZE"; response="$fill_template__out"
     list_filter_not "$response" "$forbidden_words"; safe_response="$list_filter_not__out"
 
     # Output template
