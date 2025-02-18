@@ -264,21 +264,12 @@ find your operating system and package manager for the right instructions~
 <details>
 <summary>red hat/fedora/opensuse/rpm-based</summary>
 
-* **dnf (copr)** (automatic updates)  
+* **dnf/yum (copr)** (automatic updates)  
   installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
   (requires the `dnf-plugins-core` package.)
   ```shell
   sudo dnf copr enable fwdekker/mommy
   sudo dnf install mommy
-  ```
-  packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
-  `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
-* **yum (copr)** (automatic updates)  
-  installs from the [copr repository](https://copr.fedorainfracloud.org/coprs/fwdekker/mommy/).
-  (requires the `yum-plugin-core` package.)
-  ```shell
-  sudo yum copr enable fwdekker/mommy
-  sudo yum install mommy
   ```
   packages are signed by `fwdekker#mommy@copr.fedorahosted.org`, check for fingerprint
   `E332 C8E6 ADAA 58E4 1974 7CE2 CE16 3CFF 9F79 DD8A`~
