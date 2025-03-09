@@ -466,6 +466,22 @@ stimky<"
                 The status should be success
             End
 
+            It "replaces %%_%%"
+                set_config "MOMMY_COMPLIMENTS='>model%%_%%punish<'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ">model punish<"
+                The status should be success
+            End
+
+            It "replaces %%_%% inside pronouns"
+                set_config "MOMMY_COMPLIMENTS='>%%THEY%%<';MOMMY_PRONOUNS='nor%%_%%mal tumble source land storm'"
+
+                When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                The error should equal ">nor mal<"
+                The status should be success
+            End
+
             It "prepends the prefix"
                 set_config "MOMMY_COMPLIMENTS='<';MOMMY_PREFIX='woolen'"
 
@@ -514,7 +530,7 @@ stimky<"
 
             Describe "pronouns"
                 It "replaces %%THEY%%"
-                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%<';MOMMY_PRONOUNS='front lean weekend'"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%<';MOMMY_PRONOUNS='front lean weekend range great'"
 
                     When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                     The error should equal ">front<"
@@ -522,7 +538,7 @@ stimky<"
                 End
 
                 It "replaces %%THEM%%"
-                    set_config "MOMMY_COMPLIMENTS='>%%THEM%%<';MOMMY_PRONOUNS='paint heighten well'"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEM%%<';MOMMY_PRONOUNS='paint heighten well have spoil'"
 
                     When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                     The error should equal ">heighten<"
@@ -530,18 +546,51 @@ stimky<"
                 End
 
                 It "replaces %%THEIR%%"
-                    set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_PRONOUNS='sink satisfy razor'"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEIR%%<';MOMMY_PRONOUNS='sink satisfy razor fox dirty'"
 
                     When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                     The error should equal ">razor<"
                     The status should be success
                 End
 
-                It "chooses a consistent set of pronouns"
-                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%.%%THEM%%.%%THEIR%%<';MOMMY_PRONOUNS='a b c/d e f'"
+                It "replaces %%THEIRS%%"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEIRS%%<';MOMMY_PRONOUNS='medal worth ride thrust poetry'"
 
                     When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
-                    The error should match pattern ">a.b.c<|>d.e.f<"
+                    The error should equal ">thrust<"
+                    The status should be success
+                End
+
+                It "replaces %%THEMSELF%%"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEMSELF%%<';MOMMY_PRONOUNS='accept belong fever forge manner'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">manner<"
+                    The status should be success
+                End
+
+                It "replaces %%THEIRS%% with an induced default value if only three words are given"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEIRS%%<';MOMMY_PRONOUNS='singer medium bow'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">bows<"
+                    The status should be success
+                End
+
+                It "replaces %%THEMSELF%% with an induced default value if only three words are given"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEMSELF%%<';MOMMY_PRONOUNS='load aunt hell'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should equal ">auntself<"
+                    The status should be success
+                End
+
+                It "chooses a consistent set of pronouns"
+                    set_config "MOMMY_COMPLIMENTS='>%%THEY%%.%%THEM%%.%%THEIR%%.%%THEIRS%%.%%THEMSELF%%<';\
+                                MOMMY_PRONOUNS='a b c d e/f g h i j'"
+
+                    When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
+                    The error should match pattern ">a.b.c.d.e<|>f.g.h.i.j<"
                     The status should be success
                 End
             End
@@ -602,7 +651,8 @@ stimky<"
             End
 
             It "removes all templates that contain a forbidden word"
-                set_config "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';MOMMY_FORBIDDEN_WORDS='instant/boundary'"
+                set_config "MOMMY_COMPLIMENTS='after boundary/failure school/instant delay';\
+                            MOMMY_FORBIDDEN_WORDS='instant/boundary'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                 The error should equal "failure school"
@@ -650,7 +700,9 @@ stimky<"
             End
 
             It "does not output anything even if the list only matches after variable substitutions"
-                set_config "MOMMY_COMPLIMENTS='%%THEY%%%%THEM%%';MOMMY_PRONOUNS='a b c';MOMMY_FORBIDDEN_WORDS='(ab)'"
+                set_config "MOMMY_COMPLIMENTS='%%THEY%%%%THEM%%';\
+                            MOMMY_PRONOUNS='a b c d e';\
+                            MOMMY_FORBIDDEN_WORDS='(ab)'"
 
                 When run "$MOMMY_EXEC" -c "$MOMMY_CONFIG_FILE" true
                 The error should equal ""

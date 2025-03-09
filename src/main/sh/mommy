@@ -4,7 +4,7 @@ n="
 
 ## Configuration
 MOMMY_CAREGIVER="mommy"
-MOMMY_PRONOUNS="she her her"
+MOMMY_PRONOUNS="she her her hers herself"
 MOMMY_SWEETIE="${LOGNAME:-girl}"
 MOMMY_PREFIX=""
 MOMMY_SUFFIX="~"
@@ -125,8 +125,8 @@ split() {
 
 # Returns `0` if and only if `$1` consists of more than just whitespace.
 is_blank() {
-    is_blank__trimmed="${1#${1%%[![:space:]]*}}"
-    test "x" = "x${is_blank__trimmed%${is_blank__trimmed##*[![:space:]]}}"
+    is_blank__trimmed="${1#"${1%%[![:space:]]*}"}"
+    test "x" = "x${is_blank__trimmed%"${is_blank__trimmed##*[![:space:]]}"}"
     return "$?"
 }
 
@@ -211,6 +211,7 @@ list_normalize() {
 # Outputs a random line from `$1` to `$list_choose__out`.
 if [ -x "$(command -v shuf)" ]; then
     list_choose() {
+        # shellcheck disable=SC2319 # False positive, see https://github.com/koalaman/shellcheck/issues/2937
         test "x${-#*f}" != "x$-"; list_choose__glob="$?"; set -f; list_choose__ifs="$IFS"; IFS="$n"
 
         list_choose__out="$(shuf -n1 -e $1)"
@@ -257,44 +258,66 @@ color_print() {
     return 0
 }
 
-# Given the whitespace-separated list of three words in `$1`, stores the three words in `$they`, `$them`, and `$their`,
+# Given the whitespace-separated list of words in `$1`, stores the results in global variables.
+#
+# If `$1` contains five words, the results are stored in `$they`, `$them`, `$their`, `$theirs`, and `$themself`.
+# Otherwise, if `$1` contains only three words, then `$theirs` and `$themself` are set to `${their}s` and `${them}self`,
 # respectively.
 split_pronouns() {
-    they="${1%% *}"
-    replace_all__remainder="${1#* }"
+    replace_all__remainder="$1"
+    they="${replace_all__remainder%% *}"
+    replace_all__remainder="${replace_all__remainder#* }"
     them="${replace_all__remainder%% *}"
-    their="${replace_all__remainder##* }"
+    replace_all__remainder="${replace_all__remainder#* }"
+    their="${replace_all__remainder%% *}"
+    if [ "$replace_all__remainder" = "$their" ]; then
+        theirs="${their}s"
+        themself="${them}self"
+    else
+        replace_all__remainder="${replace_all__remainder#* }"
+        theirs="${replace_all__remainder%% *}"
+        replace_all__remainder="${replace_all__remainder#* }"
+        themself="${replace_all__remainder%% *}"
+    fi
 
     return 0
 }
 
 # Reads `$1`, and
-# 1. replaces
-#    * `%%SWEETIE%%` with a random entry from `$2`,
+# 1. replaces, in the following order,
+#    * `%%CAREGIVER%%` with a random entry from `$2`,
 #    * `%%THEY%%` with the first word of a random entry from `$3`,
 #    * `%%THEM%%` with the second word of the same random entry from `$3`,
-#    * `%%THEIR%%` with the third word of the same random entry from `$3`, and
-#    * `%%CAREGIVER%%` with a random entry from `$4`;
+#    * `%%THEIR%%` with the third word of the same random entry from `$3`,
+#    * `%%THEIRS%%` with the fourth word of the same random entry from `$3`,
+#    * `%%THEMSELF%%` with the fifth word of the same random entry frm `$3`,
+#    * `%%SWEETIE%%` with a random entry from `$4`,
+#    * `%%N%%` with a literal newline character,
+#    * `%%S%%` with a literal forward slash character,
+#    * `%%_%%` with a literal whitespace character;
 # 2. applies `capitalize_lines` using `$7` as the choice parameter;
 # 3. removes leading and trailing newlines;
 # 4. prepends `$5` and appends `$6`; and
 # 5. stores the output in `$fill_template__out`.
 fill_template() {
-    list_normal_choose "$2"; sweetie="$list_choose__out"
+    list_normal_choose "$2"; caregiver="$list_choose__out"
     list_normal_choose "$3"; split_pronouns "$list_choose__out"
-    list_normal_choose "$4"; caregiver="$list_choose__out"
+    list_normal_choose "$4"; sweetie="$list_choose__out"
 
     list_normal_choose "$5"; prefix="$list_choose__out"
     list_normal_choose "$6"; suffix="$list_choose__out"
 
     replace_all__out="$1"
-    replace_all "$replace_all__out" "%%SWEETIE%%" "$sweetie"
+    replace_all "$replace_all__out" "%%CAREGIVER%%" "$caregiver"
     replace_all "$replace_all__out" "%%THEY%%" "$they"
     replace_all "$replace_all__out" "%%THEM%%" "$them"
     replace_all "$replace_all__out" "%%THEIR%%" "$their"
-    replace_all "$replace_all__out" "%%CAREGIVER%%" "$caregiver"
+    replace_all "$replace_all__out" "%%THEIRS%%" "$theirs"
+    replace_all "$replace_all__out" "%%THEMSELF%%" "$themself"
+    replace_all "$replace_all__out" "%%SWEETIE%%" "$sweetie"
     replace_all "$replace_all__out" "%%N%%" "$n"
     replace_all "$replace_all__out" "%%S%%" "/"
+    replace_all "$replace_all__out" "%%_%%" " "
 
     capitalize "$prefix$replace_all__out$suffix" "$7"; fill_template__out="$capitalize__out"
     return 0
@@ -314,7 +337,7 @@ while getopts ":hv1d:c:e:s:-:" OPT; do
     # Cheap workaround for long options, cf. https://stackoverflow.com/a/28466267
     if [ "-" = "$OPT" ]; then
         OPT="${OPTARG%%=*}"
-        OPTARG="${OPTARG#$OPT}"
+        OPTARG="${OPTARG#"$OPT"}"
         OPTARG="${OPTARG#=}"
     fi
 
@@ -341,7 +364,7 @@ shift "$((OPTIND - 1))"
 config_dir=""
 while [ "x$opt_global_config_dirs" != "x$config_dir" ] ;do
     config_dir="${opt_global_config_dirs%%:*}"
-    opt_global_config_dirs="${opt_global_config_dirs#$config_dir:}"
+    opt_global_config_dirs="${opt_global_config_dirs#"$config_dir":}"
 
     if [ -d "$config_dir" ] && [ -f "$config_dir/config.sh" ] && [ -r "$config_dir/config.sh" ]; then
         # shellcheck source=/dev/null # User-defined target
@@ -398,7 +421,7 @@ else
     # Select and fill template
     list_normalize "$MOMMY_FORBIDDEN_WORDS"; forbidden_words="$list_normalize__out"
     list_normal_choose "$templates" "$forbidden_words"; template="$list_choose__out"
-    fill_template "$template" "$MOMMY_SWEETIE" "$MOMMY_PRONOUNS" "$MOMMY_CAREGIVER" "$MOMMY_PREFIX" "$MOMMY_SUFFIX" \
+    fill_template "$template" "$MOMMY_CAREGIVER" "$MOMMY_PRONOUNS" "$MOMMY_SWEETIE" "$MOMMY_PREFIX" "$MOMMY_SUFFIX" \
                   "$MOMMY_CAPITALIZE"; response="$fill_template__out"
     list_filter_not "$response" "$forbidden_words"; safe_response="$list_filter_not__out"
 
