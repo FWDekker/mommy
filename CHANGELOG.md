@@ -7,7 +7,7 @@
 * ☕ mommy explains how to use fish completions on macos~
 
 ### fixed
-* 👹 mommy ensured freebsd builds don't have the target version hardcoded~
+* 👹 mommy ensures freebsd builds don't have the target version hardcoded~
 
 
 ## [1.5.1] -- 2024-09-28
