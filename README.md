@@ -770,8 +770,33 @@ sudo ln -fs /usr/share/man/man1/mommy.1.gz /usr/share/man/man1/daddy.1.gz
 
 
 ## ⚗️ development<a name="development"></a> <small><sup>[top ▲](#toc)</sup></small>
-this section explains how to build mommy from source, in case you want to
-[help with development](https://github.com/FWDekker/mommy/blob/main/CONTRIBUTING.md) or for any other reason~
+this section explains some development details of the project, like its file structure and how to build mommy from source, in case you want to [help with development](https://github.com/FWDekker/mommy/blob/main/CONTRIBUTING.md), for example~
+
+<details>
+<summary>🧱 file structure</summary>
+
+| path                         | contains                                                                                                                                                          |
+|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| _project root_               | various configuration files and repository documentation                                                                                                          |
+| `.github/`                   | supplemental files for the repository on github                                                                                                                   |
+| `.github/img/`               | images used in the readme                                                                                                                                         | 
+| `.github/workflows/`         | github actions definitions                                                                                                                                        |
+| `pkg/`                       | files used by programs that package mommy into distributable files                                                                                                |
+| `pkg/fpm/`                   | changelogs for packages created by `fpm`. more about these changelogs in the [development section in the readme](/?tab=readme-ov-file#%EF%B8%8F-development-top-) |
+| `pkg/rpkg/`                  | files used by `rpkg`, which packages for `rpm`, known from red hat linux                                                                                          |
+| `src/`                       | the source code. this is where the features live                                                                                                                  |
+| `src/main/`                  | the source code files that should be distributed to users (after some pre-processing)                                                                             |
+| `src/main/completions/`      | files that specify for various shells how auto-completion works for `mommy`                                                                                       |
+| `src/main/man/`              | the documentation files that are distributed to users                                                                                                             |
+| `src/main/sh/`               | the actual shell code that implements the `mommy` command                                                                                                         |
+| `src/test/`                  | the code that tests the code in `src/main/` to see if everything works as desired                                                                                 |
+| `src/test/helper/`           | files containing additional functions and variables, reusable across different test suites                                                                        |
+| `src/test/resources/`        | files that can be placed inside the test environment while executing tests                                                                                        |
+| `src/sh/`                    | the test code that runs mommy and checks that the outputs are as desired                                                                                          |
+| `src/sh/integration_spec.sh` | tests for integration with an external environment or program                                                                                                     |
+| `src/sh/unit_spec.sh`        | tests for mommy's core features, irrespective of the outside environment                                                                                          |
+
+</details>
 
 <details>
 <summary>🎬 run</summary>
