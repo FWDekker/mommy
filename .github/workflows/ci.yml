@@ -463,7 +463,6 @@ jobs:
             echo "::group::Install additional shells"
             sudo pkgin -y in fish zsh
             touch "$HOME/.zshrc"
-            echo "Touched '$HOME/.zshrc'. I am user '$(username)'. Currently I am in directory '$(pwd)'."
             echo "::endgroup::"
 
             echo "::group::Ignore ownership issues"
