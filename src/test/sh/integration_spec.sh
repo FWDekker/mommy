@@ -113,14 +113,35 @@ Describe "integration of mommy with other programs"
         BeforeEach "zsh_before_each"
 
         zsh_complete() {
-            # `script` emulates an interactive terminal during GitHub actions
-            if script -q -c true /dev/null 1>/dev/null 2>/dev/null; then
-                # Linux
-                script -q -c "$MOMMY_ZSH_EXEC -i -u -c \"source '$MOMMY_ZSH_PREAMBLE_FILE'; compget '$1'\"" /dev/null
-            else
-                # *BSD
-                script -q /dev/null "$MOMMY_ZSH_EXEC" -i -u -c "source '$MOMMY_ZSH_PREAMBLE_FILE'; compget '$1'"
-            fi
+            # Records the output generated in a terminal when completions are requested for `$1` in zsh.
+            #
+            # `script` emulates an interactive terminal during GitHub actions. Unfortunately, the interface of `script`
+            # varies significantly between distributions. This function unifies the desired behaviour. It's not pretty.
+
+            printf "%s\n%s" \
+                "#!/bin/sh" \
+                "\"$MOMMY_ZSH_EXEC\" -i -u -c \"source '$MOMMY_ZSH_PREAMBLE_FILE'; compget '$1'\"" \
+                > /tmp/mommy-script
+            chmod +x /tmp/mommy-script
+
+            case "$(uname)" in
+                Darwin|FreeBSD)
+                    # macOS/Freebsd: Has no `-c` option, so command must be specified as a vararg
+                    script -q /dev/null /tmp/mommy-script
+                    ;;
+                OpenBSD)
+                    # OpenBSD: Has no `-q` option, so output is written to file, and then header and footer are stripped
+                    script -c /tmp/mommy-script /tmp/mommy-script-out 1>/dev/null 2>/dev/null
+                    tail -n +2 /tmp/mommy-script-out | head -n 1
+                    rm -f /tmp/mommy-script-out
+                    ;;
+                *)
+                    # Linux / NetBSD
+                    script -q -c /tmp/mommy-script /dev/null
+                    ;;
+            esac
+
+            rm -f /tmp/mommy-script
         }
 
 
