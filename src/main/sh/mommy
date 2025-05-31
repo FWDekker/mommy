@@ -350,6 +350,7 @@ while getopts ":hv1d:c:e:s:-:" OPT; do
     c|config) opt_config="$OPTARG" ;;
     e|eval) require_arg; opt_eval="$OPTARG" ;;
     s|status) require_arg; require_int; opt_status="$OPTARG" ;;
+    r|rename) require_arg; opt_rename="$OPTARG" ;;
     :) die "mommy's last option is missing its argument~" ;;
     ?) die "mommy doesn't know option -$OPTARG~" ;;
     *) die "mommy doesn't know option --$OPT~" ;;
@@ -357,6 +358,54 @@ while getopts ":hv1d:c:e:s:-:" OPT; do
 done
 
 shift "$((OPTIND - 1))"
+
+# do the symlinking
+if [ -n "$opt_rename" ]; then
+    if [ $# -lt 1 ]; then
+        die "mommy expected a file path to rename"
+    fi
+    echo "mommy is locating her shell script"
+    findoldpath=0
+    oldpath="$(whereis mommy | sed 's/^mommy://')"
+    
+    if is_blank "$oldpath"; then
+        echo "Mommy's shell script is not in path, mommy's gonna search your whole disk now"
+        echo "Warning: Mommy's search could be extremely slow on hard drives"
+        findoldpath=1
+        mommyshellscript="$(find / -name mommy -type f 2>/dev/null)"
+        mommymandocs="$(find / -name mommy.1.gz -type f 2>/dev/null)"
+        # prevents an error on my system, may not be applicable everywhere
+        sleep 1
+    fi
+
+    if [ "$findoldpath" -eq 0 ]; then
+        # strip space at the beginning of oldpath (nessessary due to the fact if we strip it with sed, if it is not found it will output "mommy:" instead of being blank)
+        oldpath="${oldpath#?}"
+        # split oldpath on first space
+        mommyshellscript="${oldpath%% *}"
+        mommymandocs="${oldpath#* }"
+    fi
+
+    if [ -z "$mommyshellscript" ]; then
+        die "mommy couldn't find her shell script"
+    fi
+
+    # OH MY GOD, I HATE COPILOT, IT KEEPS ADDING USELESS SUGGESTIONS AND REWRITING MY COMMENTS FOR NO REASON
+    # EVEN RIGHT NOW WHILE ITS SUGGESTING STUFF STOPPPPPP
+    # send help, im going insane
+
+    new_shell="${mommyshellscript%/*}/$opt_rename"
+    new_man="${mommymandocs%/*}/$opt_rename.1.gz"
+
+    ln -sf "$mommyshellscript" "$new_shell"
+    ln -sf "$mommymandocs"   "$new_man"
+
+    echo "Renamed $new_shell → $mommyshellscript"
+    echo "Renamed $new_man   → $mommymandocs"
+    echo "You may need to restart your shell for this to work"
+
+    exit $?
+fi
 
 
 ## Load configuration
