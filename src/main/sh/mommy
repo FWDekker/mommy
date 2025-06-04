@@ -362,16 +362,12 @@ shift "$((OPTIND - 1))"
 
 ## do the symlinking (only long option --rename)
 if [ -n "$opt_rename_to" ]; then
-    if [ $# -lt 1 ]; then
-        die "mommy expected a file path to rename"
-    fi
-    echo "mommy is locating her shell script"
     findoldpath=0
     oldpath="$(whereis mommy | sed 's/^mommy://')"
     
     if is_blank "$oldpath"; then
-        echo "Mommy's shell script is not in path, mommy's gonna search your whole disk now"
-        echo "Warning: Mommy's search could be extremely slow on hard drives"
+        printf "%s\n" "Mommy's shell script is not in path, mommy's gonna search your whole disk now"
+        printf "%s\n" "Warning: Mommy's search could be extremely slow on hard drives"
         findoldpath=1
         mommyshellscript="$(find / -name mommy -type f 2>/dev/null)"
         mommymandocs="$(find / -name mommy.1.gz -type f 2>/dev/null)"
@@ -397,11 +393,11 @@ if [ -n "$opt_rename_to" ]; then
     ln -sf "$mommyshellscript" "$new_shell"
     ln -sf "$mommymandocs"   "$new_man"
 
-    echo "Renamed $new_shell → $mommyshellscript"
-    echo "Renamed $new_man   → $mommymandocs"
-    echo "You may need to restart your shell for this to work"
+    printf "Renamed %s → %s\n" "$new_shell" "$mommyshellscript"
+    printf "Renamed %s → %s\n" "$new_man" "$mommymandocs"
+    printf "%s\n" "You may need to restart your shell for this to work"
 
-    exit $?
+    exit 0
 fi
 
 
