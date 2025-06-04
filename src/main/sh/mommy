@@ -332,6 +332,7 @@ opt_config="${opt_config:-"${XDG_CONFIG_HOME:-"$HOME/.config"}/mommy/config.sh"}
 opt_global_config_dirs="${XDG_CONFIG_DIRS}:/etc/mommy/:/usr/local/etc/mommy/"
 opt_eval=""
 opt_status=""
+opt_rename_to=""
 
 while getopts ":hv1d:c:e:s:-:" OPT; do
     # Cheap workaround for long options, cf. https://stackoverflow.com/a/28466267
@@ -350,7 +351,7 @@ while getopts ":hv1d:c:e:s:-:" OPT; do
     c|config) opt_config="$OPTARG" ;;
     e|eval) require_arg; opt_eval="$OPTARG" ;;
     s|status) require_arg; require_int; opt_status="$OPTARG" ;;
-    r|rename) require_arg; opt_rename="$OPTARG" ;;
+    rename) require_arg; opt_rename_to="$OPTARG" ;;
     :) die "mommy's last option is missing its argument~" ;;
     ?) die "mommy doesn't know option -$OPTARG~" ;;
     *) die "mommy doesn't know option --$OPT~" ;;
@@ -359,8 +360,8 @@ done
 
 shift "$((OPTIND - 1))"
 
-# do the symlinking
-if [ -n "$opt_rename" ]; then
+## do the symlinking (only long option --rename)
+if [ -n "$opt_rename_to" ]; then
     if [ $# -lt 1 ]; then
         die "mommy expected a file path to rename"
     fi
@@ -390,12 +391,8 @@ if [ -n "$opt_rename" ]; then
         die "mommy couldn't find her shell script"
     fi
 
-    # OH MY GOD, I HATE COPILOT, IT KEEPS ADDING USELESS SUGGESTIONS AND REWRITING MY COMMENTS FOR NO REASON
-    # EVEN RIGHT NOW WHILE ITS SUGGESTING STUFF STOPPPPPP
-    # send help, im going insane
-
-    new_shell="${mommyshellscript%/*}/$opt_rename"
-    new_man="${mommymandocs%/*}/$opt_rename.1.gz"
+    new_shell="${mommyshellscript%/*}/$opt_rename_to"
+    new_man="${mommymandocs%/*}/$opt_rename_to.1.gz"
 
     ln -sf "$mommyshellscript" "$new_shell"
     ln -sf "$mommymandocs"   "$new_man"

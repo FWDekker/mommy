@@ -15,6 +15,7 @@ _arguments \
     {-d,--global-config-dirs}'[Colon-separated global config file dirs]:global config:_dir_list' \
     {-e,--eval}'[Evaluate string]:string' \
     {-s,--status}'[Exit code]:code:->status' \
+    {--rename}'[Change executable name]:name' \
     '*::command:'
 
 # suggest exit codes for --status
