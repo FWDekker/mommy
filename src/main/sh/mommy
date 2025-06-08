@@ -362,6 +362,11 @@ shift "$((OPTIND - 1))"
 
 ## do the symlinking (only long option --rename)
 if [ -n "$opt_rename_to" ]; then
+    # Check if running as root
+    if [ "$(id -u)" -ne 0 ]; then
+        die "mommy needs to be root to rename herself, run with sudo~"
+    fi
+
     # Determine the currently running script and man page instead of searching the entire disk
     if command -v readlink >/dev/null 2>&1; then
         mommyshellscript="$(readlink -f "$0")"
@@ -375,10 +380,6 @@ if [ -n "$opt_rename_to" ]; then
     mommymandocs="$(man -w mommy 2>/dev/null | tr ':' '\n' | grep -E '\.1($|\.gz$)' | head -n1)"
 
     if [ -z "$mommyshellscript" ] || [ ! -f "$mommyshellscript" ]; then
-        die "mommy couldn't find her shell script"
-    fi
-
-    if [ -z "$mommyshellscript" ]; then
         die "mommy couldn't find her shell script"
     fi
 
