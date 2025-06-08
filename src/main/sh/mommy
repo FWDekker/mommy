@@ -362,25 +362,20 @@ shift "$((OPTIND - 1))"
 
 ## do the symlinking (only long option --rename)
 if [ -n "$opt_rename_to" ]; then
-    findoldpath=0
-    oldpath="$(whereis mommy | sed 's/^mommy://')"
-    
-    if is_blank "$oldpath"; then
-        printf "%s\n" "Mommy's shell script is not in path, mommy's gonna search your whole disk now"
-        printf "%s\n" "Warning: Mommy's search could be extremely slow on hard drives"
-        findoldpath=1
-        mommyshellscript="$(find / -name mommy -type f 2>/dev/null)"
-        mommymandocs="$(find / -name mommy.1.gz -type f 2>/dev/null)"
-        # prevents an error on my system, may not be applicable everywhere
-        sleep 1
+    # Determine the currently running script and man page instead of searching the entire disk
+    if command -v readlink >/dev/null 2>&1; then
+        mommyshellscript="$(readlink -f "$0")"
+    elif command -v realpath >/dev/null 2>&1; then
+        mommyshellscript="$(realpath "$0")"
+    else
+        mommyshellscript="$0"
     fi
 
-    if [ "$findoldpath" -eq 0 ]; then
-        # strip space at the beginning of oldpath (nessessary due to the fact if we strip it with sed, if it is not found it will output "mommy:" instead of being blank)
-        oldpath="${oldpath#?}"
-        # split oldpath on first space
-        mommyshellscript="${oldpath%% *}"
-        mommymandocs="${oldpath#* }"
+    # Find the manual page for mommy; take the first match
+    mommymandocs="$(man -w mommy 2>/dev/null | tr ':' '\n' | grep -E '\.1($|\.gz$)' | head -n1)"
+
+    if [ -z "$mommyshellscript" ] || [ ! -f "$mommyshellscript" ]; then
+        die "mommy couldn't find her shell script"
     fi
 
     if [ -z "$mommyshellscript" ]; then
