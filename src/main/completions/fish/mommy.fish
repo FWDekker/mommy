@@ -81,6 +81,11 @@ complete --command mommy --long-option rename \
     --description "Change executable name" \
     --condition "not __fish_seen_argument $opt_help $opt_version" \
     --condition "test -z (get_args)"
+complete --command mommy --long-option remove-rename \
+    --require-parameter \
+    --description "Remove rename and symlinks" \
+    --condition "not __fish_seen_argument $opt_help $opt_version" \
+    --condition "test -z (get_args)"
 
 # Usage
 complete --command mommy \

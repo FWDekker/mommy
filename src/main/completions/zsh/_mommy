@@ -16,6 +16,7 @@ _arguments \
     {-e,--eval}'[Evaluate string]:string' \
     {-s,--status}'[Exit code]:code:->status' \
     {--rename}'[Change executable name]:name' \
+    {--remove-rename}'[Remove rename and symlinks]:name' \
     '*::command:'
 
 # suggest exit codes for --status
