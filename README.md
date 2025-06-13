@@ -434,6 +434,8 @@ additionally, mommy knows a few extra options, which you can use to discover who
 | `-1`         |                               | writes output to stdout instead of stderr~                                                        |
 | `-c <file>`  | `--config=<file>`             | tells mommy that she should read your [config](#configuration) from `<file>`~                     |
 | `-d <dirs>`  | `--global-config-dirs=<dirs>` | sets [global configuration dirs](#config-file-locations) to the colon-separated list in `<dirs>`~ |
+|              | `--rename=<name>`             | changes mommy executable name                                                                     |
+|              | `--remove-rename=<name>`      | removes a previous rename and its symlinks                                                        |
 
 
 ## 🙋 configuration<a name="configuration"></a> <small><sup>[top ▲](#toc)</sup></small>
